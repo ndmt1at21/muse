@@ -14,9 +14,12 @@ help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 	  awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-generate: ## Regenerate protobuf Go code (buf)
+generate: ## Regenerate protobuf Go code + OpenAPI spec (buf)
 	buf lint
 	buf generate
+	# Wrap the OpenAPI responses in the runtime envelope { code, message, trace_id, data }.
+	jq -f core/api/envelope.jq core/api/openapi.swagger.json > core/api/openapi.swagger.json.tmp \
+		&& mv core/api/openapi.swagger.json.tmp core/api/openapi.swagger.json
 
 build: ## Build all packages in both modules
 	go build ./...
@@ -100,7 +103,7 @@ seed: ## Seed demo data (campaign + spin-wheel game + prizes + integration) via 
 	./deploy/seed.sh
 
 docs: ## Run the Docusaurus docs site locally (architecture + flows, http://localhost:3000)
-	cd website && npm install && npm start
+	cd docs/website && npm install && npm start
 
-docs-build: ## Build the static docs site to website/build
-	cd website && npm install && npm run build
+docs-build: ## Build the static docs site to docs/website/build
+	cd docs/website && npm install && npm run build

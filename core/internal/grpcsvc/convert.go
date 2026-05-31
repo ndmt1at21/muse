@@ -8,7 +8,6 @@ import (
 
 	"github.com/muse/gamekit/types"
 	"google.golang.org/protobuf/types/known/structpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func scopeFromProto(s *gamev1.Scope) types.Scope {
@@ -18,18 +17,20 @@ func scopeFromProto(s *gamev1.Scope) types.Scope {
 	return types.Scope{TenantID: s.GetTenantId(), MerchantID: s.GetMerchantId()}
 }
 
-func ts(t time.Time) *timestamppb.Timestamp {
+// ts converts a domain time to a unix-seconds timestamp (0 for the zero time).
+func ts(t time.Time) int64 {
 	if t.IsZero() {
-		return nil
+		return 0
 	}
-	return timestamppb.New(t)
+	return t.Unix()
 }
 
-func ptime(t *timestamppb.Timestamp) *time.Time {
-	if t == nil {
+// ptime converts a unix-seconds timestamp to a domain time (nil when 0/unset).
+func ptime(unix int64) *time.Time {
+	if unix == 0 {
 		return nil
 	}
-	v := t.AsTime()
+	v := time.Unix(unix, 0).UTC()
 	return &v
 }
 
@@ -47,11 +48,10 @@ func gameFromProto(scope types.Scope, g *gamev1.Game) *types.Game {
 		SeedGenerator:   g.GetSeedGenerator(),
 		RewardHandler:   g.GetRewardHandler(),
 		Validator:       g.GetValidator(),
-		Status:          types.GameStatus(g.GetStatus()),
+		Status:          domGameStatus(g.GetStatus()),
 		HandlerConfig:   json.RawMessage(g.GetHandlerConfig()),
 		ValidatorConfig: json.RawMessage(g.GetValidatorConfig()),
-		UI:              json.RawMessage(g.GetUi()),
-		WalletScope:     g.GetWalletScope(),
+		WalletScope:     domWalletScope(g.GetWalletScope()),
 		Milestones:      json.RawMessage(g.GetMilestones()),
 	}
 	if r := g.GetRules(); r != nil {
@@ -78,7 +78,8 @@ func gameToProto(g *types.Game) *gamev1.Game {
 		SeedGenerator: g.SeedGenerator,
 		RewardHandler: g.RewardHandler,
 		Validator:     g.Validator,
-		Status:        string(g.Status),
+		Status:        pbGameStatus(g.Status),
+		WalletScope:   pbWalletScope(g.WalletScope),
 		Rules: &gamev1.Rules{
 			MaxPlaysPerUser: int32(g.Rules.MaxPlaysPerUser),
 			MaxPlaysPerDay:  int32(g.Rules.MaxPlaysPerDay),
@@ -89,17 +90,17 @@ func gameToProto(g *types.Game) *gamev1.Game {
 		},
 		HandlerConfig:   string(g.HandlerConfig),
 		ValidatorConfig: string(g.ValidatorConfig),
-		Ui:              string(g.UI),
 		CreatedAt:       ts(g.CreatedAt),
 		UpdatedAt:       ts(g.UpdatedAt),
 	}
 }
 
-func tsPtr(t *time.Time) *timestamppb.Timestamp {
+// tsPtr converts an optional domain time to a unix-seconds timestamp (0 when nil).
+func tsPtr(t *time.Time) int64 {
 	if t == nil {
-		return nil
+		return 0
 	}
-	return timestamppb.New(*t)
+	return t.Unix()
 }
 
 func prizeFromProto(scope types.Scope, p *gamev1.Prize) *types.Prize {
@@ -153,7 +154,7 @@ func rewardToProto(r *types.RewardRecord) *gamev1.RewardRecord {
 		Type:        r.Type,
 		Value:       r.Value,
 		Code:        r.Code,
-		Status:      string(r.Status),
+		Status:      pbRewardStatus(r.Status),
 		CreatedAt:   ts(r.CreatedAt),
 		ClaimedAt:   tsPtr(r.ClaimedAt),
 		FulfilledAt: tsPtr(r.FulfilledAt),
@@ -172,7 +173,7 @@ func taskToProto(t *types.FulfillmentTask) *gamev1.FulfillmentTask {
 		CampaignId:    t.CampaignID,
 		Channel:       t.Channel,
 		ChannelConfig: string(t.ChannelConfig),
-		Status:        string(t.Status),
+		Status:        pbTaskStatus(t.Status),
 		Attempts:      int32(t.Attempts),
 		MaxAttempts:   int32(t.MaxAttempts),
 		LastError:     t.LastError,

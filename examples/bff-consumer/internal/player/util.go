@@ -5,12 +5,20 @@ import (
 
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func invalidArg(msg string) error {
 	return apierr.FromDomainError(gkerr.New(gkerr.ReasonValidationFailed, msg)).Err()
+}
+
+func unauthenticated(msg string) error {
+	return apierr.FromDomainError(gkerr.New(gkerr.ReasonUnauthenticated, msg)).Err()
+}
+
+func internalErr(msg string) error {
+	return apierr.FromDomainError(gkerr.New(gkerr.ReasonInternal, msg)).Err()
 }
 
 func orEmptyObj(b json.RawMessage) json.RawMessage {
@@ -20,11 +28,12 @@ func orEmptyObj(b json.RawMessage) json.RawMessage {
 	return b
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 // playerView shapes a player (+ optional identity) into the player-facing
@@ -52,7 +61,7 @@ func contactsView(idn *gamev1.Identity) []any {
 	contacts := make([]any, 0, len(idn.GetContacts()))
 	for _, c := range idn.GetContacts() {
 		contacts = append(contacts, map[string]any{
-			"type": c.GetType(), "value": c.GetValue(), "verified": c.GetVerified(),
+			"type": enumx.Name(c.GetType()), "value": c.GetValue(), "verified": c.GetVerified(),
 		})
 	}
 	return contacts

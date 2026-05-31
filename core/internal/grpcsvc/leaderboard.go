@@ -144,34 +144,6 @@ func (s *Server) GetRankings(ctx context.Context, req *gamev1.GetRankingsRequest
 	return &gamev1.GetRankingsResponse{Entries: rankedToProto(entries), Total: total, WindowKey: wk}, nil
 }
 
-func (s *Server) AroundMe(ctx context.Context, req *gamev1.AroundMeRequest) (*gamev1.AroundMeResponse, error) {
-	if err := s.lbReady(); err != nil {
-		return nil, err
-	}
-	scope := scopeFromProto(req.GetScope())
-	entries, err := s.lb.AroundMe(ctx, scope, req.GetLeaderboardId(), req.GetPlayerId(), int(req.GetRadius()))
-	if err != nil {
-		return nil, s.fail(err)
-	}
-	return &gamev1.AroundMeResponse{Entries: rankedToProto(entries)}, nil
-}
-
-func (s *Server) MyRank(ctx context.Context, req *gamev1.MyRankRequest) (*gamev1.MyRankResponse, error) {
-	if err := s.lbReady(); err != nil {
-		return nil, err
-	}
-	scope := scopeFromProto(req.GetScope())
-	entry, nextFrom, toGo, err := s.lb.MyRank(ctx, scope, req.GetLeaderboardId(), req.GetPlayerId())
-	if err != nil {
-		return nil, s.fail(err)
-	}
-	return &gamev1.MyRankResponse{
-		Entry:            entryToProto(&entry.LeaderboardEntry, entry.Rank),
-		NextTierFromRank: int32(nextFrom),
-		RanksToNextTier:  toGo,
-	}, nil
-}
-
 // --- converters ---
 
 func leaderboardFromProto(scope types.Scope, p *gamev1.Leaderboard) *types.Leaderboard {
@@ -184,8 +156,8 @@ func leaderboardFromProto(scope types.Scope, p *gamev1.Leaderboard) *types.Leade
 		MerchantID: scope.MerchantID,
 		CampaignID: p.GetCampaignId(),
 		Name:       p.GetName(),
-		Metric:     p.GetMetric(),
-		Status:     p.GetStatus(),
+		Metric:     domLeaderboardMetric(p.GetMetric()),
+		Status:     domLeaderboardStatus(p.GetStatus()),
 	}
 	if s := p.GetTimeWindow(); s != "" {
 		_ = json.Unmarshal([]byte(s), &lb.Window)
@@ -209,11 +181,11 @@ func leaderboardToProto(lb *types.Leaderboard) *gamev1.Leaderboard {
 		MerchantId: lb.MerchantID,
 		CampaignId: lb.CampaignID,
 		Name:       lb.Name,
-		Metric:     lb.Metric,
+		Metric:     pbLeaderboardMetric(lb.Metric),
 		TimeWindow: string(window),
 		PrizeTiers: string(tiers),
 		AntiCheat:  string(ac),
-		Status:     lb.Status,
+		Status:     pbLeaderboardStatus(lb.Status),
 		CreatedAt:  ts(lb.CreatedAt),
 		UpdatedAt:  ts(lb.UpdatedAt),
 	}
@@ -221,7 +193,7 @@ func leaderboardToProto(lb *types.Leaderboard) *gamev1.Leaderboard {
 
 func entryToProto(e *types.LeaderboardEntry, rank int64) *gamev1.RankedEntry {
 	return &gamev1.RankedEntry{
-		PlayerId: e.PlayerID, Score: e.Score, Plays: e.Plays, Rank: rank, State: e.State,
+		PlayerId: e.PlayerID, Score: e.Score, Plays: e.Plays, Rank: rank, State: pbEntryState(e.State),
 	}
 }
 

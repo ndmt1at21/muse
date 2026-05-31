@@ -1,6 +1,7 @@
 // Package leaderboard implements the consumer BFF's leaderboard read surface
-// over Core's LeaderboardService: public top-N rankings, and the player's
-// around-me / my-rank views (which require a verified player JWT).
+// over Core's LeaderboardService: the public top-N rankings. (Screen-specific
+// views like around-me / my-rank are a presentation concern — a BFF that needs
+// them derives them from GetRankings; Core exposes only the rankings query.)
 package leaderboard
 
 import (
@@ -13,6 +14,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -28,16 +30,9 @@ func New(core *coreclient.Client, rmcache *cache.Cache) *Handler {
 	return &Handler{core: core, cache: rmcache}
 }
 
-// Routes mounts the leaderboard read endpoints. Rankings is public; around-me
-// and my-rank require a verified player JWT.
+// Routes mounts the leaderboard read endpoints (public top-N rankings).
 func (h *Handler) Routes(r chi.Router) {
 	r.Get("/leaderboards/{lbId}/rankings", h.rankings)
-
-	r.Group(func(r chi.Router) {
-		r.Use(auth.RequirePlayer)
-		r.Get("/leaderboards/{lbId}/around-me", h.aroundMe)
-		r.Get("/leaderboards/{lbId}/my-rank", h.myRank)
-	})
 }
 
 // rankings serves the public top-N board, cache-aside with a short TTL: the hot
@@ -78,46 +73,6 @@ func (h *Handler) rankings(w http.ResponseWriter, r *http.Request) {
 	envelope.WriteSuccess(w, tid, data)
 }
 
-func (h *Handler) aroundMe(w http.ResponseWriter, r *http.Request) {
-	tid := middleware.TraceIDFrom(r.Context())
-	tenant, merchant := auth.Scope(r)
-	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Leaderboard.AroundMe(ctx, &gamev1.AroundMeRequest{
-		Scope:         coreclient.Scope(tenant, merchant),
-		LeaderboardId: chi.URLParam(r, "lbId"),
-		PlayerId:      auth.PlayerID(r),
-		Radius:        int32(atoiDefault(r.URL.Query().Get("radius"), 3)),
-	})
-	if err != nil {
-		envelope.WriteError(w, tid, err)
-		return
-	}
-	items := make([]any, 0, len(resp.GetEntries()))
-	for _, e := range resp.GetEntries() {
-		items = append(items, entryView(e))
-	}
-	envelope.WriteSuccess(w, tid, map[string]any{"items": items})
-}
-
-func (h *Handler) myRank(w http.ResponseWriter, r *http.Request) {
-	tid := middleware.TraceIDFrom(r.Context())
-	tenant, merchant := auth.Scope(r)
-	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Leaderboard.MyRank(ctx, &gamev1.MyRankRequest{
-		Scope:         coreclient.Scope(tenant, merchant),
-		LeaderboardId: chi.URLParam(r, "lbId"),
-		PlayerId:      auth.PlayerID(r),
-	})
-	if err != nil {
-		envelope.WriteError(w, tid, err)
-		return
-	}
-	data := entryView(resp.GetEntry())
-	data["next_tier_from_rank"] = resp.GetNextTierFromRank()
-	data["ranks_to_next_tier"] = resp.GetRanksToNextTier()
-	envelope.WriteSuccess(w, tid, data)
-}
-
 func entryView(e *gamev1.RankedEntry) map[string]any {
 	if e == nil {
 		return map[string]any{}
@@ -126,7 +81,7 @@ func entryView(e *gamev1.RankedEntry) map[string]any {
 		"player_id": e.GetPlayerId(),
 		"score":     e.GetScore(),
 		"rank":      e.GetRank(),
-		"state":     e.GetState(),
+		"state":     enumx.Name(e.GetState()),
 	}
 }
 

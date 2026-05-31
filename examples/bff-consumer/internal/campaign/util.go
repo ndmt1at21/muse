@@ -3,8 +3,8 @@ package campaign
 import (
 	"encoding/json"
 
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // publicView is the widget-facing render config: the campaign's display
@@ -15,7 +15,7 @@ func publicView(c *gamev1.Campaign) map[string]any {
 	return map[string]any{
 		"campaign_id": c.GetId(),
 		"name":        c.GetName(),
-		"status":      c.GetStatus(),
+		"status":      enumx.Name(c.GetStatus()),
 		"start_date":  tsString(c.GetStartDate()),
 		"end_date":    tsString(c.GetEndDate()),
 		"channels":    strSlice(c.GetChannels()),
@@ -43,9 +43,10 @@ func rawJSON(s string) any {
 	return v
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }

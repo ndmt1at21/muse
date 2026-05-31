@@ -43,7 +43,7 @@ func identityToProto(idn *types.Identity) *gamev1.Identity {
 	contacts := make([]*gamev1.Contact, 0, len(idn.Contacts))
 	for _, c := range idn.Contacts {
 		contacts = append(contacts, &gamev1.Contact{
-			Type: string(c.Type), Value: c.Value, Verified: c.Verified,
+			Type: pbContactType(c.Type), Value: c.Value, Verified: c.Verified,
 		})
 	}
 	return &gamev1.Identity{

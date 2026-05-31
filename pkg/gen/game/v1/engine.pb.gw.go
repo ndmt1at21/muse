@@ -291,7 +291,7 @@ func local_request_EngineService_GetHistory_0(ctx context.Context, marshaler run
 
 }
 
-func request_GameAdminService_CreateGame_0(ctx context.Context, marshaler runtime.Marshaler, client GameAdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_GameConfigService_CreateGame_0(ctx context.Context, marshaler runtime.Marshaler, client GameConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateGameRequest
 	var metadata runtime.ServerMetadata
 
@@ -304,7 +304,7 @@ func request_GameAdminService_CreateGame_0(ctx context.Context, marshaler runtim
 
 }
 
-func local_request_GameAdminService_CreateGame_0(ctx context.Context, marshaler runtime.Marshaler, server GameAdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_GameConfigService_CreateGame_0(ctx context.Context, marshaler runtime.Marshaler, server GameConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateGameRequest
 	var metadata runtime.ServerMetadata
 
@@ -318,10 +318,10 @@ func local_request_GameAdminService_CreateGame_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_GameAdminService_GetGame_0 = &utilities.DoubleArray{Encoding: map[string]int{"game_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_GameConfigService_GetGame_0 = &utilities.DoubleArray{Encoding: map[string]int{"game_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_GameAdminService_GetGame_0(ctx context.Context, marshaler runtime.Marshaler, client GameAdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_GameConfigService_GetGame_0(ctx context.Context, marshaler runtime.Marshaler, client GameConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetGameRequest
 	var metadata runtime.ServerMetadata
 
@@ -345,7 +345,7 @@ func request_GameAdminService_GetGame_0(ctx context.Context, marshaler runtime.M
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GameAdminService_GetGame_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GameConfigService_GetGame_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -354,7 +354,7 @@ func request_GameAdminService_GetGame_0(ctx context.Context, marshaler runtime.M
 
 }
 
-func local_request_GameAdminService_GetGame_0(ctx context.Context, marshaler runtime.Marshaler, server GameAdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_GameConfigService_GetGame_0(ctx context.Context, marshaler runtime.Marshaler, server GameConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetGameRequest
 	var metadata runtime.ServerMetadata
 
@@ -378,7 +378,7 @@ func local_request_GameAdminService_GetGame_0(ctx context.Context, marshaler run
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GameAdminService_GetGame_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GameConfigService_GetGame_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1761,54 +1761,28 @@ func local_request_IdentityService_GetIdentity_0(ctx context.Context, marshaler 
 
 }
 
-func request_PlayerService_StartAuth_0(ctx context.Context, marshaler runtime.Marshaler, client PlayerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StartAuthRequest
+func request_PlayerService_ResolvePlayer_0(ctx context.Context, marshaler runtime.Marshaler, client PlayerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ResolvePlayerRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.StartAuth(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ResolvePlayer(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_PlayerService_StartAuth_0(ctx context.Context, marshaler runtime.Marshaler, server PlayerServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StartAuthRequest
+func local_request_PlayerService_ResolvePlayer_0(ctx context.Context, marshaler runtime.Marshaler, server PlayerServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ResolvePlayerRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.StartAuth(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
-func request_PlayerService_VerifyAuth_0(ctx context.Context, marshaler runtime.Marshaler, client PlayerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq VerifyAuthRequest
-	var metadata runtime.ServerMetadata
-
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.VerifyAuth(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_PlayerService_VerifyAuth_0(ctx context.Context, marshaler runtime.Marshaler, server PlayerServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq VerifyAuthRequest
-	var metadata runtime.ServerMetadata
-
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := server.VerifyAuth(ctx, &protoReq)
+	msg, err := server.ResolvePlayer(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -3462,146 +3436,6 @@ func local_request_LeaderboardService_GetRankings_0(ctx context.Context, marshal
 }
 
 var (
-	filter_LeaderboardService_AroundMe_0 = &utilities.DoubleArray{Encoding: map[string]int{"leaderboard_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
-func request_LeaderboardService_AroundMe_0(ctx context.Context, marshaler runtime.Marshaler, client LeaderboardServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq AroundMeRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["leaderboard_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leaderboard_id")
-	}
-
-	protoReq.LeaderboardId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leaderboard_id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_LeaderboardService_AroundMe_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.AroundMe(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_LeaderboardService_AroundMe_0(ctx context.Context, marshaler runtime.Marshaler, server LeaderboardServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq AroundMeRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["leaderboard_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leaderboard_id")
-	}
-
-	protoReq.LeaderboardId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leaderboard_id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_LeaderboardService_AroundMe_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := server.AroundMe(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
-var (
-	filter_LeaderboardService_MyRank_0 = &utilities.DoubleArray{Encoding: map[string]int{"leaderboard_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
-func request_LeaderboardService_MyRank_0(ctx context.Context, marshaler runtime.Marshaler, client LeaderboardServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MyRankRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["leaderboard_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leaderboard_id")
-	}
-
-	protoReq.LeaderboardId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leaderboard_id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_LeaderboardService_MyRank_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.MyRank(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_LeaderboardService_MyRank_0(ctx context.Context, marshaler runtime.Marshaler, server LeaderboardServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MyRankRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["leaderboard_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "leaderboard_id")
-	}
-
-	protoReq.LeaderboardId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "leaderboard_id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_LeaderboardService_MyRank_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := server.MyRank(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
-var (
 	filter_WalletService_GetWallet_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
@@ -4070,13 +3904,13 @@ func RegisterEngineServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 	return nil
 }
 
-// RegisterGameAdminServiceHandlerServer registers the http handlers for service GameAdminService to "mux".
-// UnaryRPC     :call GameAdminServiceServer directly.
+// RegisterGameConfigServiceHandlerServer registers the http handlers for service GameConfigService to "mux".
+// UnaryRPC     :call GameConfigServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGameAdminServiceHandlerFromEndpoint instead.
-func RegisterGameAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GameAdminServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGameConfigServiceHandlerFromEndpoint instead.
+func RegisterGameConfigServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GameConfigServiceServer) error {
 
-	mux.Handle("POST", pattern_GameAdminService_CreateGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_GameConfigService_CreateGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -4084,12 +3918,12 @@ func RegisterGameAdminServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.GameAdminService/CreateGame", runtime.WithHTTPPathPattern("/api/v1/admin/games"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.GameConfigService/CreateGame", runtime.WithHTTPPathPattern("/api/v1/games"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GameAdminService_CreateGame_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_GameConfigService_CreateGame_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -4097,11 +3931,11 @@ func RegisterGameAdminServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 			return
 		}
 
-		forward_GameAdminService_CreateGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GameConfigService_CreateGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_GameAdminService_GetGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_GameConfigService_GetGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -4109,12 +3943,12 @@ func RegisterGameAdminServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.GameAdminService/GetGame", runtime.WithHTTPPathPattern("/api/v1/admin/games/{game_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.GameConfigService/GetGame", runtime.WithHTTPPathPattern("/api/v1/games/{game_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_GameAdminService_GetGame_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_GameConfigService_GetGame_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -4122,7 +3956,7 @@ func RegisterGameAdminServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 			return
 		}
 
-		forward_GameAdminService_GetGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GameConfigService_GetGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -4143,7 +3977,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/CreatePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/CreatePrize", runtime.WithHTTPPathPattern("/api/v1/prizes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4168,7 +4002,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/ListPrizes", runtime.WithHTTPPathPattern("/api/v1/admin/prizes"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/ListPrizes", runtime.WithHTTPPathPattern("/api/v1/prizes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4193,7 +4027,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/GetPrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/GetPrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4218,7 +4052,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/UpdatePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/UpdatePrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4243,7 +4077,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/DeletePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/DeletePrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4268,7 +4102,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/ImportCodes", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}/codes"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/ImportCodes", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}/codes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4293,7 +4127,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/GetPrizeSummary", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/summary"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/GetPrizeSummary", runtime.WithHTTPPathPattern("/api/v1/prizes/summary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4343,7 +4177,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/FulfillReward", runtime.WithHTTPPathPattern("/api/v1/admin/rewards/{reward_id}/fulfill"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/FulfillReward", runtime.WithHTTPPathPattern("/api/v1/rewards/{reward_id}/fulfill"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4368,7 +4202,7 @@ func RegisterRewardServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/RevokeReward", runtime.WithHTTPPathPattern("/api/v1/admin/rewards/{reward_id}/revoke"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.RewardService/RevokeReward", runtime.WithHTTPPathPattern("/api/v1/rewards/{reward_id}/revoke"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4427,7 +4261,7 @@ func RegisterFulfillmentServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/ListTasks", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/ListTasks", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4452,7 +4286,7 @@ func RegisterFulfillmentServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks/{task_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks/{task_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4477,7 +4311,7 @@ func RegisterFulfillmentServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/RetryTask", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks/{task_id}/retry"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.FulfillmentService/RetryTask", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks/{task_id}/retry"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4536,7 +4370,7 @@ func RegisterTenantServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/CreateTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/CreateTenant", runtime.WithHTTPPathPattern("/api/v1/tenants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4561,7 +4395,7 @@ func RegisterTenantServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/GetTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/GetTenant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4586,7 +4420,7 @@ func RegisterTenantServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/UpdateTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/UpdateTenant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4611,7 +4445,7 @@ func RegisterTenantServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/ListTenants", runtime.WithHTTPPathPattern("/api/v1/admin/tenants"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.TenantService/ListTenants", runtime.WithHTTPPathPattern("/api/v1/tenants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4645,7 +4479,7 @@ func RegisterMerchantServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/CreateMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/CreateMerchant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4670,7 +4504,7 @@ func RegisterMerchantServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/GetMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants/{merchant_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/GetMerchant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants/{merchant_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4695,7 +4529,7 @@ func RegisterMerchantServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/UpdateMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/merchants/{merchant.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/UpdateMerchant", runtime.WithHTTPPathPattern("/api/v1/merchants/{merchant.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4720,7 +4554,7 @@ func RegisterMerchantServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/ListMerchants", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.MerchantService/ListMerchants", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4754,7 +4588,7 @@ func RegisterIdentityServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/ResolveOrCreate", runtime.WithHTTPPathPattern("/api/v1/admin/identities/resolve"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/ResolveOrCreate", runtime.WithHTTPPathPattern("/api/v1/identities/resolve"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4779,7 +4613,7 @@ func RegisterIdentityServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/LinkContact", runtime.WithHTTPPathPattern("/api/v1/admin/identities/{identity_id}/contacts"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/LinkContact", runtime.WithHTTPPathPattern("/api/v1/identities/{identity_id}/contacts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4804,7 +4638,7 @@ func RegisterIdentityServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/GetIdentity", runtime.WithHTTPPathPattern("/api/v1/admin/identities/{identity_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IdentityService/GetIdentity", runtime.WithHTTPPathPattern("/api/v1/identities/{identity_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -4830,7 +4664,7 @@ func RegisterIdentityServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterPlayerServiceHandlerFromEndpoint instead.
 func RegisterPlayerServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server PlayerServiceServer) error {
 
-	mux.Handle("POST", pattern_PlayerService_StartAuth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_PlayerService_ResolvePlayer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -4838,12 +4672,12 @@ func RegisterPlayerServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.PlayerService/StartAuth", runtime.WithHTTPPathPattern("/api/v1/auth/start"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.PlayerService/ResolvePlayer", runtime.WithHTTPPathPattern("/api/v1/players/resolve"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_PlayerService_StartAuth_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_PlayerService_ResolvePlayer_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -4851,32 +4685,7 @@ func RegisterPlayerServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 			return
 		}
 
-		forward_PlayerService_StartAuth_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("POST", pattern_PlayerService_VerifyAuth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.PlayerService/VerifyAuth", runtime.WithHTTPPathPattern("/api/v1/auth/verify"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_PlayerService_VerifyAuth_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_PlayerService_VerifyAuth_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_PlayerService_ResolvePlayer_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -5047,7 +4856,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/CreateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/CreateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5072,7 +4881,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5097,7 +4906,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/UpdateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/UpdateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5122,7 +4931,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/ListCampaigns", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/ListCampaigns", runtime.WithHTTPPathPattern("/api/v1/campaigns"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5147,7 +4956,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/DuplicateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}/duplicate"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/DuplicateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/duplicate"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5172,7 +4981,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaignAnalytics", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}/analytics"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaignAnalytics", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/analytics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5197,7 +5006,7 @@ func RegisterCampaignServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetPublicConfig", runtime.WithHTTPPathPattern("/api/v1/public/campaigns/{campaign_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.CampaignService/GetPublicConfig", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/config"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5231,7 +5040,7 @@ func RegisterQuestServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/CreateQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/CreateQuest", runtime.WithHTTPPathPattern("/api/v1/quests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5256,7 +5065,7 @@ func RegisterQuestServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/GetQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/GetQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5281,7 +5090,7 @@ func RegisterQuestServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/UpdateQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/UpdateQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5306,7 +5115,7 @@ func RegisterQuestServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/DeleteQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/DeleteQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5331,7 +5140,7 @@ func RegisterQuestServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/ListQuests", runtime.WithHTTPPathPattern("/api/v1/admin/quests"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.QuestService/ListQuests", runtime.WithHTTPPathPattern("/api/v1/quests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5415,7 +5224,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/CreateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/CreateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5440,7 +5249,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/GetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/GetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5465,7 +5274,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/UpdateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/UpdateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5490,7 +5299,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/ListLeaderboards", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/ListLeaderboards", runtime.WithHTTPPathPattern("/api/v1/leaderboards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5515,7 +5324,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/FinalizeLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/finalize"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/FinalizeLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/finalize"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5540,7 +5349,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/ResetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/reset"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/ResetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/reset"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5565,7 +5374,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/DisqualifyEntry", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/disqualify"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/DisqualifyEntry", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/disqualify"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5590,7 +5399,7 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/AdjustEntry", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/adjust"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/AdjustEntry", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/adjust"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5629,56 +5438,6 @@ func RegisterLeaderboardServiceHandlerServer(ctx context.Context, mux *runtime.S
 		}
 
 		forward_LeaderboardService_GetRankings_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_LeaderboardService_AroundMe_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/AroundMe", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/around-me"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_LeaderboardService_AroundMe_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_LeaderboardService_AroundMe_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_LeaderboardService_MyRank_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.LeaderboardService/MyRank", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/my-rank"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_LeaderboardService_MyRank_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_LeaderboardService_MyRank_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -5808,7 +5567,7 @@ func RegisterIntegrationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/CreateIntegration", runtime.WithHTTPPathPattern("/api/v1/admin/integrations"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/CreateIntegration", runtime.WithHTTPPathPattern("/api/v1/integrations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5833,7 +5592,7 @@ func RegisterIntegrationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/ListIntegrations", runtime.WithHTTPPathPattern("/api/v1/admin/integrations"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/ListIntegrations", runtime.WithHTTPPathPattern("/api/v1/integrations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5858,7 +5617,7 @@ func RegisterIntegrationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/DeleteIntegration", runtime.WithHTTPPathPattern("/api/v1/admin/integrations/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/DeleteIntegration", runtime.WithHTTPPathPattern("/api/v1/integrations/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -5883,7 +5642,7 @@ func RegisterIntegrationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/EmitEvent", runtime.WithHTTPPathPattern("/api/v1/admin/integrations/emit"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/game.v1.IntegrationService/EmitEvent", runtime.WithHTTPPathPattern("/api/v1/integrations/emit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6052,9 +5811,9 @@ var (
 	forward_EngineService_GetHistory_0 = runtime.ForwardResponseMessage
 )
 
-// RegisterGameAdminServiceHandlerFromEndpoint is same as RegisterGameAdminServiceHandler but
+// RegisterGameConfigServiceHandlerFromEndpoint is same as RegisterGameConfigServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterGameAdminServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterGameConfigServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.NewClient(endpoint, opts...)
 	if err != nil {
 		return err
@@ -6074,63 +5833,63 @@ func RegisterGameAdminServiceHandlerFromEndpoint(ctx context.Context, mux *runti
 		}()
 	}()
 
-	return RegisterGameAdminServiceHandler(ctx, mux, conn)
+	return RegisterGameConfigServiceHandler(ctx, mux, conn)
 }
 
-// RegisterGameAdminServiceHandler registers the http handlers for service GameAdminService to "mux".
+// RegisterGameConfigServiceHandler registers the http handlers for service GameConfigService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterGameAdminServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterGameAdminServiceHandlerClient(ctx, mux, NewGameAdminServiceClient(conn))
+func RegisterGameConfigServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterGameConfigServiceHandlerClient(ctx, mux, NewGameConfigServiceClient(conn))
 }
 
-// RegisterGameAdminServiceHandlerClient registers the http handlers for service GameAdminService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GameAdminServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GameAdminServiceClient"
+// RegisterGameConfigServiceHandlerClient registers the http handlers for service GameConfigService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GameConfigServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GameConfigServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "GameAdminServiceClient" to call the correct interceptors.
-func RegisterGameAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GameAdminServiceClient) error {
+// "GameConfigServiceClient" to call the correct interceptors.
+func RegisterGameConfigServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GameConfigServiceClient) error {
 
-	mux.Handle("POST", pattern_GameAdminService_CreateGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_GameConfigService_CreateGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.GameAdminService/CreateGame", runtime.WithHTTPPathPattern("/api/v1/admin/games"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.GameConfigService/CreateGame", runtime.WithHTTPPathPattern("/api/v1/games"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GameAdminService_CreateGame_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_GameConfigService_CreateGame_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GameAdminService_CreateGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GameConfigService_CreateGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_GameAdminService_GetGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_GameConfigService_GetGame_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.GameAdminService/GetGame", runtime.WithHTTPPathPattern("/api/v1/admin/games/{game_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.GameConfigService/GetGame", runtime.WithHTTPPathPattern("/api/v1/games/{game_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GameAdminService_GetGame_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_GameConfigService_GetGame_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_GameAdminService_GetGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_GameConfigService_GetGame_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -6138,15 +5897,15 @@ func RegisterGameAdminServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_GameAdminService_CreateGame_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "games"}, ""))
+	pattern_GameConfigService_CreateGame_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "games"}, ""))
 
-	pattern_GameAdminService_GetGame_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "games", "game_id"}, ""))
+	pattern_GameConfigService_GetGame_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "games", "game_id"}, ""))
 )
 
 var (
-	forward_GameAdminService_CreateGame_0 = runtime.ForwardResponseMessage
+	forward_GameConfigService_CreateGame_0 = runtime.ForwardResponseMessage
 
-	forward_GameAdminService_GetGame_0 = runtime.ForwardResponseMessage
+	forward_GameConfigService_GetGame_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterRewardServiceHandlerFromEndpoint is same as RegisterRewardServiceHandler but
@@ -6193,7 +5952,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/CreatePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/CreatePrize", runtime.WithHTTPPathPattern("/api/v1/prizes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6215,7 +5974,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/ListPrizes", runtime.WithHTTPPathPattern("/api/v1/admin/prizes"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/ListPrizes", runtime.WithHTTPPathPattern("/api/v1/prizes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6237,7 +5996,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/GetPrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/GetPrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6259,7 +6018,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/UpdatePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/UpdatePrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6281,7 +6040,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/DeletePrize", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/DeletePrize", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6303,7 +6062,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/ImportCodes", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/{prize_id}/codes"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/ImportCodes", runtime.WithHTTPPathPattern("/api/v1/prizes/{prize_id}/codes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6325,7 +6084,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/GetPrizeSummary", runtime.WithHTTPPathPattern("/api/v1/admin/prizes/summary"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/GetPrizeSummary", runtime.WithHTTPPathPattern("/api/v1/prizes/summary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6369,7 +6128,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/FulfillReward", runtime.WithHTTPPathPattern("/api/v1/admin/rewards/{reward_id}/fulfill"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/FulfillReward", runtime.WithHTTPPathPattern("/api/v1/rewards/{reward_id}/fulfill"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6391,7 +6150,7 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/RevokeReward", runtime.WithHTTPPathPattern("/api/v1/admin/rewards/{reward_id}/revoke"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.RewardService/RevokeReward", runtime.WithHTTPPathPattern("/api/v1/rewards/{reward_id}/revoke"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6433,25 +6192,25 @@ func RegisterRewardServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_RewardService_CreatePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "prizes"}, ""))
+	pattern_RewardService_CreatePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "prizes"}, ""))
 
-	pattern_RewardService_ListPrizes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "prizes"}, ""))
+	pattern_RewardService_ListPrizes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "prizes"}, ""))
 
-	pattern_RewardService_GetPrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "prizes", "prize_id"}, ""))
+	pattern_RewardService_GetPrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "prizes", "prize_id"}, ""))
 
-	pattern_RewardService_UpdatePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "prizes", "prize.id"}, ""))
+	pattern_RewardService_UpdatePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "prizes", "prize.id"}, ""))
 
-	pattern_RewardService_DeletePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "prizes", "prize_id"}, ""))
+	pattern_RewardService_DeletePrize_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "prizes", "prize_id"}, ""))
 
-	pattern_RewardService_ImportCodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "prizes", "prize_id", "codes"}, ""))
+	pattern_RewardService_ImportCodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "prizes", "prize_id", "codes"}, ""))
 
-	pattern_RewardService_GetPrizeSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "admin", "prizes", "summary"}, ""))
+	pattern_RewardService_GetPrizeSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "prizes", "summary"}, ""))
 
 	pattern_RewardService_ClaimReward_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "rewards", "reward_id", "claim"}, ""))
 
-	pattern_RewardService_FulfillReward_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "rewards", "reward_id", "fulfill"}, ""))
+	pattern_RewardService_FulfillReward_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "rewards", "reward_id", "fulfill"}, ""))
 
-	pattern_RewardService_RevokeReward_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "rewards", "reward_id", "revoke"}, ""))
+	pattern_RewardService_RevokeReward_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "rewards", "reward_id", "revoke"}, ""))
 
 	pattern_RewardService_ListRewards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "rewards"}, ""))
 )
@@ -6524,7 +6283,7 @@ func RegisterFulfillmentServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/ListTasks", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/ListTasks", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6546,7 +6305,7 @@ func RegisterFulfillmentServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks/{task_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks/{task_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6568,7 +6327,7 @@ func RegisterFulfillmentServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/RetryTask", runtime.WithHTTPPathPattern("/api/v1/admin/fulfillment/tasks/{task_id}/retry"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.FulfillmentService/RetryTask", runtime.WithHTTPPathPattern("/api/v1/fulfillment/tasks/{task_id}/retry"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6610,11 +6369,11 @@ func RegisterFulfillmentServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_FulfillmentService_ListTasks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "admin", "fulfillment", "tasks"}, ""))
+	pattern_FulfillmentService_ListTasks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "fulfillment", "tasks"}, ""))
 
-	pattern_FulfillmentService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "admin", "fulfillment", "tasks", "task_id"}, ""))
+	pattern_FulfillmentService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "fulfillment", "tasks", "task_id"}, ""))
 
-	pattern_FulfillmentService_RetryTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"api", "v1", "admin", "fulfillment", "tasks", "task_id", "retry"}, ""))
+	pattern_FulfillmentService_RetryTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "fulfillment", "tasks", "task_id", "retry"}, ""))
 
 	pattern_FulfillmentService_ReportResult_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "fulfillment", "tasks", "task_id", "callback"}, ""))
 )
@@ -6673,7 +6432,7 @@ func RegisterTenantServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/CreateTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/CreateTenant", runtime.WithHTTPPathPattern("/api/v1/tenants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6695,7 +6454,7 @@ func RegisterTenantServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/GetTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/GetTenant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6717,7 +6476,7 @@ func RegisterTenantServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/UpdateTenant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/UpdateTenant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6739,7 +6498,7 @@ func RegisterTenantServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/ListTenants", runtime.WithHTTPPathPattern("/api/v1/admin/tenants"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.TenantService/ListTenants", runtime.WithHTTPPathPattern("/api/v1/tenants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6759,13 +6518,13 @@ func RegisterTenantServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_TenantService_CreateTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "tenants"}, ""))
+	pattern_TenantService_CreateTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "tenants"}, ""))
 
-	pattern_TenantService_GetTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "tenants", "tenant_id"}, ""))
+	pattern_TenantService_GetTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "tenants", "tenant_id"}, ""))
 
-	pattern_TenantService_UpdateTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "tenants", "tenant.id"}, ""))
+	pattern_TenantService_UpdateTenant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "tenants", "tenant.id"}, ""))
 
-	pattern_TenantService_ListTenants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "tenants"}, ""))
+	pattern_TenantService_ListTenants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "tenants"}, ""))
 )
 
 var (
@@ -6822,7 +6581,7 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/CreateMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/CreateMerchant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6844,7 +6603,7 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/GetMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants/{merchant_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/GetMerchant", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants/{merchant_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6866,7 +6625,7 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/UpdateMerchant", runtime.WithHTTPPathPattern("/api/v1/admin/merchants/{merchant.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/UpdateMerchant", runtime.WithHTTPPathPattern("/api/v1/merchants/{merchant.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6888,7 +6647,7 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/ListMerchants", runtime.WithHTTPPathPattern("/api/v1/admin/tenants/{tenant_id}/merchants"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.MerchantService/ListMerchants", runtime.WithHTTPPathPattern("/api/v1/tenants/{tenant_id}/merchants"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6908,13 +6667,13 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_MerchantService_CreateMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "tenants", "tenant_id", "merchants"}, ""))
+	pattern_MerchantService_CreateMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "tenants", "tenant_id", "merchants"}, ""))
 
-	pattern_MerchantService_GetMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "admin", "tenants", "tenant_id", "merchants", "merchant_id"}, ""))
+	pattern_MerchantService_GetMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "tenants", "tenant_id", "merchants", "merchant_id"}, ""))
 
-	pattern_MerchantService_UpdateMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "merchants", "merchant.id"}, ""))
+	pattern_MerchantService_UpdateMerchant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "merchants", "merchant.id"}, ""))
 
-	pattern_MerchantService_ListMerchants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "tenants", "tenant_id", "merchants"}, ""))
+	pattern_MerchantService_ListMerchants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "tenants", "tenant_id", "merchants"}, ""))
 )
 
 var (
@@ -6971,7 +6730,7 @@ func RegisterIdentityServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/ResolveOrCreate", runtime.WithHTTPPathPattern("/api/v1/admin/identities/resolve"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/ResolveOrCreate", runtime.WithHTTPPathPattern("/api/v1/identities/resolve"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -6993,7 +6752,7 @@ func RegisterIdentityServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/LinkContact", runtime.WithHTTPPathPattern("/api/v1/admin/identities/{identity_id}/contacts"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/LinkContact", runtime.WithHTTPPathPattern("/api/v1/identities/{identity_id}/contacts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7015,7 +6774,7 @@ func RegisterIdentityServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/GetIdentity", runtime.WithHTTPPathPattern("/api/v1/admin/identities/{identity_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IdentityService/GetIdentity", runtime.WithHTTPPathPattern("/api/v1/identities/{identity_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7035,11 +6794,11 @@ func RegisterIdentityServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_IdentityService_ResolveOrCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "admin", "identities", "resolve"}, ""))
+	pattern_IdentityService_ResolveOrCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "identities", "resolve"}, ""))
 
-	pattern_IdentityService_LinkContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "identities", "identity_id", "contacts"}, ""))
+	pattern_IdentityService_LinkContact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "identities", "identity_id", "contacts"}, ""))
 
-	pattern_IdentityService_GetIdentity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "identities", "identity_id"}, ""))
+	pattern_IdentityService_GetIdentity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "identities", "identity_id"}, ""))
 )
 
 var (
@@ -7088,47 +6847,25 @@ func RegisterPlayerServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 // "PlayerServiceClient" to call the correct interceptors.
 func RegisterPlayerServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client PlayerServiceClient) error {
 
-	mux.Handle("POST", pattern_PlayerService_StartAuth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_PlayerService_ResolvePlayer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.PlayerService/StartAuth", runtime.WithHTTPPathPattern("/api/v1/auth/start"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.PlayerService/ResolvePlayer", runtime.WithHTTPPathPattern("/api/v1/players/resolve"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_PlayerService_StartAuth_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_PlayerService_ResolvePlayer_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_PlayerService_StartAuth_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("POST", pattern_PlayerService_VerifyAuth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.PlayerService/VerifyAuth", runtime.WithHTTPPathPattern("/api/v1/auth/verify"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_PlayerService_VerifyAuth_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_PlayerService_VerifyAuth_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_PlayerService_ResolvePlayer_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -7268,9 +7005,7 @@ func RegisterPlayerServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_PlayerService_StartAuth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "auth", "start"}, ""))
-
-	pattern_PlayerService_VerifyAuth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "auth", "verify"}, ""))
+	pattern_PlayerService_ResolvePlayer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "players", "resolve"}, ""))
 
 	pattern_PlayerService_GetProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "players", "player_id"}, ""))
 
@@ -7286,9 +7021,7 @@ var (
 )
 
 var (
-	forward_PlayerService_StartAuth_0 = runtime.ForwardResponseMessage
-
-	forward_PlayerService_VerifyAuth_0 = runtime.ForwardResponseMessage
+	forward_PlayerService_ResolvePlayer_0 = runtime.ForwardResponseMessage
 
 	forward_PlayerService_GetProfile_0 = runtime.ForwardResponseMessage
 
@@ -7347,7 +7080,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/CreateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/CreateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7369,7 +7102,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7391,7 +7124,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/UpdateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/UpdateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7413,7 +7146,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/ListCampaigns", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/ListCampaigns", runtime.WithHTTPPathPattern("/api/v1/campaigns"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7435,7 +7168,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/DuplicateCampaign", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}/duplicate"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/DuplicateCampaign", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/duplicate"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7457,7 +7190,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaignAnalytics", runtime.WithHTTPPathPattern("/api/v1/admin/campaigns/{campaign_id}/analytics"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetCampaignAnalytics", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/analytics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7479,7 +7212,7 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetPublicConfig", runtime.WithHTTPPathPattern("/api/v1/public/campaigns/{campaign_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.CampaignService/GetPublicConfig", runtime.WithHTTPPathPattern("/api/v1/campaigns/{campaign_id}/config"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7499,19 +7232,19 @@ func RegisterCampaignServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_CampaignService_CreateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "campaigns"}, ""))
+	pattern_CampaignService_CreateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "campaigns"}, ""))
 
-	pattern_CampaignService_GetCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "campaigns", "campaign_id"}, ""))
+	pattern_CampaignService_GetCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "campaigns", "campaign_id"}, ""))
 
-	pattern_CampaignService_UpdateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "campaigns", "campaign.id"}, ""))
+	pattern_CampaignService_UpdateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "campaigns", "campaign.id"}, ""))
 
-	pattern_CampaignService_ListCampaigns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "campaigns"}, ""))
+	pattern_CampaignService_ListCampaigns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "campaigns"}, ""))
 
-	pattern_CampaignService_DuplicateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "campaigns", "campaign_id", "duplicate"}, ""))
+	pattern_CampaignService_DuplicateCampaign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "campaigns", "campaign_id", "duplicate"}, ""))
 
-	pattern_CampaignService_GetCampaignAnalytics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "campaigns", "campaign_id", "analytics"}, ""))
+	pattern_CampaignService_GetCampaignAnalytics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "campaigns", "campaign_id", "analytics"}, ""))
 
-	pattern_CampaignService_GetPublicConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "public", "campaigns", "campaign_id"}, ""))
+	pattern_CampaignService_GetPublicConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "campaigns", "campaign_id", "config"}, ""))
 )
 
 var (
@@ -7574,7 +7307,7 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/CreateQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/CreateQuest", runtime.WithHTTPPathPattern("/api/v1/quests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7596,7 +7329,7 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/GetQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/GetQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7618,7 +7351,7 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/UpdateQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/UpdateQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7640,7 +7373,7 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/DeleteQuest", runtime.WithHTTPPathPattern("/api/v1/admin/quests/{quest_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/DeleteQuest", runtime.WithHTTPPathPattern("/api/v1/quests/{quest_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7662,7 +7395,7 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/ListQuests", runtime.WithHTTPPathPattern("/api/v1/admin/quests"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.QuestService/ListQuests", runtime.WithHTTPPathPattern("/api/v1/quests"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7726,15 +7459,15 @@ func RegisterQuestServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_QuestService_CreateQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "quests"}, ""))
+	pattern_QuestService_CreateQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "quests"}, ""))
 
-	pattern_QuestService_GetQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "quests", "quest_id"}, ""))
+	pattern_QuestService_GetQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "quests", "quest_id"}, ""))
 
-	pattern_QuestService_UpdateQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "quests", "quest.id"}, ""))
+	pattern_QuestService_UpdateQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "quests", "quest.id"}, ""))
 
-	pattern_QuestService_DeleteQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "quests", "quest_id"}, ""))
+	pattern_QuestService_DeleteQuest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "quests", "quest_id"}, ""))
 
-	pattern_QuestService_ListQuests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "quests"}, ""))
+	pattern_QuestService_ListQuests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "quests"}, ""))
 
 	pattern_QuestService_ListPlayerQuests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "campaigns", "campaign_id", "quests"}, ""))
 
@@ -7801,7 +7534,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/CreateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/CreateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7823,7 +7556,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/GetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/GetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7845,7 +7578,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/UpdateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/UpdateLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7867,7 +7600,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/ListLeaderboards", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/ListLeaderboards", runtime.WithHTTPPathPattern("/api/v1/leaderboards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7889,7 +7622,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/FinalizeLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/finalize"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/FinalizeLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/finalize"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7911,7 +7644,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/ResetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/reset"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/ResetLeaderboard", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/reset"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7933,7 +7666,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/DisqualifyEntry", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/disqualify"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/DisqualifyEntry", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/disqualify"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7955,7 +7688,7 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/AdjustEntry", runtime.WithHTTPPathPattern("/api/v1/admin/leaderboards/{leaderboard_id}/adjust"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/AdjustEntry", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/adjust"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -7993,75 +7726,27 @@ func RegisterLeaderboardServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_LeaderboardService_AroundMe_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/AroundMe", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/around-me"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_LeaderboardService_AroundMe_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_LeaderboardService_AroundMe_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_LeaderboardService_MyRank_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.LeaderboardService/MyRank", runtime.WithHTTPPathPattern("/api/v1/leaderboards/{leaderboard_id}/my-rank"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_LeaderboardService_MyRank_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_LeaderboardService_MyRank_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	return nil
 }
 
 var (
-	pattern_LeaderboardService_CreateLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "leaderboards"}, ""))
+	pattern_LeaderboardService_CreateLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "leaderboards"}, ""))
 
-	pattern_LeaderboardService_GetLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "leaderboards", "leaderboard_id"}, ""))
+	pattern_LeaderboardService_GetLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "leaderboards", "leaderboard_id"}, ""))
 
-	pattern_LeaderboardService_UpdateLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "leaderboards", "leaderboard.id"}, ""))
+	pattern_LeaderboardService_UpdateLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "leaderboards", "leaderboard.id"}, ""))
 
-	pattern_LeaderboardService_ListLeaderboards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "leaderboards"}, ""))
+	pattern_LeaderboardService_ListLeaderboards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "leaderboards"}, ""))
 
-	pattern_LeaderboardService_FinalizeLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "leaderboards", "leaderboard_id", "finalize"}, ""))
+	pattern_LeaderboardService_FinalizeLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "finalize"}, ""))
 
-	pattern_LeaderboardService_ResetLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "leaderboards", "leaderboard_id", "reset"}, ""))
+	pattern_LeaderboardService_ResetLeaderboard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "reset"}, ""))
 
-	pattern_LeaderboardService_DisqualifyEntry_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "leaderboards", "leaderboard_id", "disqualify"}, ""))
+	pattern_LeaderboardService_DisqualifyEntry_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "disqualify"}, ""))
 
-	pattern_LeaderboardService_AdjustEntry_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v1", "admin", "leaderboards", "leaderboard_id", "adjust"}, ""))
+	pattern_LeaderboardService_AdjustEntry_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "adjust"}, ""))
 
 	pattern_LeaderboardService_GetRankings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "rankings"}, ""))
-
-	pattern_LeaderboardService_AroundMe_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "around-me"}, ""))
-
-	pattern_LeaderboardService_MyRank_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "leaderboards", "leaderboard_id", "my-rank"}, ""))
 )
 
 var (
@@ -8082,10 +7767,6 @@ var (
 	forward_LeaderboardService_AdjustEntry_0 = runtime.ForwardResponseMessage
 
 	forward_LeaderboardService_GetRankings_0 = runtime.ForwardResponseMessage
-
-	forward_LeaderboardService_AroundMe_0 = runtime.ForwardResponseMessage
-
-	forward_LeaderboardService_MyRank_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterWalletServiceHandlerFromEndpoint is same as RegisterWalletServiceHandler but
@@ -8281,7 +7962,7 @@ func RegisterIntegrationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/CreateIntegration", runtime.WithHTTPPathPattern("/api/v1/admin/integrations"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/CreateIntegration", runtime.WithHTTPPathPattern("/api/v1/integrations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8303,7 +7984,7 @@ func RegisterIntegrationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/ListIntegrations", runtime.WithHTTPPathPattern("/api/v1/admin/integrations"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/ListIntegrations", runtime.WithHTTPPathPattern("/api/v1/integrations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8325,7 +8006,7 @@ func RegisterIntegrationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/DeleteIntegration", runtime.WithHTTPPathPattern("/api/v1/admin/integrations/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/DeleteIntegration", runtime.WithHTTPPathPattern("/api/v1/integrations/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8347,7 +8028,7 @@ func RegisterIntegrationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/EmitEvent", runtime.WithHTTPPathPattern("/api/v1/admin/integrations/emit"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/game.v1.IntegrationService/EmitEvent", runtime.WithHTTPPathPattern("/api/v1/integrations/emit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8367,13 +8048,13 @@ func RegisterIntegrationServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_IntegrationService_CreateIntegration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "integrations"}, ""))
+	pattern_IntegrationService_CreateIntegration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "integrations"}, ""))
 
-	pattern_IntegrationService_ListIntegrations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "admin", "integrations"}, ""))
+	pattern_IntegrationService_ListIntegrations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "integrations"}, ""))
 
-	pattern_IntegrationService_DeleteIntegration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "admin", "integrations", "id"}, ""))
+	pattern_IntegrationService_DeleteIntegration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "integrations", "id"}, ""))
 
-	pattern_IntegrationService_EmitEvent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "admin", "integrations", "emit"}, ""))
+	pattern_IntegrationService_EmitEvent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "integrations", "emit"}, ""))
 )
 
 var (

@@ -61,14 +61,14 @@ func (s *Server) GetMilestones(ctx context.Context, req *gamev1.GetMilestonesReq
 			MilestoneId: mv.Milestone.ID,
 			Threshold:   mv.Milestone.Threshold,
 			PrizeId:     mv.Milestone.PrizeID,
-			Status:      mv.Status,
+			Status:      pbMilestoneStatus(mv.Status),
 			Progress:    mv.Progress,
 			Remaining:   mv.Remaining,
 		})
 	}
 	return &gamev1.GetMilestonesResponse{
 		Currency:   res.Currency,
-		Mode:       res.Mode,
+		Mode:       pbMilestoneMode(res.Mode),
 		Balance:    res.Balance,
 		Milestones: out,
 	}, nil
@@ -85,7 +85,7 @@ func (s *Server) Redeem(ctx context.Context, req *gamev1.RedeemRequest) (*gamev1
 	}
 	resp := &gamev1.RedeemResponse{
 		Redeemed: res.Redeemed,
-		Mode:     res.Mode,
+		Mode:     pbMilestoneMode(res.Mode),
 		Spent:    res.Spent,
 		Balances: res.Balances,
 	}
@@ -100,7 +100,7 @@ func ledgerEntryToProto(e *types.LedgerEntry) *gamev1.LedgerEntry {
 		Id:        e.ID,
 		Currency:  e.Currency,
 		Amount:    e.Amount,
-		Reason:    e.Reason,
+		Reason:    pbLedgerReason(e.Reason),
 		RefId:     e.RefID,
 		CreatedAt: ts(e.CreatedAt),
 	}

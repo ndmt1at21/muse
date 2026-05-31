@@ -5,43 +5,38 @@ import (
 	"encoding/json"
 
 	"github.com/muse/gamekit/gkerr"
+	"github.com/muse/gamekit/identity"
 	"github.com/muse/gamekit/types"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
-// --- PlayerService: auth, profile, contacts, turn balances ---
+// --- PlayerService: player resolution, profile, contacts, turn balances ---
 
-func (s *Server) StartAuth(ctx context.Context, req *gamev1.StartAuthRequest) (*gamev1.StartAuthResponse, error) {
-	if s.auth == nil {
-		return nil, s.fail(gkerr.New(gkerr.ReasonInternal, "auth not configured"))
+// ResolvePlayer is the business step behind login: the caller (a BFF) has
+// already authenticated the contact, so Core resolve-or-creates the global
+// identity and upserts the tenant-scoped player. Core mints no token and issues
+// no challenge — authentication lives in the BFF.
+func (s *Server) ResolvePlayer(ctx context.Context, req *gamev1.ResolvePlayerRequest) (*gamev1.ResolvePlayerResponse, error) {
+	if s.resolver == nil {
+		return nil, s.fail(gkerr.New(gkerr.ReasonInternal, "identity resolver not configured"))
 	}
 	scope := scopeFromProto(req.GetScope())
-	res, err := s.auth.StartAuth(ctx, scope, req.GetContactType(), req.GetContactValue(), req.GetMethod(), req.GetCampaignId())
+	login, err := s.resolver.ResolveLogin(ctx, identity.VerifiedLogin{
+		Tenant: scope,
+		Contact: types.Contact{
+			Type:     domContactType(req.GetContactType()),
+			Value:    req.GetContactValue(),
+			Verified: true,
+		},
+	})
 	if err != nil {
 		return nil, s.fail(err)
 	}
-	return &gamev1.StartAuthResponse{
-		ChallengeId: res.ChallengeID,
-		ExpiresAt:   ts(res.ExpiresAt),
-		DevCode:     res.DevCode,
-	}, nil
-}
-
-func (s *Server) VerifyAuth(ctx context.Context, req *gamev1.VerifyAuthRequest) (*gamev1.VerifyAuthResponse, error) {
-	if s.auth == nil {
-		return nil, s.fail(gkerr.New(gkerr.ReasonInternal, "auth not configured"))
-	}
-	scope := scopeFromProto(req.GetScope())
-	res, err := s.auth.VerifyAuth(ctx, scope, req.GetChallengeId(), req.GetCode(), req.GetProof())
-	if err != nil {
-		return nil, s.fail(err)
-	}
-	return &gamev1.VerifyAuthResponse{
-		Token:         res.Token,
-		Player:        playerToProto(res.Player),
-		Identity:      identityToProto(res.Identity),
-		IdentityIsNew: res.IdentityIsNew,
-		PlayerIsNew:   res.PlayerIsNew,
+	return &gamev1.ResolvePlayerResponse{
+		Player:        playerToProto(login.Player),
+		Identity:      identityToProto(login.Identity),
+		IdentityIsNew: login.IdentityIsNew,
+		PlayerIsNew:   login.PlayerIsNew,
 	}, nil
 }
 
@@ -91,7 +86,7 @@ func (s *Server) AddContact(ctx context.Context, req *gamev1.AddContactRequest) 
 		identityID = p.IdentityID
 	}
 	idn, err := s.resolver.LinkContact(ctx, identityID, types.Contact{
-		Type: types.ContactType(req.GetContactType()), Value: req.GetContactValue(),
+		Type: domContactType(req.GetContactType()), Value: req.GetContactValue(),
 	})
 	if err != nil {
 		return nil, s.fail(err)

@@ -16,8 +16,8 @@ import (
 	"github.com/muse/bffkit/middleware"
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Handler holds the Core client.
@@ -56,11 +56,11 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.core.Integration.CreateIntegration(ctx, &gamev1.CreateIntegrationRequest{
 		Scope: coreclient.Scope(tenant, merchant),
 		Integration: &gamev1.Integration{
-			Type:       body.Type,
+			Type:       enumx.Parse[gamev1.IntegrationType](body.Type, gamev1.IntegrationType_value),
 			CampaignId: body.CampaignID,
 			Events:     body.Events,
 			Config:     string(orEmptyObj(body.Config)),
-			Status:     body.Status,
+			Status:     enumx.Parse[gamev1.IntegrationStatus](body.Status, gamev1.IntegrationStatus_value),
 		},
 	})
 	if err != nil {
@@ -138,11 +138,11 @@ func integrationView(i *gamev1.Integration) map[string]any {
 	}
 	return map[string]any{
 		"id":          i.GetId(),
-		"type":        i.GetType(),
+		"type":        enumx.Name(i.GetType()),
 		"campaign_id": emptyToNil(i.GetCampaignId()),
 		"events":      i.GetEvents(),
 		"config":      rawJSON(i.GetConfig()),
-		"status":      i.GetStatus(),
+		"status":      enumx.Name(i.GetStatus()),
 		"created_at":  tsString(i.GetCreatedAt()),
 	}
 }
@@ -183,11 +183,12 @@ func rawJSON(s string) any {
 	return v
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 func parseLimit(s string) int {

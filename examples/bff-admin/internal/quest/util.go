@@ -6,8 +6,8 @@ import (
 
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func invalidArg(msg string) error {
@@ -24,16 +24,16 @@ func orEmptyObj(b json.RawMessage) json.RawMessage {
 func questView(q *gamev1.Quest) map[string]any {
 	var reward any
 	if r := q.GetReward(); r != nil {
-		reward = map[string]any{"type": r.GetType(), "quantity": r.GetQuantity()}
+		reward = map[string]any{"type": enumx.Name(r.GetType()), "quantity": r.GetQuantity()}
 	}
 	return map[string]any{
 		"quest_id":    q.GetId(),
 		"tenant_id":   q.GetTenantId(),
 		"merchant_id": q.GetMerchantId(),
 		"campaign_id": q.GetCampaignId(),
-		"type":        q.GetType(),
+		"type":        enumx.Name(q.GetType()),
 		"name":        q.GetName(),
-		"status":      q.GetStatus(),
+		"status":      enumx.Name(q.GetStatus()),
 		"reward":      reward,
 		"config":      rawJSON(q.GetConfig()),
 		"created_at":  tsString(q.GetCreatedAt()),
@@ -69,11 +69,12 @@ func rawJSON(s string) any {
 	return v
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 func parseLimit(s string) int {

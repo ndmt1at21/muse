@@ -129,7 +129,7 @@ func (h *Handler) eligibility(w http.ResponseWriter, r *http.Request) {
 		"remaining_plays": resp.GetRemainingPlays(),
 		"reason":          emptyToNil(resp.GetReason()),
 	}
-	if resp.GetNextResetAt() != nil {
+	if resp.GetNextResetAt() != 0 {
 		data["next_reset_at"] = tsString(resp.GetNextResetAt())
 	}
 	envelope.WriteSuccess(w, tid, data)

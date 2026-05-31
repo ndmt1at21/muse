@@ -1,0 +1,6473 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "game/v1/engine.proto",
+    "description": "Package game.v1 is the Core service boundary — the central product surface.\nCore serves this contract over both gRPC and REST: the google.api.http\nannotations below drive a grpc-gateway that exposes every RPC as JSON/HTTP\nunder /api/v1, wrapped in the uniform {code, message, trace_id, data}\nenvelope. Core is auth-agnostic — it trusts the caller (a BFF the developer\nbuilds, see examples/) to authenticate and to pass the tenant/merchant Scope;\nit only validates and operates on the business object. Errors map to gRPC\nstatus codes (and to the envelope at the gateway). Versioned by package; a\nbreaking change becomes game.v2.",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EngineService"
+    },
+    {
+      "name": "GameConfigService"
+    },
+    {
+      "name": "RewardService"
+    },
+    {
+      "name": "FulfillmentService"
+    },
+    {
+      "name": "TenantService"
+    },
+    {
+      "name": "MerchantService"
+    },
+    {
+      "name": "IdentityService"
+    },
+    {
+      "name": "PlayerService"
+    },
+    {
+      "name": "CampaignService"
+    },
+    {
+      "name": "QuestService"
+    },
+    {
+      "name": "LeaderboardService"
+    },
+    {
+      "name": "WalletService"
+    },
+    {
+      "name": "IntegrationService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/campaigns": {
+      "get": {
+        "operationId": "CampaignService_ListCampaigns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListCampaignsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      },
+      "post": {
+        "operationId": "CampaignService_CreateCampaign",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateCampaignResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCampaignRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign.id}": {
+      "put": {
+        "operationId": "CampaignService_UpdateCampaign",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateCampaignResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CampaignServiceUpdateCampaignBody"
+            }
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}": {
+      "get": {
+        "operationId": "CampaignService_GetCampaign",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetCampaignResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/analytics": {
+      "get": {
+        "operationId": "CampaignService_GetCampaignAnalytics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetCampaignAnalyticsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/config": {
+      "get": {
+        "operationId": "CampaignService_GetPublicConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetPublicConfigResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/duplicate": {
+      "post": {
+        "operationId": "CampaignService_DuplicateCampaign",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1DuplicateCampaignResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CampaignServiceDuplicateCampaignBody"
+            }
+          }
+        ],
+        "tags": [
+          "CampaignService"
+        ]
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/quests": {
+      "get": {
+        "operationId": "QuestService_ListPlayerQuests",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListPlayerQuestsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      }
+    },
+    "/api/v1/fulfillment/tasks": {
+      "get": {
+        "operationId": "FulfillmentService_ListTasks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListTasksResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": "filter (UNSPECIFIED = no filter)",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_STATUS_UNSPECIFIED",
+              "TASK_STATUS_PENDING",
+              "TASK_STATUS_PROCESSING",
+              "TASK_STATUS_FULFILLED",
+              "TASK_STATUS_FAILED",
+              "TASK_STATUS_DEAD"
+            ],
+            "default": "TASK_STATUS_UNSPECIFIED"
+          },
+          {
+            "name": "campaign_id",
+            "description": "filter (optional)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "prize_id",
+            "description": "filter (optional)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FulfillmentService"
+        ]
+      }
+    },
+    "/api/v1/fulfillment/tasks/{task_id}": {
+      "get": {
+        "operationId": "FulfillmentService_GetTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetTaskResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FulfillmentService"
+        ]
+      }
+    },
+    "/api/v1/fulfillment/tasks/{task_id}/callback": {
+      "post": {
+        "operationId": "FulfillmentService_ReportResult",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ReportResultResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FulfillmentServiceReportResultBody"
+            }
+          }
+        ],
+        "tags": [
+          "FulfillmentService"
+        ]
+      }
+    },
+    "/api/v1/fulfillment/tasks/{task_id}/retry": {
+      "post": {
+        "operationId": "FulfillmentService_RetryTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1RetryTaskResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FulfillmentServiceRetryTaskBody"
+            }
+          }
+        ],
+        "tags": [
+          "FulfillmentService"
+        ]
+      }
+    },
+    "/api/v1/games": {
+      "post": {
+        "operationId": "GameConfigService_CreateGame",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateGameResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateGameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameConfigService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}": {
+      "get": {
+        "operationId": "GameConfigService_GetGame",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetGameResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GameConfigService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/eligibility": {
+      "get": {
+        "operationId": "EngineService_CheckEligibility",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CheckEligibilityResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EngineService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/history": {
+      "get": {
+        "operationId": "EngineService_GetHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetHistoryResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EngineService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/milestones": {
+      "get": {
+        "operationId": "WalletService_GetMilestones",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetMilestonesResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WalletService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/play": {
+      "post": {
+        "operationId": "EngineService_Play",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1PlayResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EngineServicePlayBody"
+            }
+          }
+        ],
+        "tags": [
+          "EngineService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/redeem": {
+      "post": {
+        "operationId": "WalletService_Redeem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1RedeemResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WalletServiceRedeemBody"
+            }
+          }
+        ],
+        "tags": [
+          "WalletService"
+        ]
+      }
+    },
+    "/api/v1/games/{game_id}/start": {
+      "post": {
+        "operationId": "EngineService_StartGame",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1StartGameResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EngineServiceStartGameBody"
+            }
+          }
+        ],
+        "tags": [
+          "EngineService"
+        ]
+      }
+    },
+    "/api/v1/identities/resolve": {
+      "post": {
+        "operationId": "IdentityService_ResolveOrCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ResolveOrCreateResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ResolveOrCreate takes a VERIFIED contact and returns the identity (created if\nnew). The hosting auth layer calls this after a provider verifies the contact.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ResolveOrCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/identities/{identity_id}": {
+      "get": {
+        "operationId": "IdentityService_GetIdentity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetIdentityResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "identity_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/identities/{identity_id}/contacts": {
+      "post": {
+        "operationId": "IdentityService_LinkContact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1LinkContactResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "identity_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IdentityServiceLinkContactBody"
+            }
+          }
+        ],
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    },
+    "/api/v1/integrations": {
+      "get": {
+        "operationId": "IntegrationService_ListIntegrations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListIntegrationsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "campaign_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IntegrationService"
+        ]
+      },
+      "post": {
+        "operationId": "IntegrationService_CreateIntegration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateIntegrationResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateIntegrationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntegrationService"
+        ]
+      }
+    },
+    "/api/v1/integrations/emit": {
+      "post": {
+        "operationId": "IntegrationService_EmitEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1EmitEventResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EmitEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IntegrationService"
+        ]
+      }
+    },
+    "/api/v1/integrations/{id}": {
+      "delete": {
+        "operationId": "IntegrationService_DeleteIntegration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1DeleteIntegrationResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "IntegrationService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards": {
+      "get": {
+        "operationId": "LeaderboardService_ListLeaderboards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListLeaderboardsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "campaign_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      },
+      "post": {
+        "operationId": "LeaderboardService_CreateLeaderboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateLeaderboardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateLeaderboardRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard.id}": {
+      "put": {
+        "operationId": "LeaderboardService_UpdateLeaderboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateLeaderboardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LeaderboardServiceUpdateLeaderboardBody"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}": {
+      "get": {
+        "operationId": "LeaderboardService_GetLeaderboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetLeaderboardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}/adjust": {
+      "post": {
+        "operationId": "LeaderboardService_AdjustEntry",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1AdjustEntryResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LeaderboardServiceAdjustEntryBody"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}/disqualify": {
+      "post": {
+        "operationId": "LeaderboardService_DisqualifyEntry",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1DisqualifyEntryResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LeaderboardServiceDisqualifyEntryBody"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}/finalize": {
+      "post": {
+        "operationId": "LeaderboardService_FinalizeLeaderboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1FinalizeLeaderboardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LeaderboardServiceFinalizeLeaderboardBody"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}/rankings": {
+      "get": {
+        "operationId": "LeaderboardService_GetRankings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetRankingsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/leaderboards/{leaderboard_id}/reset": {
+      "post": {
+        "operationId": "LeaderboardService_ResetLeaderboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ResetLeaderboardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "leaderboard_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LeaderboardServiceResetLeaderboardBody"
+            }
+          }
+        ],
+        "tags": [
+          "LeaderboardService"
+        ]
+      }
+    },
+    "/api/v1/merchants/{merchant.id}": {
+      "put": {
+        "operationId": "MerchantService_UpdateMerchant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateMerchantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "merchant.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MerchantServiceUpdateMerchantBody"
+            }
+          }
+        ],
+        "tags": [
+          "MerchantService"
+        ]
+      }
+    },
+    "/api/v1/players/resolve": {
+      "post": {
+        "operationId": "PlayerService_ResolvePlayer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ResolvePlayerResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ResolvePlayer is the business operation behind login: given a VERIFIED contact\n(the caller — a BFF — has already authenticated it), resolve-or-create the\nglobal identity and upsert the tenant-scoped player. Authentication itself\n(challenge issue/verify, token minting) is NOT Core's concern; it lives in the\nBFF, which calls this after a successful verification.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ResolvePlayerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}": {
+      "get": {
+        "operationId": "PlayerService_GetProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetProfileResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}/contacts": {
+      "post": {
+        "operationId": "PlayerService_AddContact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1AddContactResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerServiceAddContactBody"
+            }
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}/profile": {
+      "put": {
+        "operationId": "PlayerService_UpdateProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateProfileResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerServiceUpdateProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}/turns": {
+      "get": {
+        "operationId": "PlayerService_GetTurnBalance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetTurnBalanceResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}/turns/consume": {
+      "post": {
+        "operationId": "PlayerService_ConsumeTurn",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ConsumeTurnResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerServiceConsumeTurnBody"
+            }
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/players/{player_id}/turns/grant": {
+      "post": {
+        "operationId": "PlayerService_GrantTurns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GrantTurnsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerServiceGrantTurnsBody"
+            }
+          }
+        ],
+        "tags": [
+          "PlayerService"
+        ]
+      }
+    },
+    "/api/v1/prizes": {
+      "get": {
+        "operationId": "RewardService_ListPrizes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListPrizesResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      },
+      "post": {
+        "operationId": "RewardService_CreatePrize",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreatePrizeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePrizeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/prizes/summary": {
+      "get": {
+        "operationId": "RewardService_GetPrizeSummary",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetPrizeSummaryResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/prizes/{prize.id}": {
+      "put": {
+        "operationId": "RewardService_UpdatePrize",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdatePrizeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "prize.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RewardServiceUpdatePrizeBody"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/prizes/{prize_id}": {
+      "get": {
+        "operationId": "RewardService_GetPrize",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetPrizeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "prize_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      },
+      "delete": {
+        "operationId": "RewardService_DeletePrize",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1DeletePrizeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "prize_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/prizes/{prize_id}/codes": {
+      "post": {
+        "operationId": "RewardService_ImportCodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ImportCodesResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "prize_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RewardServiceImportCodesBody"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/quests": {
+      "get": {
+        "operationId": "QuestService_ListQuests",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListQuestsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "campaign_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      },
+      "post": {
+        "operationId": "QuestService_CreateQuest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateQuestResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateQuestRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      }
+    },
+    "/api/v1/quests/{quest.id}": {
+      "put": {
+        "operationId": "QuestService_UpdateQuest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateQuestResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "quest.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QuestServiceUpdateQuestBody"
+            }
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      }
+    },
+    "/api/v1/quests/{quest_id}": {
+      "get": {
+        "operationId": "QuestService_GetQuest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetQuestResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      },
+      "delete": {
+        "operationId": "QuestService_DeleteQuest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1DeleteQuestResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      }
+    },
+    "/api/v1/quests/{quest_id}/complete": {
+      "post": {
+        "operationId": "QuestService_CompleteQuest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CompleteQuestResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QuestServiceCompleteQuestBody"
+            }
+          }
+        ],
+        "tags": [
+          "QuestService"
+        ]
+      }
+    },
+    "/api/v1/rewards": {
+      "get": {
+        "operationId": "RewardService_ListRewards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListRewardsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/rewards/{reward_id}/claim": {
+      "post": {
+        "operationId": "RewardService_ClaimReward",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ClaimRewardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RewardServiceClaimRewardBody"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/rewards/{reward_id}/fulfill": {
+      "post": {
+        "operationId": "RewardService_FulfillReward",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1FulfillRewardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RewardServiceFulfillRewardBody"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/rewards/{reward_id}/revoke": {
+      "post": {
+        "operationId": "RewardService_RevokeReward",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1RevokeRewardResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RewardServiceRevokeRewardBody"
+            }
+          }
+        ],
+        "tags": [
+          "RewardService"
+        ]
+      }
+    },
+    "/api/v1/tenants": {
+      "get": {
+        "operationId": "TenantService_ListTenants",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListTenantsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantService"
+        ]
+      },
+      "post": {
+        "operationId": "TenantService_CreateTenant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateTenantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTenantRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TenantService"
+        ]
+      }
+    },
+    "/api/v1/tenants/{tenant.id}": {
+      "put": {
+        "operationId": "TenantService_UpdateTenant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateTenantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant.id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TenantServiceUpdateTenantBody"
+            }
+          }
+        ],
+        "tags": [
+          "TenantService"
+        ]
+      }
+    },
+    "/api/v1/tenants/{tenant_id}": {
+      "get": {
+        "operationId": "TenantService_GetTenant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetTenantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantService"
+        ]
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/merchants": {
+      "get": {
+        "operationId": "MerchantService_ListMerchants",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1ListMerchantsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MerchantService"
+        ]
+      },
+      "post": {
+        "operationId": "MerchantService_CreateMerchant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1CreateMerchantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MerchantServiceCreateMerchantBody"
+            }
+          }
+        ],
+        "tags": [
+          "MerchantService"
+        ]
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/merchants/{merchant_id}": {
+      "get": {
+        "operationId": "MerchantService_GetMerchant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetMerchantResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "merchant_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "MerchantService"
+        ]
+      }
+    },
+    "/api/v1/wallet": {
+      "get": {
+        "operationId": "WalletService_GetWallet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetWalletResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WalletService"
+        ]
+      }
+    },
+    "/api/v1/wallet/ledger": {
+      "get": {
+        "operationId": "WalletService_GetLedger",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1GetLedgerResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scope.tenant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope.merchant_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scope_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "player_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "WalletService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CampaignServiceDuplicateCampaignBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CampaignServiceUpdateCampaignBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "campaign": {
+          "type": "object",
+          "properties": {
+            "tenant_id": {
+              "type": "string"
+            },
+            "merchant_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/definitions/v1CampaignStatus"
+            },
+            "start_date": {
+              "type": "string",
+              "format": "int64"
+            },
+            "end_date": {
+              "type": "string",
+              "format": "int64"
+            },
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "games": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "linked game ids"
+            },
+            "quests": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "linked quest ids"
+            },
+            "settings": {
+              "type": "string",
+              "title": "raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          "description": "Campaign groups games + quests under a merchant, with channels, auth methods,\na run window, and widget/eligibility settings. tenant_id + merchant_id are the\nisolation boundary (from the scope, never the path)."
+        }
+      }
+    },
+    "EngineServicePlayBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object",
+          "title": "shape-specific"
+        },
+        "idempotency_key": {
+          "type": "string"
+        }
+      }
+    },
+    "EngineServiceStartGameBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "player_id": {
+          "type": "string"
+        }
+      }
+    },
+    "FulfillmentServiceReportResultBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TaskStatus",
+          "title": "FULFILLED | FAILED"
+        },
+        "receipt": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "error": {
+          "type": "string",
+          "title": "populated when status == failed"
+        }
+      },
+      "description": "ReportResult finalizes a task from an external orchestrator (n8n) callback.\nLooked up by the globally-unique task_id; scope is advisory."
+    },
+    "FulfillmentServiceRetryTaskBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        }
+      }
+    },
+    "IdentityServiceLinkContactBody": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/v1Contact"
+        }
+      }
+    },
+    "LeaderboardServiceAdjustEntryBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "delta": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "LeaderboardServiceDisqualifyEntryBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "player_id": {
+          "type": "string"
+        }
+      }
+    },
+    "LeaderboardServiceFinalizeLeaderboardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        }
+      }
+    },
+    "LeaderboardServiceResetLeaderboardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        }
+      }
+    },
+    "LeaderboardServiceUpdateLeaderboardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "leaderboard": {
+          "type": "object",
+          "properties": {
+            "tenant_id": {
+              "type": "string"
+            },
+            "merchant_id": {
+              "type": "string"
+            },
+            "campaign_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "metric": {
+              "$ref": "#/definitions/v1LeaderboardMetric"
+            },
+            "time_window": {
+              "type": "string"
+            },
+            "prize_tiers": {
+              "type": "string"
+            },
+            "anti_cheat": {
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/definitions/v1LeaderboardStatus"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          "description": "Leaderboard config. time_window/prize_tiers/anti_cheat are raw JSON (decoded\nby the hosting layer): time_window={type,period,start,end},\nprize_tiers=[{from_rank,to_rank,prize_id}], anti_cheat={score_ceiling,flag_outliers}."
+        }
+      }
+    },
+    "MerchantServiceCreateMerchantBody": {
+      "type": "object",
+      "properties": {
+        "merchant": {
+          "$ref": "#/definitions/v1Merchant"
+        }
+      }
+    },
+    "MerchantServiceUpdateMerchantBody": {
+      "type": "object",
+      "properties": {
+        "merchant": {
+          "type": "object",
+          "properties": {
+            "tenant_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "logo": {
+              "type": "string"
+            },
+            "settings": {
+              "type": "string",
+              "title": "raw JSON: {wallet_scope_override}"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "PlayerServiceAddContactBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "identity_id": {
+          "type": "string"
+        },
+        "contact_type": {
+          "$ref": "#/definitions/v1ContactType"
+        },
+        "contact_value": {
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/definitions/v1AuthMethod",
+          "title": "verification method (dev stubs auto-verify)"
+        }
+      }
+    },
+    "PlayerServiceConsumeTurnBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "scope_key": {
+          "type": "string"
+        }
+      }
+    },
+    "PlayerServiceGrantTurnsBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "scope_key": {
+          "type": "string"
+        },
+        "delta": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "PlayerServiceUpdateProfileBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "profile": {
+          "type": "string"
+        }
+      }
+    },
+    "QuestServiceCompleteQuestBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "proof": {
+          "type": "string",
+          "title": "raw JSON, verifier-specific"
+        }
+      },
+      "description": "CompleteQuest verifies the proof, gates re-completion, and grants the reward."
+    },
+    "QuestServiceUpdateQuestBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "quest": {
+          "type": "object",
+          "properties": {
+            "tenant_id": {
+              "type": "string"
+            },
+            "merchant_id": {
+              "type": "string"
+            },
+            "campaign_id": {
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/definitions/v1QuestType"
+            },
+            "name": {
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/definitions/v1QuestStatus"
+            },
+            "reward": {
+              "$ref": "#/definitions/v1QuestReward"
+            },
+            "config": {
+              "type": "string",
+              "title": "raw JSON"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          "description": "Quest is an admin-configured mission under a campaign. config is verifier-\nspecific raw JSON (decoded only by the matching quest-type verifier)."
+        }
+      }
+    },
+    "RewardServiceClaimRewardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "player_id": {
+          "type": "string"
+        }
+      }
+    },
+    "RewardServiceFulfillRewardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        }
+      }
+    },
+    "RewardServiceImportCodesBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "RewardServiceRevokeRewardBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        }
+      }
+    },
+    "RewardServiceUpdatePrizeBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "prize": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "$ref": "#/definitions/v1Scope"
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "image": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string",
+              "format": "int64"
+            },
+            "total": {
+              "type": "string",
+              "format": "int64"
+            },
+            "remaining": {
+              "type": "string",
+              "format": "int64"
+            },
+            "metadata": {
+              "type": "string",
+              "title": "raw JSON"
+            },
+            "award_constraints": {
+              "type": "string",
+              "title": "raw JSON: {max_per_user, max_per_day}"
+            },
+            "fulfillment": {
+              "type": "string",
+              "title": "raw JSON: {redemption_mode, method}"
+            }
+          },
+          "description": "Prize is an awardable item with finite stock."
+        }
+      }
+    },
+    "TenantServiceUpdateTenantBody": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "plan": {
+              "type": "string"
+            },
+            "settings": {
+              "type": "string",
+              "title": "raw JSON: {identity_linking, default_locale, wallet_scope}"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "WalletServiceRedeemBody": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "milestone_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AddContactResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        }
+      }
+    },
+    "v1AdjustEntryResponse": {
+      "type": "object",
+      "properties": {
+        "entry": {
+          "$ref": "#/definitions/v1RankedEntry"
+        }
+      }
+    },
+    "v1AuthMethod": {
+      "type": "string",
+      "enum": [
+        "AUTH_METHOD_UNSPECIFIED",
+        "AUTH_METHOD_CODE",
+        "AUTH_METHOD_OTP",
+        "AUTH_METHOD_MAGIC_LINK",
+        "AUTH_METHOD_SOCIAL"
+      ],
+      "default": "AUTH_METHOD_UNSPECIFIED",
+      "description": "AuthMethod is the verification method used to start/complete a login."
+    },
+    "v1Campaign": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "merchant_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1CampaignStatus"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "games": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "linked game ids"
+        },
+        "quests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "linked quest ids"
+        },
+        "settings": {
+          "type": "string",
+          "title": "raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "Campaign groups games + quests under a merchant, with channels, auth methods,\na run window, and widget/eligibility settings. tenant_id + merchant_id are the\nisolation boundary (from the scope, never the path)."
+    },
+    "v1CampaignAnalytics": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "type": "string"
+        },
+        "total_plays": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total_wins": {
+          "type": "string",
+          "format": "int64"
+        },
+        "unique_players": {
+          "type": "string",
+          "format": "int64"
+        },
+        "conversion": {
+          "type": "number",
+          "format": "double",
+          "title": "wins / plays"
+        }
+      }
+    },
+    "v1CampaignStatus": {
+      "type": "string",
+      "enum": [
+        "CAMPAIGN_STATUS_UNSPECIFIED",
+        "CAMPAIGN_STATUS_DRAFT",
+        "CAMPAIGN_STATUS_ACTIVE",
+        "CAMPAIGN_STATUS_PAUSED",
+        "CAMPAIGN_STATUS_ENDED"
+      ],
+      "default": "CAMPAIGN_STATUS_UNSPECIFIED",
+      "description": "CampaignStatus is a campaign's lifecycle state."
+    },
+    "v1CheckEligibilityResponse": {
+      "type": "object",
+      "properties": {
+        "can_play": {
+          "type": "boolean"
+        },
+        "remaining_plays": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "next_reset_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ClaimRewardResponse": {
+      "type": "object",
+      "properties": {
+        "reward": {
+          "$ref": "#/definitions/v1RewardRecord"
+        }
+      }
+    },
+    "v1CompleteQuestResponse": {
+      "type": "object",
+      "properties": {
+        "completed": {
+          "type": "boolean"
+        },
+        "turns_granted": {
+          "type": "string",
+          "format": "int64"
+        },
+        "turn_balance": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ConsumeTurnResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Contact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1ContactType"
+        },
+        "value": {
+          "type": "string",
+          "title": "normalized"
+        },
+        "verified": {
+          "type": "boolean"
+        }
+      },
+      "description": "Contact is a verified means of identifying a person (globally unique)."
+    },
+    "v1ContactType": {
+      "type": "string",
+      "enum": [
+        "CONTACT_TYPE_UNSPECIFIED",
+        "CONTACT_TYPE_PHONE",
+        "CONTACT_TYPE_EMAIL"
+      ],
+      "default": "CONTACT_TYPE_UNSPECIFIED",
+      "description": "ContactType is the kind of a verified contact."
+    },
+    "v1CreateCampaignRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1CreateCampaignResponse": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1CreateGameRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "game": {
+          "$ref": "#/definitions/v1Game"
+        }
+      }
+    },
+    "v1CreateGameResponse": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "$ref": "#/definitions/v1Game"
+        }
+      }
+    },
+    "v1CreateIntegrationRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "integration": {
+          "$ref": "#/definitions/v1Integration"
+        }
+      }
+    },
+    "v1CreateIntegrationResponse": {
+      "type": "object",
+      "properties": {
+        "integration": {
+          "$ref": "#/definitions/v1Integration"
+        }
+      }
+    },
+    "v1CreateLeaderboardRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "leaderboard": {
+          "$ref": "#/definitions/v1Leaderboard"
+        }
+      }
+    },
+    "v1CreateLeaderboardResponse": {
+      "type": "object",
+      "properties": {
+        "leaderboard": {
+          "$ref": "#/definitions/v1Leaderboard"
+        }
+      }
+    },
+    "v1CreateMerchantResponse": {
+      "type": "object",
+      "properties": {
+        "merchant": {
+          "$ref": "#/definitions/v1Merchant"
+        }
+      }
+    },
+    "v1CreatePrizeRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "prize": {
+          "$ref": "#/definitions/v1Prize"
+        },
+        "game_id": {
+          "type": "string",
+          "title": "associates the prize with a game for stock listing"
+        }
+      }
+    },
+    "v1CreatePrizeResponse": {
+      "type": "object",
+      "properties": {
+        "prize": {
+          "$ref": "#/definitions/v1Prize"
+        }
+      }
+    },
+    "v1CreateQuestRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "quest": {
+          "$ref": "#/definitions/v1Quest"
+        }
+      }
+    },
+    "v1CreateQuestResponse": {
+      "type": "object",
+      "properties": {
+        "quest": {
+          "$ref": "#/definitions/v1Quest"
+        }
+      }
+    },
+    "v1CreateTenantRequest": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "$ref": "#/definitions/v1Tenant"
+        }
+      }
+    },
+    "v1CreateTenantResponse": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "$ref": "#/definitions/v1Tenant"
+        }
+      }
+    },
+    "v1DeleteIntegrationResponse": {
+      "type": "object"
+    },
+    "v1DeletePrizeResponse": {
+      "type": "object"
+    },
+    "v1DeleteQuestResponse": {
+      "type": "object"
+    },
+    "v1DisqualifyEntryResponse": {
+      "type": "object",
+      "properties": {
+        "entry": {
+          "$ref": "#/definitions/v1RankedEntry"
+        }
+      }
+    },
+    "v1DuplicateCampaignResponse": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1EmitEventRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "type": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EmitEventResponse": {
+      "type": "object",
+      "properties": {
+        "dispatched": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1EntryState": {
+      "type": "string",
+      "enum": [
+        "ENTRY_STATE_UNSPECIFIED",
+        "ENTRY_STATE_ACTIVE",
+        "ENTRY_STATE_FLAGGED",
+        "ENTRY_STATE_DISQUALIFIED"
+      ],
+      "default": "ENTRY_STATE_UNSPECIFIED",
+      "description": "EntryState is a ranked entry's standing."
+    },
+    "v1FinalizeLeaderboardResponse": {
+      "type": "object",
+      "properties": {
+        "awarded": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "awards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TierAward"
+          }
+        }
+      }
+    },
+    "v1FulfillRewardResponse": {
+      "type": "object",
+      "properties": {
+        "reward": {
+          "$ref": "#/definitions/v1RewardRecord"
+        }
+      }
+    },
+    "v1FulfillmentTask": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "reward_id": {
+          "type": "string"
+        },
+        "prize_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "game_id": {
+          "type": "string"
+        },
+        "campaign_id": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "channel_config": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TaskStatus"
+        },
+        "attempts": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "last_error": {
+          "type": "string"
+        },
+        "receipt": {
+          "type": "string",
+          "description": "raw JSON: voucher code, tracking no., ..."
+        },
+        "next_attempt_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "FulfillmentTask is one row of the transactional outbox: a unit of delivery\nwork committed atomically with the reward it delivers."
+    },
+    "v1Game": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "campaign_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "seed_generator": {
+          "type": "string"
+        },
+        "reward_handler": {
+          "type": "string"
+        },
+        "validator": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1GameStatus"
+        },
+        "rules": {
+          "$ref": "#/definitions/v1Rules"
+        },
+        "handler_config": {
+          "type": "string",
+          "title": "raw JSON, decoded by the reward handler/seed"
+        },
+        "validator_config": {
+          "type": "string",
+          "title": "raw JSON, decoded by the validator (anti-cheat)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "wallet_scope": {
+          "$ref": "#/definitions/v1WalletScope",
+          "title": "UNSPECIFIED → campaign"
+        },
+        "milestones": {
+          "type": "string",
+          "title": "raw JSON: milestone config (currency, mode, auto_grant, thresholds)"
+        }
+      },
+      "description": "Game is the config-driven game definition. handler_config is opaque JSON the\nengine never interprets (decoded only by the reward handler/seed). Widget/UI\nrender config is NOT a Core concern — it lives in the presentation layer (BFF)."
+    },
+    "v1GameStatus": {
+      "type": "string",
+      "enum": [
+        "GAME_STATUS_UNSPECIFIED",
+        "GAME_STATUS_DRAFT",
+        "GAME_STATUS_ACTIVE",
+        "GAME_STATUS_PAUSED",
+        "GAME_STATUS_ENDED"
+      ],
+      "default": "GAME_STATUS_UNSPECIFIED",
+      "description": "GameStatus is a game's lifecycle state."
+    },
+    "v1GetCampaignAnalyticsResponse": {
+      "type": "object",
+      "properties": {
+        "analytics": {
+          "$ref": "#/definitions/v1CampaignAnalytics"
+        }
+      }
+    },
+    "v1GetCampaignResponse": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1GetGameResponse": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "$ref": "#/definitions/v1Game"
+        }
+      }
+    },
+    "v1GetHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1HistoryEntry"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetIdentityResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        }
+      }
+    },
+    "v1GetLeaderboardResponse": {
+      "type": "object",
+      "properties": {
+        "leaderboard": {
+          "$ref": "#/definitions/v1Leaderboard"
+        }
+      }
+    },
+    "v1GetLedgerResponse": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LedgerEntry"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetMerchantResponse": {
+      "type": "object",
+      "properties": {
+        "merchant": {
+          "$ref": "#/definitions/v1Merchant"
+        }
+      }
+    },
+    "v1GetMilestonesResponse": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/definitions/v1MilestoneMode"
+        },
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MilestoneState"
+          }
+        }
+      }
+    },
+    "v1GetPrizeResponse": {
+      "type": "object",
+      "properties": {
+        "prize": {
+          "$ref": "#/definitions/v1Prize"
+        }
+      }
+    },
+    "v1GetPrizeSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PrizeSummaryItem"
+          }
+        }
+      }
+    },
+    "v1GetProfileResponse": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/v1Player"
+        },
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        }
+      }
+    },
+    "v1GetPublicConfigResponse": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1GetQuestResponse": {
+      "type": "object",
+      "properties": {
+        "quest": {
+          "$ref": "#/definitions/v1Quest"
+        }
+      }
+    },
+    "v1GetRankingsResponse": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RankedEntry"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "window_key": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetTaskResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1FulfillmentTask"
+        }
+      }
+    },
+    "v1GetTenantResponse": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "$ref": "#/definitions/v1Tenant"
+        }
+      }
+    },
+    "v1GetTurnBalanceResponse": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        },
+        "scope_key": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetWalletResponse": {
+      "type": "object",
+      "properties": {
+        "balances": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "v1GrantTurnsResponse": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1HistoryEntry": {
+      "type": "object",
+      "properties": {
+        "play_id": {
+          "type": "string"
+        },
+        "game_id": {
+          "type": "string"
+        },
+        "rewards": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "metadata": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Identity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Contact"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ImportCodesResponse": {
+      "type": "object",
+      "properties": {
+        "imported": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Integration": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1IntegrationType"
+        },
+        "campaign_id": {
+          "type": "string",
+          "title": "optional: \"\" = all campaigns in scope"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "subscribed event types (play_completed, prize_won, ...)"
+        },
+        "config": {
+          "type": "string",
+          "title": "JSON: { url, hmac_secret, sheet_id, ... } (adapter-specific)"
+        },
+        "status": {
+          "$ref": "#/definitions/v1IntegrationStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1IntegrationStatus": {
+      "type": "string",
+      "enum": [
+        "INTEGRATION_STATUS_UNSPECIFIED",
+        "INTEGRATION_STATUS_ACTIVE",
+        "INTEGRATION_STATUS_PAUSED"
+      ],
+      "default": "INTEGRATION_STATUS_UNSPECIFIED",
+      "description": "IntegrationStatus is whether an integration is firing."
+    },
+    "v1IntegrationType": {
+      "type": "string",
+      "enum": [
+        "INTEGRATION_TYPE_UNSPECIFIED",
+        "INTEGRATION_TYPE_WEBHOOK",
+        "INTEGRATION_TYPE_GSHEET",
+        "INTEGRATION_TYPE_SMS",
+        "INTEGRATION_TYPE_ZNS",
+        "INTEGRATION_TYPE_CRM",
+        "INTEGRATION_TYPE_N8N"
+      ],
+      "default": "INTEGRATION_TYPE_UNSPECIFIED",
+      "description": "IntegrationType is the outbound adapter kind."
+    },
+    "v1Leaderboard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "merchant_id": {
+          "type": "string"
+        },
+        "campaign_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "metric": {
+          "$ref": "#/definitions/v1LeaderboardMetric"
+        },
+        "time_window": {
+          "type": "string"
+        },
+        "prize_tiers": {
+          "type": "string"
+        },
+        "anti_cheat": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1LeaderboardStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "Leaderboard config. time_window/prize_tiers/anti_cheat are raw JSON (decoded\nby the hosting layer): time_window={type,period,start,end},\nprize_tiers=[{from_rank,to_rank,prize_id}], anti_cheat={score_ceiling,flag_outliers}."
+    },
+    "v1LeaderboardMetric": {
+      "type": "string",
+      "enum": [
+        "LEADERBOARD_METRIC_UNSPECIFIED",
+        "LEADERBOARD_METRIC_HIGH_SCORE",
+        "LEADERBOARD_METRIC_TOTAL_SCORE",
+        "LEADERBOARD_METRIC_TOTAL_WINS",
+        "LEADERBOARD_METRIC_TOTAL_PLAYS",
+        "LEADERBOARD_METRIC_QUEST_POINTS",
+        "LEADERBOARD_METRIC_COLLECTION_COUNT"
+      ],
+      "default": "LEADERBOARD_METRIC_UNSPECIFIED",
+      "description": "LeaderboardMetric is the score a leaderboard ranks by."
+    },
+    "v1LeaderboardStatus": {
+      "type": "string",
+      "enum": [
+        "LEADERBOARD_STATUS_UNSPECIFIED",
+        "LEADERBOARD_STATUS_ACTIVE",
+        "LEADERBOARD_STATUS_FINALIZED"
+      ],
+      "default": "LEADERBOARD_STATUS_UNSPECIFIED",
+      "description": "LeaderboardStatus is a leaderboard's lifecycle state."
+    },
+    "v1LedgerEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64",
+          "title": "signed: + earn, - spend"
+        },
+        "reason": {
+          "$ref": "#/definitions/v1LedgerReason"
+        },
+        "ref_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1LedgerReason": {
+      "type": "string",
+      "enum": [
+        "LEDGER_REASON_UNSPECIFIED",
+        "LEDGER_REASON_PLAY",
+        "LEDGER_REASON_REDEEM",
+        "LEDGER_REASON_ADJUST"
+      ],
+      "default": "LEDGER_REASON_UNSPECIFIED",
+      "description": "LedgerReason is why a wallet ledger entry was written."
+    },
+    "v1LinkContactResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        }
+      }
+    },
+    "v1ListCampaignsResponse": {
+      "type": "object",
+      "properties": {
+        "campaigns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Campaign"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListIntegrationsResponse": {
+      "type": "object",
+      "properties": {
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Integration"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListLeaderboardsResponse": {
+      "type": "object",
+      "properties": {
+        "leaderboards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Leaderboard"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListMerchantsResponse": {
+      "type": "object",
+      "properties": {
+        "merchants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Merchant"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListPlayerQuestsResponse": {
+      "type": "object",
+      "properties": {
+        "quests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1QuestState"
+          }
+        }
+      }
+    },
+    "v1ListPrizesResponse": {
+      "type": "object",
+      "properties": {
+        "prizes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Prize"
+          }
+        }
+      }
+    },
+    "v1ListQuestsResponse": {
+      "type": "object",
+      "properties": {
+        "quests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Quest"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListRewardsResponse": {
+      "type": "object",
+      "properties": {
+        "rewards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RewardRecord"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListTasksResponse": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FulfillmentTask"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListTenantsResponse": {
+      "type": "object",
+      "properties": {
+        "tenants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Tenant"
+          }
+        },
+        "next_cursor": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Merchant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "logo": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "string",
+          "title": "raw JSON: {wallet_scope_override}"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MilestoneMode": {
+      "type": "string",
+      "enum": [
+        "MILESTONE_MODE_UNSPECIFIED",
+        "MILESTONE_MODE_CUMULATIVE_UNLOCK",
+        "MILESTONE_MODE_SPEND_EXCHANGE"
+      ],
+      "default": "MILESTONE_MODE_UNSPECIFIED",
+      "description": "MilestoneMode is how a milestone set behaves."
+    },
+    "v1MilestoneState": {
+      "type": "object",
+      "properties": {
+        "milestone_id": {
+          "type": "string"
+        },
+        "threshold": {
+          "type": "string",
+          "format": "int64"
+        },
+        "prize_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1MilestoneStatus"
+        },
+        "progress": {
+          "type": "string",
+          "format": "int64"
+        },
+        "remaining": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MilestoneStatus": {
+      "type": "string",
+      "enum": [
+        "MILESTONE_STATUS_UNSPECIFIED",
+        "MILESTONE_STATUS_LOCKED",
+        "MILESTONE_STATUS_UNLOCKED",
+        "MILESTONE_STATUS_GRANTED"
+      ],
+      "default": "MILESTONE_STATUS_UNSPECIFIED",
+      "description": "MilestoneStatus is a milestone's progress state for a player."
+    },
+    "v1PlayResponse": {
+      "type": "object",
+      "properties": {
+        "play_id": {
+          "type": "string"
+        },
+        "rewards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Reward"
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "v1Player": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "merchant_id": {
+          "type": "string"
+        },
+        "identity_id": {
+          "type": "string"
+        },
+        "profile": {
+          "type": "string",
+          "title": "raw JSON (collected fields)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Prize": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "remaining": {
+          "type": "string",
+          "format": "int64"
+        },
+        "metadata": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "award_constraints": {
+          "type": "string",
+          "title": "raw JSON: {max_per_user, max_per_day}"
+        },
+        "fulfillment": {
+          "type": "string",
+          "title": "raw JSON: {redemption_mode, method}"
+        }
+      },
+      "description": "Prize is an awardable item with finite stock."
+    },
+    "v1PrizeSummaryItem": {
+      "type": "object",
+      "properties": {
+        "prize_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "remaining": {
+          "type": "string",
+          "format": "int64"
+        },
+        "awarded": {
+          "type": "string",
+          "format": "int64"
+        },
+        "codes_available": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Quest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "merchant_id": {
+          "type": "string"
+        },
+        "campaign_id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1QuestType"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1QuestStatus"
+        },
+        "reward": {
+          "$ref": "#/definitions/v1QuestReward"
+        },
+        "config": {
+          "type": "string",
+          "title": "raw JSON"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "Quest is an admin-configured mission under a campaign. config is verifier-\nspecific raw JSON (decoded only by the matching quest-type verifier)."
+    },
+    "v1QuestReward": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1QuestRewardType"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64",
+          "title": "turns granted on completion"
+        }
+      }
+    },
+    "v1QuestRewardType": {
+      "type": "string",
+      "enum": [
+        "QUEST_REWARD_TYPE_UNSPECIFIED",
+        "QUEST_REWARD_TYPE_PLAY_TURN"
+      ],
+      "default": "QUEST_REWARD_TYPE_UNSPECIFIED",
+      "description": "QuestRewardType is the kind of reward a quest grants on completion."
+    },
+    "v1QuestState": {
+      "type": "object",
+      "properties": {
+        "quest": {
+          "$ref": "#/definitions/v1Quest"
+        },
+        "completed": {
+          "type": "boolean",
+          "title": "ever completed (daily: today)"
+        },
+        "completions": {
+          "type": "integer",
+          "format": "int32",
+          "title": "lifetime count"
+        },
+        "last_completed": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "QuestState is a quest plus the caller's completion status (player list)."
+    },
+    "v1QuestStatus": {
+      "type": "string",
+      "enum": [
+        "QUEST_STATUS_UNSPECIFIED",
+        "QUEST_STATUS_ACTIVE",
+        "QUEST_STATUS_INACTIVE"
+      ],
+      "default": "QUEST_STATUS_UNSPECIFIED",
+      "description": "QuestStatus is whether a quest is live."
+    },
+    "v1QuestType": {
+      "type": "string",
+      "enum": [
+        "QUEST_TYPE_UNSPECIFIED",
+        "QUEST_TYPE_DAILY_CHECKIN",
+        "QUEST_TYPE_SHARE_SOCIAL",
+        "QUEST_TYPE_INVITE_FRIEND",
+        "QUEST_TYPE_SCAN_QR",
+        "QUEST_TYPE_VIEW_PAGE",
+        "QUEST_TYPE_ANSWER_QUESTION",
+        "QUEST_TYPE_EXTERNAL_EVENT"
+      ],
+      "default": "QUEST_TYPE_UNSPECIFIED",
+      "description": "QuestType selects the quest verifier."
+    },
+    "v1RankedEntry": {
+      "type": "object",
+      "properties": {
+        "player_id": {
+          "type": "string"
+        },
+        "score": {
+          "type": "string",
+          "format": "int64"
+        },
+        "plays": {
+          "type": "string",
+          "format": "int64"
+        },
+        "rank": {
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "$ref": "#/definitions/v1EntryState"
+        }
+      },
+      "description": "RankedEntry is one player's standing (player list / rankings)."
+    },
+    "v1RedeemResponse": {
+      "type": "object",
+      "properties": {
+        "redeemed": {
+          "type": "boolean"
+        },
+        "mode": {
+          "$ref": "#/definitions/v1MilestoneMode"
+        },
+        "spent": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "reward": {
+          "$ref": "#/definitions/v1Reward"
+        },
+        "balances": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "v1ReportResultResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1FulfillmentTask"
+        }
+      }
+    },
+    "v1ResetLeaderboardResponse": {
+      "type": "object",
+      "properties": {
+        "cleared": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ResolveOrCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/v1Contact"
+        }
+      },
+      "description": "ResolveOrCreate takes a VERIFIED contact and returns the identity (created if\nnew). The hosting auth layer calls this after a provider verifies the contact."
+    },
+    "v1ResolveOrCreateResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        },
+        "created": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ResolvePlayerRequest": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/v1Scope",
+          "title": "tenant_id (+ optional merchant_id)"
+        },
+        "contact_type": {
+          "$ref": "#/definitions/v1ContactType"
+        },
+        "contact_value": {
+          "type": "string",
+          "title": "raw; normalized server-side"
+        }
+      },
+      "description": "ResolvePlayer is the business operation behind login: given a VERIFIED contact\n(the caller — a BFF — has already authenticated it), resolve-or-create the\nglobal identity and upsert the tenant-scoped player. Authentication itself\n(challenge issue/verify, token minting) is NOT Core's concern; it lives in the\nBFF, which calls this after a successful verification."
+    },
+    "v1ResolvePlayerResponse": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/v1Player"
+        },
+        "identity": {
+          "$ref": "#/definitions/v1Identity"
+        },
+        "identity_is_new": {
+          "type": "boolean"
+        },
+        "player_is_new": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1RetryTaskResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1FulfillmentTask"
+        }
+      }
+    },
+    "v1RevokeRewardResponse": {
+      "type": "object",
+      "properties": {
+        "reward": {
+          "$ref": "#/definitions/v1RewardRecord"
+        }
+      }
+    },
+    "v1Reward": {
+      "type": "object",
+      "properties": {
+        "prize_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "int64"
+        },
+        "value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "reward_id": {
+          "type": "string",
+          "title": "durable reward record id (for claim)"
+        },
+        "code": {
+          "type": "string",
+          "title": "assigned voucher code, if any"
+        }
+      },
+      "description": "Reward is a single awarded item in a play result."
+    },
+    "v1RewardRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/v1Scope"
+        },
+        "game_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "prize_id": {
+          "type": "string"
+        },
+        "play_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "code": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1RewardStatus"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "claimed_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "fulfilled_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "revoked_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "RewardRecord is a durable record that a player won one unit of a prize."
+    },
+    "v1RewardStatus": {
+      "type": "string",
+      "enum": [
+        "REWARD_STATUS_UNSPECIFIED",
+        "REWARD_STATUS_WON",
+        "REWARD_STATUS_CLAIMED",
+        "REWARD_STATUS_FULFILLED",
+        "REWARD_STATUS_REVOKED"
+      ],
+      "default": "REWARD_STATUS_UNSPECIFIED",
+      "description": "RewardStatus is the lifecycle of an awarded reward record."
+    },
+    "v1Rules": {
+      "type": "object",
+      "properties": {
+        "max_plays_per_user": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "max_plays_per_day": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "require_login": {
+          "type": "boolean"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "int64"
+        },
+        "use_turns": {
+          "type": "boolean",
+          "title": "gate on quest-granted turn balance (keyed by campaign)"
+        }
+      },
+      "description": "Rules are engine-enforced gameplay constraints."
+    },
+    "v1Scope": {
+      "type": "object",
+      "properties": {
+        "tenant_id": {
+          "type": "string"
+        },
+        "merchant_id": {
+          "type": "string"
+        }
+      },
+      "description": "Scope is the tenant/merchant isolation boundary on every request."
+    },
+    "v1StartGameResponse": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string"
+        },
+        "seed_data": {
+          "type": "string",
+          "title": "raw JSON, may be empty"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1TaskStatus": {
+      "type": "string",
+      "enum": [
+        "TASK_STATUS_UNSPECIFIED",
+        "TASK_STATUS_PENDING",
+        "TASK_STATUS_PROCESSING",
+        "TASK_STATUS_FULFILLED",
+        "TASK_STATUS_FAILED",
+        "TASK_STATUS_DEAD"
+      ],
+      "default": "TASK_STATUS_UNSPECIFIED",
+      "description": "TaskStatus is the state of a fulfillment outbox task. ReportResult callbacks\nfinalize a task to FULFILLED or FAILED."
+    },
+    "v1Tenant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "plan": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "string",
+          "title": "raw JSON: {identity_linking, default_locale, wallet_scope}"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1TierAward": {
+      "type": "object",
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "prize_id": {
+          "type": "string"
+        },
+        "reward_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateCampaignResponse": {
+      "type": "object",
+      "properties": {
+        "campaign": {
+          "$ref": "#/definitions/v1Campaign"
+        }
+      }
+    },
+    "v1UpdateLeaderboardResponse": {
+      "type": "object",
+      "properties": {
+        "leaderboard": {
+          "$ref": "#/definitions/v1Leaderboard"
+        }
+      }
+    },
+    "v1UpdateMerchantResponse": {
+      "type": "object",
+      "properties": {
+        "merchant": {
+          "$ref": "#/definitions/v1Merchant"
+        }
+      }
+    },
+    "v1UpdatePrizeResponse": {
+      "type": "object",
+      "properties": {
+        "prize": {
+          "$ref": "#/definitions/v1Prize"
+        }
+      }
+    },
+    "v1UpdateProfileResponse": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/v1Player"
+        }
+      }
+    },
+    "v1UpdateQuestResponse": {
+      "type": "object",
+      "properties": {
+        "quest": {
+          "$ref": "#/definitions/v1Quest"
+        }
+      }
+    },
+    "v1UpdateTenantResponse": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "$ref": "#/definitions/v1Tenant"
+        }
+      }
+    },
+    "v1WalletScope": {
+      "type": "string",
+      "enum": [
+        "WALLET_SCOPE_UNSPECIFIED",
+        "WALLET_SCOPE_CAMPAIGN",
+        "WALLET_SCOPE_MERCHANT",
+        "WALLET_SCOPE_TENANT"
+      ],
+      "default": "WALLET_SCOPE_UNSPECIFIED",
+      "description": "WalletScope is the isolation level points/milestones are keyed by\n(UNSPECIFIED → campaign, the default)."
+    },
+    "apiFieldViolation": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "apiErrorInfo": {
+      "type": "object",
+      "description": "data.error payload (mirrors google.rpc.ErrorInfo).",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "canonical gRPC status name"
+        },
+        "reason": {
+          "type": "string",
+          "description": "stable machine reason (see docs/ERRORS.md)"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "field_violations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiFieldViolation"
+          }
+        }
+      }
+    },
+    "apiErrorData": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/apiErrorInfo"
+        }
+      }
+    },
+    "apiErrorEnvelope": {
+      "type": "object",
+      "description": "Uniform error envelope.",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "trace_id": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/apiErrorData"
+        }
+      }
+    }
+  }
+}

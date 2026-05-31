@@ -14,8 +14,8 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Handler holds the Core client.
@@ -97,14 +97,14 @@ func (h *Handler) milestones(w http.ResponseWriter, r *http.Request) {
 			"milestone_id": m.GetMilestoneId(),
 			"threshold":    m.GetThreshold(),
 			"prize_id":     m.GetPrizeId(),
-			"status":       m.GetStatus(),
+			"status":       enumx.Name(m.GetStatus()),
 			"progress":     m.GetProgress(),
 			"remaining":    m.GetRemaining(),
 		})
 	}
 	envelope.WriteSuccess(w, tid, map[string]any{
 		"currency":   resp.GetCurrency(),
-		"mode":       resp.GetMode(),
+		"mode":       enumx.Name(resp.GetMode()),
 		"balance":    resp.GetBalance(),
 		"milestones": rungs,
 	})
@@ -130,7 +130,7 @@ func (h *Handler) redeem(w http.ResponseWriter, r *http.Request) {
 	}
 	data := map[string]any{
 		"redeemed": resp.GetRedeemed(),
-		"mode":     resp.GetMode(),
+		"mode":     enumx.Name(resp.GetMode()),
 		"spent":    resp.GetSpent(),
 		"balances": resp.GetBalances(),
 	}
@@ -145,17 +145,18 @@ func ledgerView(e *gamev1.LedgerEntry) map[string]any {
 		"id":         e.GetId(),
 		"currency":   e.GetCurrency(),
 		"amount":     e.GetAmount(),
-		"reason":     e.GetReason(),
+		"reason":     enumx.Name(e.GetReason()),
 		"ref_id":     e.GetRefId(),
 		"created_at": tsString(e.GetCreatedAt()),
 	}
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 func rewardView(r *gamev1.Reward) map[string]any {

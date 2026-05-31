@@ -13,6 +13,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -49,7 +50,7 @@ func (b lbBody) toProto(id string) *gamev1.Leaderboard {
 		Id:         id,
 		CampaignId: b.CampaignID,
 		Name:       b.Name,
-		Metric:     b.Metric,
+		Metric:     enumx.Parse[gamev1.LeaderboardMetric](b.Metric, gamev1.LeaderboardMetric_value),
 		TimeWindow: orEmptyObj(b.TimeWindow),
 		PrizeTiers: orEmptyArr(b.PrizeTiers),
 		AntiCheat:  orEmptyObj(b.AntiCheat),

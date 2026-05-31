@@ -7,8 +7,8 @@ import (
 
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func invalidArg(msg string) error {
@@ -25,17 +25,17 @@ func orEmptyObj(b json.RawMessage) json.RawMessage {
 // parseDate accepts an RFC3339 timestamp or a date-only "2006-01-02" string and
 // returns a proto Timestamp (nil for empty/unparseable input — the field is
 // optional).
-func parseDate(s string) *timestamppb.Timestamp {
+func parseDate(s string) int64 {
 	if s == "" {
-		return nil
+		return 0
 	}
 	if t, err := time.Parse(time.RFC3339, s); err == nil {
-		return timestamppb.New(t.UTC())
+		return t.UTC().Unix()
 	}
 	if t, err := time.Parse("2006-01-02", s); err == nil {
-		return timestamppb.New(t.UTC())
+		return t.UTC().Unix()
 	}
-	return nil
+	return 0
 }
 
 func campaignView(c *gamev1.Campaign) map[string]any {
@@ -44,7 +44,7 @@ func campaignView(c *gamev1.Campaign) map[string]any {
 		"tenant_id":   c.GetTenantId(),
 		"merchant_id": c.GetMerchantId(),
 		"name":        c.GetName(),
-		"status":      c.GetStatus(),
+		"status":      enumx.Name(c.GetStatus()),
 		"start_date":  tsString(c.GetStartDate()),
 		"end_date":    tsString(c.GetEndDate()),
 		"channels":    strSlice(c.GetChannels()),
@@ -101,11 +101,12 @@ func rawJSON(s string) any {
 	return v
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 func parseLimit(s string) int {

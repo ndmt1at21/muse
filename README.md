@@ -10,13 +10,13 @@ anti-cheat sessions, and the uniform REST envelope — on **both Postgres and My
 
 ## 📖 Documentation site
 
-A [Docusaurus](https://docusaurus.io/) site in [`website/`](website/) visualizes the
+A [Docusaurus](https://docusaurus.io/) site in [`docs/website/`](docs/website/) visualizes the
 **architecture** and **flows** (Mermaid diagrams) and documents how to run and extend Muse —
 the best starting point for new users.
 
 ```bash
-make docs          # live docs at http://localhost:3000  (or: cd website && npm install && npm start)
-make docs-build    # static build → website/build
+make docs          # live docs at http://localhost:3000  (or: cd docs/website && npm install && npm start)
+make docs-build    # static build → docs/website/build
 ```
 
 Covers: architecture (components, topology, tenancy/identity, data model) · concepts (engine,
@@ -31,7 +31,7 @@ GitHub Actions in [`.github/workflows/`](.github/workflows/):
 - **`ci.yml`** (push + PR) — `go` job (gofmt check, build, vet, unit tests, and the gamekit
   race test across both modules), an `integration` job (adapter port-contract suite against real
   Postgres + MySQL + Redis via testcontainers), and a `docs` job that builds the Docusaurus site.
-- **`docs.yml`** (push to `main` touching `website/`) — builds the docs and deploys them to
+- **`docs.yml`** (push to `main` touching `docs/website/`) — builds the docs and deploys them to
   **GitHub Pages**. The Pages base path is injected at build time, so it works for project pages
   (`https://<owner>.github.io/<repo>/`) with no config edits.
 

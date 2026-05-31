@@ -79,7 +79,7 @@ func main() {
 	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
 
 	gh := game.New(core, playLimit)
-	ph := consumerplayer.New(core)
+	ph := consumerplayer.New(core, jwtSecret, env("AUTH_DEV_MODE", "") == "true")
 	ch := consumercampaign.New(core, configCache)
 	qh := consumerquest.New(core)
 	lh := consumerleaderboard.New(core, rankCache)

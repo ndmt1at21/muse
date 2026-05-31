@@ -30,6 +30,16 @@ copy, not a fixed contract.
   pagination (`?cursor=&limit=`, default 20, max 100); filters as query params.
 - **Idempotency** — mutating gameplay/claim accept an `Idempotency-Key` header.
 - **Rate limiting** — `/start` and `/play` are limited per player/IP; `429` returns `Retry-After`.
+- **Timestamps** — every time field (`created_at`, `updated_at`, `start_date`, `expires_at`, …) is
+  a unix timestamp in **seconds** (`0` = unset). These BFFs emit it as a JSON number; Core's direct
+  REST encodes the underlying `int64` as a quoted string per proto3 JSON.
+- **Enums** — closed-set fields (`status`, `metric`, `state`, `mode`, ledger `reason`, contact
+  `type`, auth `method`, quest `type`, integration `type`, …) are typed proto enums and serialize
+  as their value **name** on the wire — `"status": "CAMPAIGN_STATUS_ACTIVE"`, not `"active"`.
+  Unset reads back as `*_UNSPECIFIED`. Open, registry-driven fields stay free-form strings: game
+  `type`/`seed_generator`/`reward_handler`/`validator`, prize/reward `type`, and integration event
+  types (`play_completed`, `prize_won`, …). The persistence layer still stores the bare lowercase
+  token, so the data model's `won → claimed → …` notation refers to stored values, not the wire form.
 
 ## Consumer BFF (`:8080`) — public widget + player
 
@@ -40,14 +50,13 @@ copy, not a fixed contract.
 | GET | `/games/{id}/eligibility` | public/player | remaining turns / can-play |
 | GET | `/games/{id}/history/me` | player | caller's play history |
 | GET | `/public/campaigns/{id}` | public | widget render config (cached) |
-| POST | `/players/auth/start` · `/players/auth/verify` | public | phone/email login |
+| POST | `/players/auth/start` · `/players/auth/verify` | public | phone/email login (BFF-owned: challenge, verify, JWT mint; calls Core `ResolvePlayer`) |
 | GET · PUT | `/players/me` | player | profile |
 | POST | `/players/me/contacts` | player | link a contact |
 | GET | `/players/me/turns` | player | turn balance |
 | GET | `/games/{id}/eligibility` | player | turns / can-play |
 | POST | `/quests/{id}/complete` | player | complete a quest → grant turns |
 | GET | `/leaderboards/{id}/rankings` | public | top-N (cached) |
-| GET | `/leaderboards/{id}/around-me` · `/my-rank` | player | personalized rank |
 | GET | `/wallet` · `/wallet/ledger` | player | balances / movements |
 | GET | `/games/{id}/milestones` | player | milestone progress |
 | POST | `/games/{id}/redeem` | player | claim / exchange a milestone |

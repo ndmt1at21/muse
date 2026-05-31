@@ -16,7 +16,7 @@ import (
 type Client struct {
 	conn        *grpc.ClientConn
 	Engine      gamev1.EngineServiceClient
-	Admin       gamev1.GameAdminServiceClient
+	GameConfig  gamev1.GameConfigServiceClient
 	Reward      gamev1.RewardServiceClient
 	Fulfillment gamev1.FulfillmentServiceClient
 	Tenant      gamev1.TenantServiceClient
@@ -40,7 +40,7 @@ func Dial(addr string) (*Client, error) {
 	return &Client{
 		conn:        conn,
 		Engine:      gamev1.NewEngineServiceClient(conn),
-		Admin:       gamev1.NewGameAdminServiceClient(conn),
+		GameConfig:  gamev1.NewGameConfigServiceClient(conn),
 		Reward:      gamev1.NewRewardServiceClient(conn),
 		Fulfillment: gamev1.NewFulfillmentServiceClient(conn),
 		Tenant:      gamev1.NewTenantServiceClient(conn),

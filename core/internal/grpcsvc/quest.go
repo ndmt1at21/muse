@@ -86,7 +86,7 @@ func (s *Server) ListPlayerQuests(ctx context.Context, req *gamev1.ListPlayerQue
 	out := make([]*gamev1.QuestState, 0, len(qs))
 	for i := range qs {
 		q := &qs[i]
-		st := &gamev1.QuestState{Quest: questToProto(q), CanComplete: q.Status == types.QuestActive}
+		st := &gamev1.QuestState{Quest: questToProto(q)}
 		if playerID != "" {
 			total, today, last, cErr := s.store.CountCompletions(ctx, scope.TenantID, q.ID, playerID, startOfUTCDay(now))
 			if cErr != nil {
@@ -99,7 +99,6 @@ func (s *Server) ListPlayerQuests(ctx context.Context, req *gamev1.ListPlayerQue
 				done = today > 0 // daily: "completed" means done today
 			}
 			st.Completed = done
-			st.CanComplete = q.Status == types.QuestActive && !done
 		}
 		out = append(out, st)
 	}
@@ -211,13 +210,13 @@ func questFromProto(scope types.Scope, p *gamev1.Quest) *types.Quest {
 		TenantID:   scope.TenantID,
 		MerchantID: scope.MerchantID,
 		CampaignID: p.GetCampaignId(),
-		Type:       p.GetType(),
+		Type:       domQuestType(p.GetType()),
 		Name:       p.GetName(),
-		Status:     p.GetStatus(),
+		Status:     domQuestStatus(p.GetStatus()),
 		Config:     []byte(p.GetConfig()),
 	}
 	if r := p.GetReward(); r != nil {
-		q.Reward = types.QuestReward{Type: r.GetType(), Quantity: r.GetQuantity()}
+		q.Reward = types.QuestReward{Type: domQuestRewardType(r.GetType()), Quantity: r.GetQuantity()}
 	}
 	return q
 }
@@ -228,10 +227,10 @@ func questToProto(q *types.Quest) *gamev1.Quest {
 		TenantId:   q.TenantID,
 		MerchantId: q.MerchantID,
 		CampaignId: q.CampaignID,
-		Type:       q.Type,
+		Type:       pbQuestType(q.Type),
 		Name:       q.Name,
-		Status:     q.Status,
-		Reward:     &gamev1.QuestReward{Type: q.Reward.Type, Quantity: q.Reward.Quantity},
+		Status:     pbQuestStatus(q.Status),
+		Reward:     &gamev1.QuestReward{Type: pbQuestRewardType(q.Reward.Type), Quantity: q.Reward.Quantity},
 		Config:     string(q.Config),
 		CreatedAt:  ts(q.CreatedAt),
 		UpdatedAt:  ts(q.UpdatedAt),

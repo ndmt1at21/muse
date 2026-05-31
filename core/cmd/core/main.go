@@ -21,7 +21,6 @@ import (
 	"github.com/muse/core/internal/grpcsvc"
 	"github.com/muse/core/internal/integration"
 	"github.com/muse/core/internal/leaderboard"
-	"github.com/muse/core/internal/player"
 	"github.com/muse/core/internal/restgw"
 	"github.com/muse/core/internal/wallet"
 	"github.com/muse/core/platform"
@@ -135,20 +134,14 @@ func main() {
 		IDs:         defaults.IDGen{},
 	}, engine.Config{SessionTTL: 10 * time.Minute})
 
-	// Phase 4: identity resolver + player authenticator (phone/email login,
-	// resolve-or-create identity, upsert tenant player, issue player JWT).
+	// Phase 4: identity resolver. Authentication (challenge/verify, token minting)
+	// is the BFF's job; Core only resolves-or-creates the identity + player from a
+	// verified contact (PlayerService.ResolvePlayer).
 	clock := defaults.Clock{}
 	resolver := identity.New(store, store, defaults.IDGen{}, clock)
-	auth := player.New(
-		player.NewSQLChallengeStore(store), resolver, defaults.IDGen{}, defaults.Rand{}, clock,
-		player.Config{JWTSecret: cfg.JWTSecret, DevMode: cfg.AuthDevMode},
-	)
-	if cfg.JWTSecret == "" {
-		log.Warn("JWT_SECRET is empty; player tokens cannot be issued — set JWT_SECRET")
-	}
 
 	svc := grpcsvc.NewServer(eng, store, cache, grpcsvc.Deps{
-		Auth: auth, Resolver: resolver, Registry: registry, Leaderboard: lbService, Wallet: walletService,
+		Resolver: resolver, Registry: registry, Leaderboard: lbService, Wallet: walletService,
 		Integration: hub, Clock: clock,
 	}, log)
 
@@ -170,7 +163,7 @@ func main() {
 	grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
 		grpcsvc.TraceIDInterceptor, grpcsvc.MetricsInterceptor(metrics)))
 	gamev1.RegisterEngineServiceServer(grpcServer, svc)
-	gamev1.RegisterGameAdminServiceServer(grpcServer, svc)
+	gamev1.RegisterGameConfigServiceServer(grpcServer, svc)
 	gamev1.RegisterRewardServiceServer(grpcServer, svc)
 	gamev1.RegisterFulfillmentServiceServer(grpcServer, svc)
 	gamev1.RegisterTenantServiceServer(grpcServer, svc)

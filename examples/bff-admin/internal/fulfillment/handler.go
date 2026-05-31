@@ -19,6 +19,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -52,7 +53,7 @@ func (h *Handler) listTasks(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	resp, err := h.core.Fulfillment.ListTasks(ctx, &gamev1.ListTasksRequest{
 		Scope:      coreclient.Scope(tenant, merchant),
-		Status:     q.Get("status"),
+		Status:     enumx.Parse[gamev1.TaskStatus](q.Get("status"), gamev1.TaskStatus_value),
 		CampaignId: q.Get("campaign_id"),
 		PrizeId:    q.Get("prize_id"),
 		Limit:      int32(parseLimit(q.Get("limit"))),
@@ -112,7 +113,7 @@ func (h *Handler) callback(w http.ResponseWriter, r *http.Request) {
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Fulfillment.ReportResult(ctx, &gamev1.ReportResultRequest{
 		TaskId:  chi.URLParam(r, "taskId"),
-		Status:  in.Status,
+		Status:  enumx.Parse[gamev1.TaskStatus](in.Status, gamev1.TaskStatus_value),
 		Receipt: string(in.Receipt),
 		Error:   in.Error,
 	})
@@ -152,7 +153,7 @@ func taskView(t *gamev1.FulfillmentTask) map[string]any {
 		"game_id":         emptyToNil(t.GetGameId()),
 		"campaign_id":     emptyToNil(t.GetCampaignId()),
 		"channel":         t.GetChannel(),
-		"status":          t.GetStatus(),
+		"status":          enumx.Name(t.GetStatus()),
 		"attempts":        t.GetAttempts(),
 		"max_attempts":    t.GetMaxAttempts(),
 		"last_error":      emptyToNil(t.GetLastError()),

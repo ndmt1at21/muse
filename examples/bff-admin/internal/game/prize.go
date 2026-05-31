@@ -9,6 +9,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -37,7 +38,7 @@ func rewardView(r *gamev1.RewardRecord) map[string]any {
 		"type":      r.GetType(),
 		"value":     r.GetValue(),
 		"code":      emptyToNil(r.GetCode()),
-		"status":    r.GetStatus(),
+		"status":    enumx.Name(r.GetStatus()),
 	}
 }
 

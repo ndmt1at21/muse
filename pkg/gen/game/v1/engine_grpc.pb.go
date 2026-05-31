@@ -234,128 +234,128 @@ var EngineService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	GameAdminService_CreateGame_FullMethodName = "/game.v1.GameAdminService/CreateGame"
-	GameAdminService_GetGame_FullMethodName    = "/game.v1.GameAdminService/GetGame"
+	GameConfigService_CreateGame_FullMethodName = "/game.v1.GameConfigService/CreateGame"
+	GameConfigService_GetGame_FullMethodName    = "/game.v1.GameConfigService/GetGame"
 )
 
-// GameAdminServiceClient is the client API for GameAdminService service.
+// GameConfigServiceClient is the client API for GameConfigService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type GameAdminServiceClient interface {
+type GameConfigServiceClient interface {
 	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error)
 	GetGame(ctx context.Context, in *GetGameRequest, opts ...grpc.CallOption) (*GetGameResponse, error)
 }
 
-type gameAdminServiceClient struct {
+type gameConfigServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewGameAdminServiceClient(cc grpc.ClientConnInterface) GameAdminServiceClient {
-	return &gameAdminServiceClient{cc}
+func NewGameConfigServiceClient(cc grpc.ClientConnInterface) GameConfigServiceClient {
+	return &gameConfigServiceClient{cc}
 }
 
-func (c *gameAdminServiceClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error) {
+func (c *gameConfigServiceClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateGameResponse)
-	err := c.cc.Invoke(ctx, GameAdminService_CreateGame_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GameConfigService_CreateGame_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gameAdminServiceClient) GetGame(ctx context.Context, in *GetGameRequest, opts ...grpc.CallOption) (*GetGameResponse, error) {
+func (c *gameConfigServiceClient) GetGame(ctx context.Context, in *GetGameRequest, opts ...grpc.CallOption) (*GetGameResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetGameResponse)
-	err := c.cc.Invoke(ctx, GameAdminService_GetGame_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, GameConfigService_GetGame_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// GameAdminServiceServer is the server API for GameAdminService service.
-// All implementations must embed UnimplementedGameAdminServiceServer
+// GameConfigServiceServer is the server API for GameConfigService service.
+// All implementations must embed UnimplementedGameConfigServiceServer
 // for forward compatibility
-type GameAdminServiceServer interface {
+type GameConfigServiceServer interface {
 	CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error)
 	GetGame(context.Context, *GetGameRequest) (*GetGameResponse, error)
-	mustEmbedUnimplementedGameAdminServiceServer()
+	mustEmbedUnimplementedGameConfigServiceServer()
 }
 
-// UnimplementedGameAdminServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedGameAdminServiceServer struct {
+// UnimplementedGameConfigServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedGameConfigServiceServer struct {
 }
 
-func (UnimplementedGameAdminServiceServer) CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error) {
+func (UnimplementedGameConfigServiceServer) CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
 }
-func (UnimplementedGameAdminServiceServer) GetGame(context.Context, *GetGameRequest) (*GetGameResponse, error) {
+func (UnimplementedGameConfigServiceServer) GetGame(context.Context, *GetGameRequest) (*GetGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGame not implemented")
 }
-func (UnimplementedGameAdminServiceServer) mustEmbedUnimplementedGameAdminServiceServer() {}
+func (UnimplementedGameConfigServiceServer) mustEmbedUnimplementedGameConfigServiceServer() {}
 
-// UnsafeGameAdminServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to GameAdminServiceServer will
+// UnsafeGameConfigServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GameConfigServiceServer will
 // result in compilation errors.
-type UnsafeGameAdminServiceServer interface {
-	mustEmbedUnimplementedGameAdminServiceServer()
+type UnsafeGameConfigServiceServer interface {
+	mustEmbedUnimplementedGameConfigServiceServer()
 }
 
-func RegisterGameAdminServiceServer(s grpc.ServiceRegistrar, srv GameAdminServiceServer) {
-	s.RegisterService(&GameAdminService_ServiceDesc, srv)
+func RegisterGameConfigServiceServer(s grpc.ServiceRegistrar, srv GameConfigServiceServer) {
+	s.RegisterService(&GameConfigService_ServiceDesc, srv)
 }
 
-func _GameAdminService_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GameConfigService_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateGameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameAdminServiceServer).CreateGame(ctx, in)
+		return srv.(GameConfigServiceServer).CreateGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameAdminService_CreateGame_FullMethodName,
+		FullMethod: GameConfigService_CreateGame_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameAdminServiceServer).CreateGame(ctx, req.(*CreateGameRequest))
+		return srv.(GameConfigServiceServer).CreateGame(ctx, req.(*CreateGameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameAdminService_GetGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GameConfigService_GetGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetGameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameAdminServiceServer).GetGame(ctx, in)
+		return srv.(GameConfigServiceServer).GetGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameAdminService_GetGame_FullMethodName,
+		FullMethod: GameConfigService_GetGame_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameAdminServiceServer).GetGame(ctx, req.(*GetGameRequest))
+		return srv.(GameConfigServiceServer).GetGame(ctx, req.(*GetGameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// GameAdminService_ServiceDesc is the grpc.ServiceDesc for GameAdminService service.
+// GameConfigService_ServiceDesc is the grpc.ServiceDesc for GameConfigService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var GameAdminService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "game.v1.GameAdminService",
-	HandlerType: (*GameAdminServiceServer)(nil),
+var GameConfigService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "game.v1.GameConfigService",
+	HandlerType: (*GameConfigServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateGame",
-			Handler:    _GameAdminService_CreateGame_Handler,
+			Handler:    _GameConfigService_CreateGame_Handler,
 		},
 		{
 			MethodName: "GetGame",
-			Handler:    _GameAdminService_GetGame_Handler,
+			Handler:    _GameConfigService_GetGame_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1616,8 +1616,7 @@ var IdentityService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	PlayerService_StartAuth_FullMethodName      = "/game.v1.PlayerService/StartAuth"
-	PlayerService_VerifyAuth_FullMethodName     = "/game.v1.PlayerService/VerifyAuth"
+	PlayerService_ResolvePlayer_FullMethodName  = "/game.v1.PlayerService/ResolvePlayer"
 	PlayerService_GetProfile_FullMethodName     = "/game.v1.PlayerService/GetProfile"
 	PlayerService_UpdateProfile_FullMethodName  = "/game.v1.PlayerService/UpdateProfile"
 	PlayerService_AddContact_FullMethodName     = "/game.v1.PlayerService/AddContact"
@@ -1630,8 +1629,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlayerServiceClient interface {
-	StartAuth(ctx context.Context, in *StartAuthRequest, opts ...grpc.CallOption) (*StartAuthResponse, error)
-	VerifyAuth(ctx context.Context, in *VerifyAuthRequest, opts ...grpc.CallOption) (*VerifyAuthResponse, error)
+	ResolvePlayer(ctx context.Context, in *ResolvePlayerRequest, opts ...grpc.CallOption) (*ResolvePlayerResponse, error)
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UpdateProfileResponse, error)
 	AddContact(ctx context.Context, in *AddContactRequest, opts ...grpc.CallOption) (*AddContactResponse, error)
@@ -1648,20 +1646,10 @@ func NewPlayerServiceClient(cc grpc.ClientConnInterface) PlayerServiceClient {
 	return &playerServiceClient{cc}
 }
 
-func (c *playerServiceClient) StartAuth(ctx context.Context, in *StartAuthRequest, opts ...grpc.CallOption) (*StartAuthResponse, error) {
+func (c *playerServiceClient) ResolvePlayer(ctx context.Context, in *ResolvePlayerRequest, opts ...grpc.CallOption) (*ResolvePlayerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StartAuthResponse)
-	err := c.cc.Invoke(ctx, PlayerService_StartAuth_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *playerServiceClient) VerifyAuth(ctx context.Context, in *VerifyAuthRequest, opts ...grpc.CallOption) (*VerifyAuthResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VerifyAuthResponse)
-	err := c.cc.Invoke(ctx, PlayerService_VerifyAuth_FullMethodName, in, out, cOpts...)
+	out := new(ResolvePlayerResponse)
+	err := c.cc.Invoke(ctx, PlayerService_ResolvePlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1732,8 +1720,7 @@ func (c *playerServiceClient) ConsumeTurn(ctx context.Context, in *ConsumeTurnRe
 // All implementations must embed UnimplementedPlayerServiceServer
 // for forward compatibility
 type PlayerServiceServer interface {
-	StartAuth(context.Context, *StartAuthRequest) (*StartAuthResponse, error)
-	VerifyAuth(context.Context, *VerifyAuthRequest) (*VerifyAuthResponse, error)
+	ResolvePlayer(context.Context, *ResolvePlayerRequest) (*ResolvePlayerResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileResponse, error)
 	AddContact(context.Context, *AddContactRequest) (*AddContactResponse, error)
@@ -1747,11 +1734,8 @@ type PlayerServiceServer interface {
 type UnimplementedPlayerServiceServer struct {
 }
 
-func (UnimplementedPlayerServiceServer) StartAuth(context.Context, *StartAuthRequest) (*StartAuthResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartAuth not implemented")
-}
-func (UnimplementedPlayerServiceServer) VerifyAuth(context.Context, *VerifyAuthRequest) (*VerifyAuthResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyAuth not implemented")
+func (UnimplementedPlayerServiceServer) ResolvePlayer(context.Context, *ResolvePlayerRequest) (*ResolvePlayerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResolvePlayer not implemented")
 }
 func (UnimplementedPlayerServiceServer) GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
@@ -1784,38 +1768,20 @@ func RegisterPlayerServiceServer(s grpc.ServiceRegistrar, srv PlayerServiceServe
 	s.RegisterService(&PlayerService_ServiceDesc, srv)
 }
 
-func _PlayerService_StartAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartAuthRequest)
+func _PlayerService_ResolvePlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolvePlayerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServiceServer).StartAuth(ctx, in)
+		return srv.(PlayerServiceServer).ResolvePlayer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PlayerService_StartAuth_FullMethodName,
+		FullMethod: PlayerService_ResolvePlayer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).StartAuth(ctx, req.(*StartAuthRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PlayerService_VerifyAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyAuthRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PlayerServiceServer).VerifyAuth(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PlayerService_VerifyAuth_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServiceServer).VerifyAuth(ctx, req.(*VerifyAuthRequest))
+		return srv.(PlayerServiceServer).ResolvePlayer(ctx, req.(*ResolvePlayerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1936,12 +1902,8 @@ var PlayerService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PlayerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "StartAuth",
-			Handler:    _PlayerService_StartAuth_Handler,
-		},
-		{
-			MethodName: "VerifyAuth",
-			Handler:    _PlayerService_VerifyAuth_Handler,
+			MethodName: "ResolvePlayer",
+			Handler:    _PlayerService_ResolvePlayer_Handler,
 		},
 		{
 			MethodName: "GetProfile",
@@ -2620,8 +2582,6 @@ const (
 	LeaderboardService_DisqualifyEntry_FullMethodName     = "/game.v1.LeaderboardService/DisqualifyEntry"
 	LeaderboardService_AdjustEntry_FullMethodName         = "/game.v1.LeaderboardService/AdjustEntry"
 	LeaderboardService_GetRankings_FullMethodName         = "/game.v1.LeaderboardService/GetRankings"
-	LeaderboardService_AroundMe_FullMethodName            = "/game.v1.LeaderboardService/AroundMe"
-	LeaderboardService_MyRank_FullMethodName              = "/game.v1.LeaderboardService/MyRank"
 )
 
 // LeaderboardServiceClient is the client API for LeaderboardService service.
@@ -2637,8 +2597,6 @@ type LeaderboardServiceClient interface {
 	DisqualifyEntry(ctx context.Context, in *DisqualifyEntryRequest, opts ...grpc.CallOption) (*DisqualifyEntryResponse, error)
 	AdjustEntry(ctx context.Context, in *AdjustEntryRequest, opts ...grpc.CallOption) (*AdjustEntryResponse, error)
 	GetRankings(ctx context.Context, in *GetRankingsRequest, opts ...grpc.CallOption) (*GetRankingsResponse, error)
-	AroundMe(ctx context.Context, in *AroundMeRequest, opts ...grpc.CallOption) (*AroundMeResponse, error)
-	MyRank(ctx context.Context, in *MyRankRequest, opts ...grpc.CallOption) (*MyRankResponse, error)
 }
 
 type leaderboardServiceClient struct {
@@ -2739,26 +2697,6 @@ func (c *leaderboardServiceClient) GetRankings(ctx context.Context, in *GetRanki
 	return out, nil
 }
 
-func (c *leaderboardServiceClient) AroundMe(ctx context.Context, in *AroundMeRequest, opts ...grpc.CallOption) (*AroundMeResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AroundMeResponse)
-	err := c.cc.Invoke(ctx, LeaderboardService_AroundMe_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *leaderboardServiceClient) MyRank(ctx context.Context, in *MyRankRequest, opts ...grpc.CallOption) (*MyRankResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MyRankResponse)
-	err := c.cc.Invoke(ctx, LeaderboardService_MyRank_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // LeaderboardServiceServer is the server API for LeaderboardService service.
 // All implementations must embed UnimplementedLeaderboardServiceServer
 // for forward compatibility
@@ -2772,8 +2710,6 @@ type LeaderboardServiceServer interface {
 	DisqualifyEntry(context.Context, *DisqualifyEntryRequest) (*DisqualifyEntryResponse, error)
 	AdjustEntry(context.Context, *AdjustEntryRequest) (*AdjustEntryResponse, error)
 	GetRankings(context.Context, *GetRankingsRequest) (*GetRankingsResponse, error)
-	AroundMe(context.Context, *AroundMeRequest) (*AroundMeResponse, error)
-	MyRank(context.Context, *MyRankRequest) (*MyRankResponse, error)
 	mustEmbedUnimplementedLeaderboardServiceServer()
 }
 
@@ -2807,12 +2743,6 @@ func (UnimplementedLeaderboardServiceServer) AdjustEntry(context.Context, *Adjus
 }
 func (UnimplementedLeaderboardServiceServer) GetRankings(context.Context, *GetRankingsRequest) (*GetRankingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRankings not implemented")
-}
-func (UnimplementedLeaderboardServiceServer) AroundMe(context.Context, *AroundMeRequest) (*AroundMeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AroundMe not implemented")
-}
-func (UnimplementedLeaderboardServiceServer) MyRank(context.Context, *MyRankRequest) (*MyRankResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MyRank not implemented")
 }
 func (UnimplementedLeaderboardServiceServer) mustEmbedUnimplementedLeaderboardServiceServer() {}
 
@@ -2989,42 +2919,6 @@ func _LeaderboardService_GetRankings_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LeaderboardService_AroundMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AroundMeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LeaderboardServiceServer).AroundMe(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LeaderboardService_AroundMe_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LeaderboardServiceServer).AroundMe(ctx, req.(*AroundMeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _LeaderboardService_MyRank_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MyRankRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LeaderboardServiceServer).MyRank(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LeaderboardService_MyRank_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LeaderboardServiceServer).MyRank(ctx, req.(*MyRankRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // LeaderboardService_ServiceDesc is the grpc.ServiceDesc for LeaderboardService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -3067,14 +2961,6 @@ var LeaderboardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRankings",
 			Handler:    _LeaderboardService_GetRankings_Handler,
-		},
-		{
-			MethodName: "AroundMe",
-			Handler:    _LeaderboardService_AroundMe_Handler,
-		},
-		{
-			MethodName: "MyRank",
-			Handler:    _LeaderboardService_MyRank_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -100,9 +100,9 @@ func integrationFromProto(scope types.Scope, p *gamev1.Integration) *types.Integ
 		TenantID:   scope.TenantID,
 		MerchantID: scope.MerchantID,
 		CampaignID: p.GetCampaignId(),
-		Type:       p.GetType(),
+		Type:       domIntegrationType(p.GetType()),
 		Events:     p.GetEvents(),
-		Status:     p.GetStatus(),
+		Status:     domIntegrationStatus(p.GetStatus()),
 	}
 	if c := p.GetConfig(); c != "" {
 		i.Config = json.RawMessage(c)
@@ -115,10 +115,10 @@ func integrationToProto(i *types.Integration) *gamev1.Integration {
 		Id:         i.ID,
 		Scope:      &gamev1.Scope{TenantId: i.TenantID, MerchantId: i.MerchantID},
 		CampaignId: i.CampaignID,
-		Type:       i.Type,
+		Type:       pbIntegrationType(i.Type),
 		Events:     i.Events,
 		Config:     string(i.Config),
-		Status:     i.Status,
+		Status:     pbIntegrationStatus(i.Status),
 		CreatedAt:  ts(i.CreatedAt),
 	}
 }

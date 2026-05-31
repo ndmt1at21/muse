@@ -23,7 +23,7 @@ const (
 func (s *Server) ListTasks(ctx context.Context, req *gamev1.ListTasksRequest) (*gamev1.ListTasksResponse, error) {
 	scope := scopeFromProto(req.GetScope())
 	tasks, next, err := s.store.ListTasks(ctx, scope, sqlstore.TaskFilter{
-		Status: req.GetStatus(), CampaignID: req.GetCampaignId(), PrizeID: req.GetPrizeId(),
+		Status: string(domTaskStatus(req.GetStatus())), CampaignID: req.GetCampaignId(), PrizeID: req.GetPrizeId(),
 	}, int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -62,16 +62,16 @@ func (s *Server) ReportResult(ctx context.Context, req *gamev1.ReportResultReque
 	taskID := req.GetTaskId()
 	receipt := json.RawMessage(req.GetReceipt())
 	switch req.GetStatus() {
-	case "fulfilled", "success", "ok", "":
+	case gamev1.TaskStatus_TASK_STATUS_FULFILLED, gamev1.TaskStatus_TASK_STATUS_UNSPECIFIED:
 		if err := s.store.CompleteTask(ctx, taskID, receipt); err != nil {
 			return nil, s.fail(err)
 		}
-	case "failed", "error":
+	case gamev1.TaskStatus_TASK_STATUS_FAILED:
 		if _, err := s.store.FailTask(ctx, taskID, req.GetError(), callbackRetryBackoff, callbackDefaultMax, false); err != nil {
 			return nil, s.fail(err)
 		}
 	default:
-		return nil, s.fail(gkerr.Newf(gkerr.ReasonValidationFailed, "unknown callback status %q", req.GetStatus()))
+		return nil, s.fail(gkerr.Newf(gkerr.ReasonValidationFailed, "unknown callback status %q", req.GetStatus().String()))
 	}
 	t, err := s.store.FindTask(ctx, taskID)
 	if err != nil {

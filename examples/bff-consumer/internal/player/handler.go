@@ -6,6 +6,7 @@ package player
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/muse/bffkit/auth"
@@ -13,15 +14,28 @@ import (
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
+	"github.com/muse/pkg/token"
 )
 
-// Handler holds the Core client.
+// Handler holds the Core client + this BFF's auth state (challenge store, JWT
+// signing). Authentication is the BFF's responsibility; Core only resolves the
+// player from a verified contact.
 type Handler struct {
-	core *coreclient.Client
+	core       *coreclient.Client
+	jwtSecret  string
+	devMode    bool // reveal dev codes in startAuth (local/e2e only)
+	tokenTTL   time.Duration
+	challenges *challengeStore
 }
 
-// New builds the player handler.
-func New(core *coreclient.Client) *Handler { return &Handler{core: core} }
+// New builds the player handler. jwtSecret signs player JWTs; devMode reveals
+// dev OTP codes for local/e2e flows.
+func New(core *coreclient.Client, jwtSecret string, devMode bool) *Handler {
+	return &Handler{
+		core: core, jwtSecret: jwtSecret, devMode: devMode,
+		tokenTTL: 24 * time.Hour, challenges: newChallengeStore(),
+	}
+}
 
 // Routes mounts the player endpoints. Auth start/verify are public; me/* are
 // guarded by RequirePlayer (a verified player JWT).
@@ -55,31 +69,43 @@ func (h *Handler) startAuth(w http.ResponseWriter, r *http.Request) {
 		envelope.WriteError(w, tid, invalidArg("malformed request body"))
 		return
 	}
-	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Player.StartAuth(ctx, &gamev1.StartAuthRequest{
-		Scope:        coreclient.Scope(tenant, merchant),
-		ContactType:  body.Identifier.Type,
-		ContactValue: body.Identifier.Value,
-		Method:       body.Method,
-		CampaignId:   body.CampaignID,
-	})
-	if err != nil {
-		envelope.WriteError(w, tid, err)
+	if tenant == "" {
+		envelope.WriteError(w, tid, invalidArg("tenant scope is required"))
 		return
 	}
-	data := map[string]any{
-		"challenge_id": resp.GetChallengeId(),
-		"expires_at":   tsString(resp.GetExpiresAt()),
+	if contactTypeEnum(body.Identifier.Type) == gamev1.ContactType_CONTACT_TYPE_UNSPECIFIED {
+		envelope.WriteError(w, tid, invalidArg("identifier.type must be phone or email"))
+		return
 	}
-	if resp.GetDevCode() != "" {
-		data["dev_code"] = resp.GetDevCode() // dev mode only; Core omits in prod
+	method := body.Method
+	if method == "" {
+		method = "code"
+	}
+	switch method {
+	case "code", "otp", "magic_link", "social":
+	default:
+		envelope.WriteError(w, tid, invalidArg("unknown auth method "+method))
+		return
+	}
+	// Issue + persist the challenge in the BFF; verification + token minting also
+	// happen here. Core is not involved until ResolvePlayer (on verify).
+	secret, devCode := issueSecret(method)
+	id := "chl_" + randomHex(12)
+	exp := time.Now().Add(challengeTTL)
+	h.challenges.put(id, challenge{
+		tenantID: tenant, merchantID: merchant,
+		contactType: body.Identifier.Type, contactValue: body.Identifier.Value,
+		method: method, secret: secret, expiresAt: exp,
+	})
+	data := map[string]any{"challenge_id": id, "expires_at": exp.Unix()}
+	if h.devMode && devCode != "" {
+		data["dev_code"] = devCode // local/e2e only
 	}
 	envelope.WriteSuccess(w, tid, data)
 }
 
 func (h *Handler) verifyAuth(w http.ResponseWriter, r *http.Request) {
 	tid := middleware.TraceIDFrom(r.Context())
-	tenant, merchant := auth.Scope(r)
 	var body struct {
 		ChallengeID string `json:"challenge_id"`
 		Code        string `json:"code"`
@@ -89,20 +115,48 @@ func (h *Handler) verifyAuth(w http.ResponseWriter, r *http.Request) {
 		envelope.WriteError(w, tid, invalidArg("malformed request body"))
 		return
 	}
+	ch, ok := h.challenges.take(body.ChallengeID) // single-use
+	if !ok {
+		envelope.WriteError(w, tid, unauthenticated("invalid or already-used challenge"))
+		return
+	}
+	if time.Now().After(ch.expiresAt) {
+		envelope.WriteError(w, tid, unauthenticated("challenge expired"))
+		return
+	}
+	submitted := body.Code
+	if submitted == "" {
+		submitted = body.Proof
+	}
+	if !checkSecret(ch.method, ch.secret, submitted) {
+		envelope.WriteError(w, tid, unauthenticated("invalid code"))
+		return
+	}
+	// Contact is now verified — ask Core to resolve-or-create the player.
 	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Player.VerifyAuth(ctx, &gamev1.VerifyAuthRequest{
-		Scope:       coreclient.Scope(tenant, merchant),
-		ChallengeId: body.ChallengeID,
-		Code:        body.Code,
-		Proof:       body.Proof,
+	resp, err := h.core.Player.ResolvePlayer(ctx, &gamev1.ResolvePlayerRequest{
+		Scope:        coreclient.Scope(ch.tenantID, ch.merchantID),
+		ContactType:  contactTypeEnum(ch.contactType),
+		ContactValue: ch.contactValue,
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
 		return
 	}
+	p := resp.GetPlayer()
+	tok, err := token.Sign(h.jwtSecret, token.Claims{
+		TenantID:   p.GetTenantId(),
+		MerchantID: p.GetMerchantId(),
+		PlayerID:   p.GetId(),
+		IdentityID: resp.GetIdentity().GetId(),
+	}, time.Now(), h.tokenTTL)
+	if err != nil {
+		envelope.WriteError(w, tid, internalErr("issue token"))
+		return
+	}
 	envelope.WriteSuccess(w, tid, map[string]any{
-		"token":  resp.GetToken(),
-		"player": playerView(resp.GetPlayer(), resp.GetIdentity()),
+		"token":  tok,
+		"player": playerView(p, resp.GetIdentity()),
 	})
 }
 
@@ -159,9 +213,8 @@ func (h *Handler) addContact(w http.ResponseWriter, r *http.Request) {
 		Scope:        coreclient.Scope(tenant, merchant),
 		PlayerId:     auth.PlayerID(r),
 		IdentityId:   auth.IdentityID(r),
-		ContactType:  body.Type,
+		ContactType:  contactTypeEnum(body.Type),
 		ContactValue: body.Value,
-		Method:       body.Method,
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)

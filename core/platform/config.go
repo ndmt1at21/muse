@@ -23,10 +23,8 @@ type Config struct {
 	N8NWebhookURL       string        // default external_workflow webhook (per-prize config overrides)
 	N8NHMACSecret       string        // default HMAC secret for outbound n8n POSTs
 	CallbackBaseURL     string        // public base url n8n calls back to (e.g. the admin BFF)
-
-	// Player auth / identity (Phase 4).
-	JWTSecret   string // HMAC secret for player JWTs (shared with the BFFs)
-	AuthDevMode bool   // reveal dev OTP codes in StartAuth responses (local/e2e only)
+	// Note: player auth (challenge/verify, JWT mint) lives in the BFF, not Core —
+	// so there is intentionally no JWT secret or auth dev-mode here.
 }
 
 // LoadConfig reads configuration from the environment with sensible defaults.
@@ -45,9 +43,6 @@ func LoadConfig() Config {
 		N8NWebhookURL:       env("N8N_WEBHOOK_URL", ""),
 		N8NHMACSecret:       env("N8N_HMAC_SECRET", ""),
 		CallbackBaseURL:     env("FULFILLMENT_CALLBACK_BASE", ""),
-
-		JWTSecret:   env("JWT_SECRET", ""),
-		AuthDevMode: envBool("AUTH_DEV_MODE", false),
 	}
 }
 

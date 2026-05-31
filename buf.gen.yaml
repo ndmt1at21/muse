@@ -18,3 +18,12 @@ plugins:
     opt:
       - paths=source_relative
       - generate_unbound_methods=false
+  # OpenAPI v2 (Swagger) spec for Core's REST surface, merged into a single file
+  # at core/api/openapi.swagger.json. json_names_for_fields=false keeps the
+  # snake_case field names the gateway actually emits (UseProtoNames).
+  - local: protoc-gen-openapiv2
+    out: core/api
+    opt:
+      - allow_merge=true
+      - merge_file_name=openapi
+      - json_names_for_fields=false

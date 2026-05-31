@@ -14,6 +14,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -57,7 +58,7 @@ func (b campaignBody) toProto(id, tenant, merchant string) *gamev1.Campaign {
 		TenantId:   tenant,
 		MerchantId: merchant,
 		Name:       b.Name,
-		Status:     b.Status,
+		Status:     enumx.Parse[gamev1.CampaignStatus](b.Status, gamev1.CampaignStatus_value),
 		StartDate:  parseDate(b.StartDate),
 		EndDate:    parseDate(b.EndDate),
 		Channels:   b.Channels,

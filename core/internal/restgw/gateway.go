@@ -57,7 +57,7 @@ func New(ctx context.Context, grpcAddr string) (http.Handler, func() error, erro
 
 	register := []func(context.Context, *runtime.ServeMux, *grpc.ClientConn) error{
 		gamev1.RegisterEngineServiceHandler,
-		gamev1.RegisterGameAdminServiceHandler,
+		gamev1.RegisterGameConfigServiceHandler,
 		gamev1.RegisterRewardServiceHandler,
 		gamev1.RegisterFulfillmentServiceHandler,
 		gamev1.RegisterTenantServiceHandler,

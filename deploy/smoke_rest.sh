@@ -19,13 +19,13 @@ command -v jq >/dev/null || { echo "jq required"; exit 1; }
 say() { printf '\n\033[36m== %s ==\033[0m\n' "$1"; }
 
 say "1. Create prize (raw proto JSON; scope in body)"
-PRIZE=$(curl -sf -X POST "${CORE}/api/v1/admin/prizes" -H 'Content-Type: application/json' \
+PRIZE=$(curl -sf -X POST "${CORE}/api/v1/prizes" -H 'Content-Type: application/json' \
   -d "{\"scope\":${SCOPE},\"prize\":{\"name\":\"Voucher 100K\",\"type\":\"voucher\",\"value\":100000,\"total\":3}}")
 echo "$PRIZE" | jq '{code, prize_id: .data.prize.id, remaining: .data.prize.remaining}'
 PRIZE_ID=$(echo "$PRIZE" | jq -r '.data.prize.id')
 
 say "2. Create an always-win spin-wheel game referencing it"
-GAME=$(curl -sf -X POST "${CORE}/api/v1/admin/games" -H 'Content-Type: application/json' -d "{
+GAME=$(curl -sf -X POST "${CORE}/api/v1/games" -H 'Content-Type: application/json' -d "{
   \"scope\":${SCOPE},
   \"game\":{
     \"name\":\"Lucky Spin (REST smoke)\",\"type\":\"spin_wheel\",\"campaign_id\":\"camp_smoke\",

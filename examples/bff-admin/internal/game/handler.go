@@ -11,6 +11,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -40,14 +41,13 @@ func (h *Handler) Routes(r chi.Router) {
 }
 
 type createGameBody struct {
-	Name          string          `json:"name"`
-	Type          string          `json:"type"`
-	CampaignID    string          `json:"campaign_id"`
-	SeedGenerator string          `json:"seed_generator"`
-	RewardHandler string          `json:"reward_handler"`
-	Validator     string          `json:"validator"`
-	Status        string          `json:"status"`
-	UI            json.RawMessage `json:"ui"`
+	Name          string `json:"name"`
+	Type          string `json:"type"`
+	CampaignID    string `json:"campaign_id"`
+	SeedGenerator string `json:"seed_generator"`
+	RewardHandler string `json:"reward_handler"`
+	Validator     string `json:"validator"`
+	Status        string `json:"status"`
 	Rules         struct {
 		MaxPlaysPerUser int  `json:"max_plays_per_user"`
 		MaxPlaysPerDay  int  `json:"max_plays_per_day"`
@@ -69,7 +69,7 @@ func (h *Handler) createGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Admin.CreateGame(ctx, &gamev1.CreateGameRequest{
+	resp, err := h.core.GameConfig.CreateGame(ctx, &gamev1.CreateGameRequest{
 		Scope: coreclient.Scope(tenant, merchant),
 		Game: &gamev1.Game{
 			Name:            body.Name,
@@ -78,11 +78,10 @@ func (h *Handler) createGame(w http.ResponseWriter, r *http.Request) {
 			SeedGenerator:   body.SeedGenerator,
 			RewardHandler:   body.RewardHandler,
 			Validator:       body.Validator,
-			Status:          body.Status,
+			Status:          enumx.Parse[gamev1.GameStatus](body.Status, gamev1.GameStatus_value),
 			HandlerConfig:   string(orEmptyObj(body.HandlerConfig)),
 			ValidatorConfig: string(orEmptyObj(body.ValidatorConfig)),
-			Ui:              string(orEmptyObj(body.UI)),
-			WalletScope:     body.WalletScope,
+			WalletScope:     enumx.Parse[gamev1.WalletScope](body.WalletScope, gamev1.WalletScope_value),
 			Milestones:      string(orEmptyObj(body.Milestones)),
 			Rules: &gamev1.Rules{
 				MaxPlaysPerUser: int32(body.Rules.MaxPlaysPerUser),
@@ -102,7 +101,7 @@ func (h *Handler) getGame(w http.ResponseWriter, r *http.Request) {
 	tid := middleware.TraceIDFrom(r.Context())
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
-	resp, err := h.core.Admin.GetGame(ctx, &gamev1.GetGameRequest{
+	resp, err := h.core.GameConfig.GetGame(ctx, &gamev1.GetGameRequest{
 		Scope: coreclient.Scope(tenant, merchant), GameId: chi.URLParam(r, "gameId"),
 	})
 	if err != nil {

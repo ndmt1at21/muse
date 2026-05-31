@@ -54,7 +54,6 @@ type Game struct {
 	Rules           Rules           `json:"rules"`
 	HandlerConfig   json.RawMessage `json:"handler_config"`   // shape-specific, decoded by the handler
 	ValidatorConfig json.RawMessage `json:"validator_config"` // anti-cheat params, decoded by the validator
-	UI              json.RawMessage `json:"ui"`               // opaque to Core; read only by the widget
 	// WalletScope keys this game's wallet credits (campaign|merchant|tenant;
 	// "" → campaign). Milestones is the per-game milestone config (currency,
 	// mode, auto_grant, thresholds→prizes), decoded by the wallet layer.

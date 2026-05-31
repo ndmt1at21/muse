@@ -6,8 +6,8 @@ import (
 
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func invalidArg(msg string) error {
@@ -35,11 +35,11 @@ func lbView(lb *gamev1.Leaderboard) map[string]any {
 		"merchant_id":    lb.GetMerchantId(),
 		"campaign_id":    lb.GetCampaignId(),
 		"name":           lb.GetName(),
-		"metric":         lb.GetMetric(),
+		"metric":         enumx.Name(lb.GetMetric()),
 		"time_window":    rawJSON(lb.GetTimeWindow()),
 		"prize_tiers":    rawJSON(lb.GetPrizeTiers()),
 		"anti_cheat":     rawJSON(lb.GetAntiCheat()),
-		"status":         lb.GetStatus(),
+		"status":         enumx.Name(lb.GetStatus()),
 		"created_at":     tsString(lb.GetCreatedAt()),
 		"updated_at":     tsString(lb.GetUpdatedAt()),
 	}
@@ -51,7 +51,7 @@ func entryView(e *gamev1.RankedEntry) map[string]any {
 		"score":     e.GetScore(),
 		"plays":     e.GetPlays(),
 		"rank":      e.GetRank(),
-		"state":     e.GetState(),
+		"state":     enumx.Name(e.GetState()),
 	}
 }
 
@@ -83,11 +83,12 @@ func rawJSON(s string) any {
 	return v
 }
 
-func tsString(t *timestamppb.Timestamp) any {
-	if t == nil {
+// tsString returns the unix-seconds timestamp, or nil when unset (0).
+func tsString(unix int64) any {
+	if unix == 0 {
 		return nil
 	}
-	return t.AsTime().UTC().Format("2006-01-02T15:04:05Z07:00")
+	return unix
 }
 
 func parseLimit(s string) int {

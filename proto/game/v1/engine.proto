@@ -13,7 +13,170 @@ package game.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
+
+// All time fields (created_at, updated_at, start_date, expires_at, …) are int64
+// unix timestamps in SECONDS. 0 means unset.
+
+// --- Enums: closed-set fields. The zero (_UNSPECIFIED) value is the wire/JSON
+// default and also represents "" / "not set" when mapped to the persistence
+// layer (which continues to store the lowercase token, e.g. "active").
+// Open-ended, registry-driven fields (game type, seed_generator, reward_handler,
+// validator, prize/reward type, integration event types) stay plain strings. ---
+
+// GameStatus is a game's lifecycle state.
+enum GameStatus {
+  GAME_STATUS_UNSPECIFIED = 0;
+  GAME_STATUS_DRAFT = 1;
+  GAME_STATUS_ACTIVE = 2;
+  GAME_STATUS_PAUSED = 3;
+  GAME_STATUS_ENDED = 4;
+}
+
+// WalletScope is the isolation level points/milestones are keyed by
+// (UNSPECIFIED → campaign, the default).
+enum WalletScope {
+  WALLET_SCOPE_UNSPECIFIED = 0;
+  WALLET_SCOPE_CAMPAIGN = 1;
+  WALLET_SCOPE_MERCHANT = 2;
+  WALLET_SCOPE_TENANT = 3;
+}
+
+// RewardStatus is the lifecycle of an awarded reward record.
+enum RewardStatus {
+  REWARD_STATUS_UNSPECIFIED = 0;
+  REWARD_STATUS_WON = 1;
+  REWARD_STATUS_CLAIMED = 2;
+  REWARD_STATUS_FULFILLED = 3;
+  REWARD_STATUS_REVOKED = 4;
+}
+
+// TaskStatus is the state of a fulfillment outbox task. ReportResult callbacks
+// finalize a task to FULFILLED or FAILED.
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_PROCESSING = 2;
+  TASK_STATUS_FULFILLED = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_DEAD = 5;
+}
+
+// ContactType is the kind of a verified contact.
+enum ContactType {
+  CONTACT_TYPE_UNSPECIFIED = 0;
+  CONTACT_TYPE_PHONE = 1;
+  CONTACT_TYPE_EMAIL = 2;
+}
+
+// AuthMethod is the verification method used to start/complete a login.
+enum AuthMethod {
+  AUTH_METHOD_UNSPECIFIED = 0;
+  AUTH_METHOD_CODE = 1;
+  AUTH_METHOD_OTP = 2;
+  AUTH_METHOD_MAGIC_LINK = 3;
+  AUTH_METHOD_SOCIAL = 4;
+}
+
+// CampaignStatus is a campaign's lifecycle state.
+enum CampaignStatus {
+  CAMPAIGN_STATUS_UNSPECIFIED = 0;
+  CAMPAIGN_STATUS_DRAFT = 1;
+  CAMPAIGN_STATUS_ACTIVE = 2;
+  CAMPAIGN_STATUS_PAUSED = 3;
+  CAMPAIGN_STATUS_ENDED = 4;
+}
+
+// QuestRewardType is the kind of reward a quest grants on completion.
+enum QuestRewardType {
+  QUEST_REWARD_TYPE_UNSPECIFIED = 0;
+  QUEST_REWARD_TYPE_PLAY_TURN = 1;
+}
+
+// QuestType selects the quest verifier.
+enum QuestType {
+  QUEST_TYPE_UNSPECIFIED = 0;
+  QUEST_TYPE_DAILY_CHECKIN = 1;
+  QUEST_TYPE_SHARE_SOCIAL = 2;
+  QUEST_TYPE_INVITE_FRIEND = 3;
+  QUEST_TYPE_SCAN_QR = 4;
+  QUEST_TYPE_VIEW_PAGE = 5;
+  QUEST_TYPE_ANSWER_QUESTION = 6;
+  QUEST_TYPE_EXTERNAL_EVENT = 7;
+}
+
+// QuestStatus is whether a quest is live.
+enum QuestStatus {
+  QUEST_STATUS_UNSPECIFIED = 0;
+  QUEST_STATUS_ACTIVE = 1;
+  QUEST_STATUS_INACTIVE = 2;
+}
+
+// LeaderboardMetric is the score a leaderboard ranks by.
+enum LeaderboardMetric {
+  LEADERBOARD_METRIC_UNSPECIFIED = 0;
+  LEADERBOARD_METRIC_HIGH_SCORE = 1;
+  LEADERBOARD_METRIC_TOTAL_SCORE = 2;
+  LEADERBOARD_METRIC_TOTAL_WINS = 3;
+  LEADERBOARD_METRIC_TOTAL_PLAYS = 4;
+  LEADERBOARD_METRIC_QUEST_POINTS = 5;
+  LEADERBOARD_METRIC_COLLECTION_COUNT = 6;
+}
+
+// LeaderboardStatus is a leaderboard's lifecycle state.
+enum LeaderboardStatus {
+  LEADERBOARD_STATUS_UNSPECIFIED = 0;
+  LEADERBOARD_STATUS_ACTIVE = 1;
+  LEADERBOARD_STATUS_FINALIZED = 2;
+}
+
+// EntryState is a ranked entry's standing.
+enum EntryState {
+  ENTRY_STATE_UNSPECIFIED = 0;
+  ENTRY_STATE_ACTIVE = 1;
+  ENTRY_STATE_FLAGGED = 2;
+  ENTRY_STATE_DISQUALIFIED = 3;
+}
+
+// LedgerReason is why a wallet ledger entry was written.
+enum LedgerReason {
+  LEDGER_REASON_UNSPECIFIED = 0;
+  LEDGER_REASON_PLAY = 1;
+  LEDGER_REASON_REDEEM = 2;
+  LEDGER_REASON_ADJUST = 3;
+}
+
+// MilestoneStatus is a milestone's progress state for a player.
+enum MilestoneStatus {
+  MILESTONE_STATUS_UNSPECIFIED = 0;
+  MILESTONE_STATUS_LOCKED = 1;
+  MILESTONE_STATUS_UNLOCKED = 2;
+  MILESTONE_STATUS_GRANTED = 3;
+}
+
+// MilestoneMode is how a milestone set behaves.
+enum MilestoneMode {
+  MILESTONE_MODE_UNSPECIFIED = 0;
+  MILESTONE_MODE_CUMULATIVE_UNLOCK = 1;
+  MILESTONE_MODE_SPEND_EXCHANGE = 2;
+}
+
+// IntegrationType is the outbound adapter kind.
+enum IntegrationType {
+  INTEGRATION_TYPE_UNSPECIFIED = 0;
+  INTEGRATION_TYPE_WEBHOOK = 1;
+  INTEGRATION_TYPE_GSHEET = 2;
+  INTEGRATION_TYPE_SMS = 3;
+  INTEGRATION_TYPE_ZNS = 4;
+  INTEGRATION_TYPE_CRM = 5;
+  INTEGRATION_TYPE_N8N = 6;
+}
+
+// IntegrationStatus is whether an integration is firing.
+enum IntegrationStatus {
+  INTEGRATION_STATUS_UNSPECIFIED = 0;
+  INTEGRATION_STATUS_ACTIVE = 1;
+  INTEGRATION_STATUS_PAUSED = 2;
+}
 
 // Scope is the tenant/merchant isolation boundary on every request.
 message Scope {
@@ -26,14 +189,14 @@ message Rules {
   int32 max_plays_per_user = 1;
   int32 max_plays_per_day = 2;
   bool require_login = 3;
-  google.protobuf.Timestamp start_date = 4;
-  google.protobuf.Timestamp end_date = 5;
+  int64 start_date = 4;
+  int64 end_date = 5;
   bool use_turns = 6; // gate on quest-granted turn balance (keyed by campaign)
 }
 
-// Game is the config-driven game definition. handler_config and ui are opaque
-// JSON the engine never interprets (handler_config is decoded by the handler;
-// ui only by the widget).
+// Game is the config-driven game definition. handler_config is opaque JSON the
+// engine never interprets (decoded only by the reward handler/seed). Widget/UI
+// render config is NOT a Core concern — it lives in the presentation layer (BFF).
 message Game {
   string id = 1;
   Scope scope = 2;
@@ -43,14 +206,14 @@ message Game {
   string seed_generator = 6;
   string reward_handler = 7;
   string validator = 8;
-  string status = 9;
+  GameStatus status = 9;
   Rules rules = 10;
   string handler_config = 11;   // raw JSON, decoded by the reward handler/seed
-  string ui = 12;               // raw JSON, opaque to Core
+  reserved 12; reserved "ui";   // removed: widget render config moved to the BFF
   string validator_config = 13; // raw JSON, decoded by the validator (anti-cheat)
-  google.protobuf.Timestamp created_at = 14;
-  google.protobuf.Timestamp updated_at = 15;
-  string wallet_scope = 16;     // campaign|merchant|tenant ("" → campaign)
+  int64 created_at = 14;
+  int64 updated_at = 15;
+  WalletScope wallet_scope = 16; // UNSPECIFIED → campaign
   string milestones = 17;       // raw JSON: milestone config (currency, mode, auto_grant, thresholds)
 }
 
@@ -81,11 +244,11 @@ message RewardRecord {
   string type = 8;
   int64 value = 9;
   string code = 10;
-  string status = 11; // won | claimed | fulfilled | revoked
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp claimed_at = 13;
-  google.protobuf.Timestamp fulfilled_at = 14;
-  google.protobuf.Timestamp revoked_at = 15;
+  RewardStatus status = 11;
+  int64 created_at = 12;
+  int64 claimed_at = 13;
+  int64 fulfilled_at = 14;
+  int64 revoked_at = 15;
 }
 
 // Reward is a single awarded item in a play result.
@@ -110,7 +273,7 @@ message StartGameRequest {
 message StartGameResponse {
   string session_id = 1;
   string seed_data = 2; // raw JSON, may be empty
-  google.protobuf.Timestamp expires_at = 3;
+  int64 expires_at = 3;
 }
 
 message PlayRequest {
@@ -136,7 +299,7 @@ message CheckEligibilityResponse {
   bool can_play = 1;
   int32 remaining_plays = 2;
   string reason = 3;
-  google.protobuf.Timestamp next_reset_at = 4;
+  int64 next_reset_at = 4;
 }
 
 message GetHistoryRequest {
@@ -151,7 +314,7 @@ message HistoryEntry {
   string game_id = 2;
   string rewards = 3;  // raw JSON
   string metadata = 4; // raw JSON
-  google.protobuf.Timestamp created_at = 5;
+  int64 created_at = 5;
 }
 message GetHistoryResponse {
   repeated HistoryEntry entries = 1;
@@ -173,7 +336,7 @@ service EngineService {
   }
 }
 
-// --- GameAdminService: minimal config CRUD to seed the slice ---
+// --- GameConfigService: minimal game-config CRUD to seed the slice ---
 
 message CreateGameRequest {
   Scope scope = 1;
@@ -187,12 +350,12 @@ message GetGameRequest {
 }
 message GetGameResponse { Game game = 1; }
 
-service GameAdminService {
+service GameConfigService {
   rpc CreateGame(CreateGameRequest) returns (CreateGameResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/games" body: "*"};
+    option (google.api.http) = {post: "/api/v1/games" body: "*"};
   }
   rpc GetGame(GetGameRequest) returns (GetGameResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/games/{game_id}"};
+    option (google.api.http) = {get: "/api/v1/games/{game_id}"};
   }
 }
 
@@ -258,35 +421,35 @@ message ListRewardsResponse {
 
 service RewardService {
   rpc CreatePrize(CreatePrizeRequest) returns (CreatePrizeResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/prizes" body: "*"};
+    option (google.api.http) = {post: "/api/v1/prizes" body: "*"};
   }
   rpc ListPrizes(ListPrizesRequest) returns (ListPrizesResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/prizes"};
+    option (google.api.http) = {get: "/api/v1/prizes"};
   }
   rpc GetPrize(GetPrizeRequest) returns (GetPrizeResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/prizes/{prize_id}"};
+    option (google.api.http) = {get: "/api/v1/prizes/{prize_id}"};
   }
   rpc UpdatePrize(UpdatePrizeRequest) returns (UpdatePrizeResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/prizes/{prize.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/prizes/{prize.id}" body: "*"};
   }
   rpc DeletePrize(DeletePrizeRequest) returns (DeletePrizeResponse) {
-    option (google.api.http) = {delete: "/api/v1/admin/prizes/{prize_id}"};
+    option (google.api.http) = {delete: "/api/v1/prizes/{prize_id}"};
   }
   rpc ImportCodes(ImportCodesRequest) returns (ImportCodesResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/prizes/{prize_id}/codes" body: "*"};
+    option (google.api.http) = {post: "/api/v1/prizes/{prize_id}/codes" body: "*"};
   }
   rpc GetPrizeSummary(GetPrizeSummaryRequest) returns (GetPrizeSummaryResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/prizes/summary"};
+    option (google.api.http) = {get: "/api/v1/prizes/summary"};
   }
 
   rpc ClaimReward(ClaimRewardRequest) returns (ClaimRewardResponse) {
     option (google.api.http) = {post: "/api/v1/rewards/{reward_id}/claim" body: "*"};
   }
   rpc FulfillReward(FulfillRewardRequest) returns (FulfillRewardResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/rewards/{reward_id}/fulfill" body: "*"};
+    option (google.api.http) = {post: "/api/v1/rewards/{reward_id}/fulfill" body: "*"};
   }
   rpc RevokeReward(RevokeRewardRequest) returns (RevokeRewardResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/rewards/{reward_id}/revoke" body: "*"};
+    option (google.api.http) = {post: "/api/v1/rewards/{reward_id}/revoke" body: "*"};
   }
   rpc ListRewards(ListRewardsRequest) returns (ListRewardsResponse) {
     option (google.api.http) = {get: "/api/v1/rewards"};
@@ -307,19 +470,19 @@ message FulfillmentTask {
   string campaign_id = 7;
   string channel = 8;
   string channel_config = 9; // raw JSON
-  string status = 10;        // pending|processing|fulfilled|failed|dead
+  TaskStatus status = 10;
   int32 attempts = 11;
   int32 max_attempts = 12;
   string last_error = 13;
   string receipt = 14;       // raw JSON: voucher code, tracking no., ...
-  google.protobuf.Timestamp next_attempt_at = 15;
-  google.protobuf.Timestamp created_at = 16;
-  google.protobuf.Timestamp updated_at = 17;
+  int64 next_attempt_at = 15;
+  int64 created_at = 16;
+  int64 updated_at = 17;
 }
 
 message ListTasksRequest {
   Scope scope = 1;
-  string status = 2;      // filter (optional)
+  TaskStatus status = 2;  // filter (UNSPECIFIED = no filter)
   string campaign_id = 3; // filter (optional)
   string prize_id = 4;    // filter (optional)
   int32 limit = 5;
@@ -341,21 +504,21 @@ message RetryTaskResponse { FulfillmentTask task = 1; }
 message ReportResultRequest {
   Scope scope = 1;
   string task_id = 2;
-  string status = 3;  // fulfilled | failed
-  string receipt = 4; // raw JSON
+  TaskStatus status = 3; // FULFILLED | FAILED
+  string receipt = 4;    // raw JSON
   string error = 5;   // populated when status == failed
 }
 message ReportResultResponse { FulfillmentTask task = 1; }
 
 service FulfillmentService {
   rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/fulfillment/tasks"};
+    option (google.api.http) = {get: "/api/v1/fulfillment/tasks"};
   }
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/fulfillment/tasks/{task_id}"};
+    option (google.api.http) = {get: "/api/v1/fulfillment/tasks/{task_id}"};
   }
   rpc RetryTask(RetryTaskRequest) returns (RetryTaskResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/fulfillment/tasks/{task_id}/retry" body: "*"};
+    option (google.api.http) = {post: "/api/v1/fulfillment/tasks/{task_id}/retry" body: "*"};
   }
   rpc ReportResult(ReportResultRequest) returns (ReportResultResponse) {
     option (google.api.http) = {post: "/api/v1/fulfillment/tasks/{task_id}/callback" body: "*"};
@@ -369,8 +532,8 @@ message Tenant {
   string name = 2;
   string plan = 3;
   string settings = 4; // raw JSON: {identity_linking, default_locale, wallet_scope}
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
+  int64 created_at = 5;
+  int64 updated_at = 6;
 }
 
 message CreateTenantRequest { Tenant tenant = 1; }
@@ -382,18 +545,18 @@ message UpdateTenantResponse { Tenant tenant = 1; }
 message ListTenantsRequest { int32 limit = 1; string cursor = 2; }
 message ListTenantsResponse { repeated Tenant tenants = 1; string next_cursor = 2; }
 
-service TenantService { // platform-admin
+service TenantService { // tenant CRUD (platform-scoped; no Scope field)
   rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/tenants" body: "*"};
+    option (google.api.http) = {post: "/api/v1/tenants" body: "*"};
   }
   rpc GetTenant(GetTenantRequest) returns (GetTenantResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}"};
+    option (google.api.http) = {get: "/api/v1/tenants/{tenant_id}"};
   }
   rpc UpdateTenant(UpdateTenantRequest) returns (UpdateTenantResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/tenants/{tenant.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/tenants/{tenant.id}" body: "*"};
   }
   rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/tenants"};
+    option (google.api.http) = {get: "/api/v1/tenants"};
   }
 }
 
@@ -403,8 +566,8 @@ message Merchant {
   string name = 3;
   string logo = 4;
   string settings = 5; // raw JSON: {wallet_scope_override}
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+  int64 created_at = 6;
+  int64 updated_at = 7;
 }
 
 message CreateMerchantRequest { string tenant_id = 1; Merchant merchant = 2; }
@@ -416,24 +579,24 @@ message UpdateMerchantResponse { Merchant merchant = 1; }
 message ListMerchantsRequest { string tenant_id = 1; int32 limit = 2; string cursor = 3; }
 message ListMerchantsResponse { repeated Merchant merchants = 1; string next_cursor = 2; }
 
-service MerchantService { // tenant-admin (scoped)
+service MerchantService { // merchant CRUD under a tenant
   rpc CreateMerchant(CreateMerchantRequest) returns (CreateMerchantResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/tenants/{tenant_id}/merchants" body: "*"};
+    option (google.api.http) = {post: "/api/v1/tenants/{tenant_id}/merchants" body: "*"};
   }
   rpc GetMerchant(GetMerchantRequest) returns (GetMerchantResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}/merchants/{merchant_id}"};
+    option (google.api.http) = {get: "/api/v1/tenants/{tenant_id}/merchants/{merchant_id}"};
   }
   rpc UpdateMerchant(UpdateMerchantRequest) returns (UpdateMerchantResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/merchants/{merchant.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/merchants/{merchant.id}" body: "*"};
   }
   rpc ListMerchants(ListMerchantsRequest) returns (ListMerchantsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}/merchants"};
+    option (google.api.http) = {get: "/api/v1/tenants/{tenant_id}/merchants"};
   }
 }
 
 // Contact is a verified means of identifying a person (globally unique).
 message Contact {
-  string type = 1;  // phone | email
+  ContactType type = 1;
   string value = 2; // normalized
   bool verified = 3;
 }
@@ -441,8 +604,8 @@ message Contact {
 message Identity {
   string id = 1;
   repeated Contact contacts = 2;
-  google.protobuf.Timestamp created_at = 3;
-  google.protobuf.Timestamp updated_at = 4;
+  int64 created_at = 3;
+  int64 updated_at = 4;
 }
 
 // ResolveOrCreate takes a VERIFIED contact and returns the identity (created if
@@ -456,13 +619,13 @@ message GetIdentityResponse { Identity identity = 1; }
 
 service IdentityService { // global person (internal)
   rpc ResolveOrCreate(ResolveOrCreateRequest) returns (ResolveOrCreateResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/identities/resolve" body: "*"};
+    option (google.api.http) = {post: "/api/v1/identities/resolve" body: "*"};
   }
   rpc LinkContact(LinkContactRequest) returns (LinkContactResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/identities/{identity_id}/contacts" body: "*"};
+    option (google.api.http) = {post: "/api/v1/identities/{identity_id}/contacts" body: "*"};
   }
   rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/identities/{identity_id}"};
+    option (google.api.http) = {get: "/api/v1/identities/{identity_id}"};
   }
 }
 
@@ -472,38 +635,25 @@ message Player {
   string merchant_id = 3;
   string identity_id = 4;
   string profile = 5; // raw JSON (collected fields)
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+  int64 created_at = 6;
+  int64 updated_at = 7;
 }
 
-// StartAuth begins a login by phone/email; the provider issues a challenge.
-message StartAuthRequest {
+// ResolvePlayer is the business operation behind login: given a VERIFIED contact
+// (the caller — a BFF — has already authenticated it), resolve-or-create the
+// global identity and upsert the tenant-scoped player. Authentication itself
+// (challenge issue/verify, token minting) is NOT Core's concern; it lives in the
+// BFF, which calls this after a successful verification.
+message ResolvePlayerRequest {
   Scope scope = 1;          // tenant_id (+ optional merchant_id)
-  string contact_type = 2;  // phone | email
+  ContactType contact_type = 2;
   string contact_value = 3; // raw; normalized server-side
-  string method = 4;        // code | otp | magic_link | social
-  string campaign_id = 5;   // optional context
 }
-message StartAuthResponse {
-  string challenge_id = 1;
-  google.protobuf.Timestamp expires_at = 2;
-  string dev_code = 3; // populated only by dev-stub providers (never in prod)
-}
-
-// VerifyAuth completes a challenge → resolves identity, upserts player, returns
-// a player token (JWT) issued by Core.
-message VerifyAuthRequest {
-  Scope scope = 1;
-  string challenge_id = 2;
-  string code = 3;     // for code/otp methods
-  string proof = 4;    // for magic_link/social (opaque to the engine)
-}
-message VerifyAuthResponse {
-  string token = 1;       // player JWT (claims: tenant_id, merchant_id?, player_id, identity_id)
-  Player player = 2;
-  Identity identity = 3;
-  bool identity_is_new = 4;
-  bool player_is_new = 5;
+message ResolvePlayerResponse {
+  Player player = 1;
+  Identity identity = 2;
+  bool identity_is_new = 3;
+  bool player_is_new = 4;
 }
 
 message GetProfileRequest { Scope scope = 1; string player_id = 2; }
@@ -514,9 +664,9 @@ message AddContactRequest {
   Scope scope = 1;
   string player_id = 2;
   string identity_id = 3;
-  string contact_type = 4;
+  ContactType contact_type = 4;
   string contact_value = 5;
-  string method = 6; // verification method (dev stubs auto-verify)
+  AuthMethod method = 6; // verification method (dev stubs auto-verify)
 }
 message AddContactResponse { Identity identity = 1; }
 
@@ -528,11 +678,8 @@ message ConsumeTurnRequest { Scope scope = 1; string player_id = 2; string scope
 message ConsumeTurnResponse { bool ok = 1; int64 balance = 2; }
 
 service PlayerService {
-  rpc StartAuth(StartAuthRequest) returns (StartAuthResponse) {
-    option (google.api.http) = {post: "/api/v1/auth/start" body: "*"};
-  }
-  rpc VerifyAuth(VerifyAuthRequest) returns (VerifyAuthResponse) {
-    option (google.api.http) = {post: "/api/v1/auth/verify" body: "*"};
+  rpc ResolvePlayer(ResolvePlayerRequest) returns (ResolvePlayerResponse) {
+    option (google.api.http) = {post: "/api/v1/players/resolve" body: "*"};
   }
   rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
     option (google.api.http) = {get: "/api/v1/players/{player_id}"};
@@ -564,15 +711,15 @@ message Campaign {
   string tenant_id = 2;
   string merchant_id = 3;
   string name = 4;
-  string status = 5; // draft | active | paused | ended
-  google.protobuf.Timestamp start_date = 6;
-  google.protobuf.Timestamp end_date = 7;
+  CampaignStatus status = 5;
+  int64 start_date = 6;
+  int64 end_date = 7;
   repeated string channels = 8;
   repeated string games = 9;   // linked game ids
   repeated string quests = 10; // linked quest ids
   string settings = 11;        // raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
+  int64 created_at = 12;
+  int64 updated_at = 13;
 }
 
 message CreateCampaignRequest { Scope scope = 1; Campaign campaign = 2; }
@@ -600,34 +747,34 @@ message GetCampaignAnalyticsResponse { CampaignAnalytics analytics = 1; }
 message GetPublicConfigRequest { string campaign_id = 1; }
 message GetPublicConfigResponse { Campaign campaign = 1; }
 
-service CampaignService { // merchant-admin (scoped); GetPublicConfig is public
+service CampaignService { // campaign aggregate: CRUD + analytics + unscoped config read
   rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/campaigns" body: "*"};
+    option (google.api.http) = {post: "/api/v1/campaigns" body: "*"};
   }
   rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/campaigns/{campaign_id}"};
+    option (google.api.http) = {get: "/api/v1/campaigns/{campaign_id}"};
   }
   rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/campaigns/{campaign.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/campaigns/{campaign.id}" body: "*"};
   }
   rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/campaigns"};
+    option (google.api.http) = {get: "/api/v1/campaigns"};
   }
   rpc DuplicateCampaign(DuplicateCampaignRequest) returns (DuplicateCampaignResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/campaigns/{campaign_id}/duplicate" body: "*"};
+    option (google.api.http) = {post: "/api/v1/campaigns/{campaign_id}/duplicate" body: "*"};
   }
   rpc GetCampaignAnalytics(GetCampaignAnalyticsRequest) returns (GetCampaignAnalyticsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/campaigns/{campaign_id}/analytics"};
+    option (google.api.http) = {get: "/api/v1/campaigns/{campaign_id}/analytics"};
   }
   rpc GetPublicConfig(GetPublicConfigRequest) returns (GetPublicConfigResponse) {
-    option (google.api.http) = {get: "/api/v1/public/campaigns/{campaign_id}"};
+    option (google.api.http) = {get: "/api/v1/campaigns/{campaign_id}/config"};
   }
 }
 
 // --- Phase 6: quest / mission ---
 
 message QuestReward {
-  string type = 1;     // play_turn
+  QuestRewardType type = 1;
   int64 quantity = 2;  // turns granted on completion
 }
 
@@ -638,13 +785,13 @@ message Quest {
   string tenant_id = 2;
   string merchant_id = 3;
   string campaign_id = 4;
-  string type = 5; // daily_checkin | share_social | invite_friend | scan_qr | view_page | answer_question | external_event
+  QuestType type = 5;
   string name = 6;
-  string status = 7; // active | inactive
+  QuestStatus status = 7;
   QuestReward reward = 8;
   string config = 9; // raw JSON
-  google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
+  int64 created_at = 10;
+  int64 updated_at = 11;
 }
 
 message CreateQuestRequest { Scope scope = 1; Quest quest = 2; }
@@ -662,9 +809,9 @@ message ListQuestsResponse { repeated Quest quests = 1; string next_cursor = 2; 
 message QuestState {
   Quest quest = 1;
   bool completed = 2;       // ever completed (daily: today)
-  bool can_complete = 3;    // eligible to complete now
+  reserved 3; reserved "can_complete"; // removed: UI affordance — derive from status + completed
   int32 completions = 4;    // lifetime count
-  google.protobuf.Timestamp last_completed = 5;
+  int64 last_completed = 5;
 }
 message ListPlayerQuestsRequest { Scope scope = 1; string campaign_id = 2; string player_id = 3; }
 message ListPlayerQuestsResponse { repeated QuestState quests = 1; }
@@ -682,21 +829,21 @@ message CompleteQuestResponse {
   int64 turn_balance = 3;
 }
 
-service QuestService { // CRUD = merchant-admin; List/Complete = player
+service QuestService { // quest CRUD + player list/complete
   rpc CreateQuest(CreateQuestRequest) returns (CreateQuestResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/quests" body: "*"};
+    option (google.api.http) = {post: "/api/v1/quests" body: "*"};
   }
   rpc GetQuest(GetQuestRequest) returns (GetQuestResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/quests/{quest_id}"};
+    option (google.api.http) = {get: "/api/v1/quests/{quest_id}"};
   }
   rpc UpdateQuest(UpdateQuestRequest) returns (UpdateQuestResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/quests/{quest.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/quests/{quest.id}" body: "*"};
   }
   rpc DeleteQuest(DeleteQuestRequest) returns (DeleteQuestResponse) {
-    option (google.api.http) = {delete: "/api/v1/admin/quests/{quest_id}"};
+    option (google.api.http) = {delete: "/api/v1/quests/{quest_id}"};
   }
   rpc ListQuests(ListQuestsRequest) returns (ListQuestsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/quests"};
+    option (google.api.http) = {get: "/api/v1/quests"};
   }
   rpc ListPlayerQuests(ListPlayerQuestsRequest) returns (ListPlayerQuestsResponse) {
     option (google.api.http) = {get: "/api/v1/campaigns/{campaign_id}/quests"};
@@ -717,13 +864,13 @@ message Leaderboard {
   string merchant_id = 3;
   string campaign_id = 4;
   string name = 5;
-  string metric = 6; // high_score | total_score | total_wins | total_plays | quest_points | collection_count
+  LeaderboardMetric metric = 6;
   string time_window = 7;
   string prize_tiers = 8;
   string anti_cheat = 9;
-  string status = 10; // active | finalized
-  google.protobuf.Timestamp created_at = 11;
-  google.protobuf.Timestamp updated_at = 12;
+  LeaderboardStatus status = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
 }
 
 // RankedEntry is one player's standing (player list / rankings).
@@ -732,7 +879,7 @@ message RankedEntry {
   int64 score = 2;
   int64 plays = 3;
   int64 rank = 4;
-  string state = 5; // active | flagged | disqualified
+  EntryState state = 5;
 }
 
 message CreateLeaderboardRequest { Scope scope = 1; Leaderboard leaderboard = 2; }
@@ -758,48 +905,34 @@ message AdjustEntryResponse { RankedEntry entry = 1; }
 
 message GetRankingsRequest { Scope scope = 1; string leaderboard_id = 2; int32 limit = 3; int32 offset = 4; }
 message GetRankingsResponse { repeated RankedEntry entries = 1; int64 total = 2; string window_key = 3; }
-message AroundMeRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; int32 radius = 4; }
-message AroundMeResponse { repeated RankedEntry entries = 1; }
-message MyRankRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; }
-message MyRankResponse {
-  RankedEntry entry = 1;
-  int32 next_tier_from_rank = 2;  // the better tier the player is climbing toward (0 = top tier / none)
-  int64 ranks_to_next_tier = 3;
-}
 
-service LeaderboardService { // CRUD/finalize/reset/disqualify/adjust = admin; rankings/around-me/my-rank = player
+service LeaderboardService { // leaderboard CRUD + finalize/reset/disqualify/adjust + player reads
   rpc CreateLeaderboard(CreateLeaderboardRequest) returns (CreateLeaderboardResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/leaderboards" body: "*"};
+    option (google.api.http) = {post: "/api/v1/leaderboards" body: "*"};
   }
   rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/leaderboards/{leaderboard_id}"};
+    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}"};
   }
   rpc UpdateLeaderboard(UpdateLeaderboardRequest) returns (UpdateLeaderboardResponse) {
-    option (google.api.http) = {put: "/api/v1/admin/leaderboards/{leaderboard.id}" body: "*"};
+    option (google.api.http) = {put: "/api/v1/leaderboards/{leaderboard.id}" body: "*"};
   }
   rpc ListLeaderboards(ListLeaderboardsRequest) returns (ListLeaderboardsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/leaderboards"};
+    option (google.api.http) = {get: "/api/v1/leaderboards"};
   }
   rpc FinalizeLeaderboard(FinalizeLeaderboardRequest) returns (FinalizeLeaderboardResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/finalize" body: "*"};
+    option (google.api.http) = {post: "/api/v1/leaderboards/{leaderboard_id}/finalize" body: "*"};
   }
   rpc ResetLeaderboard(ResetLeaderboardRequest) returns (ResetLeaderboardResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/reset" body: "*"};
+    option (google.api.http) = {post: "/api/v1/leaderboards/{leaderboard_id}/reset" body: "*"};
   }
   rpc DisqualifyEntry(DisqualifyEntryRequest) returns (DisqualifyEntryResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/disqualify" body: "*"};
+    option (google.api.http) = {post: "/api/v1/leaderboards/{leaderboard_id}/disqualify" body: "*"};
   }
   rpc AdjustEntry(AdjustEntryRequest) returns (AdjustEntryResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/adjust" body: "*"};
+    option (google.api.http) = {post: "/api/v1/leaderboards/{leaderboard_id}/adjust" body: "*"};
   }
   rpc GetRankings(GetRankingsRequest) returns (GetRankingsResponse) {
     option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/rankings"};
-  }
-  rpc AroundMe(AroundMeRequest) returns (AroundMeResponse) {
-    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/around-me"};
-  }
-  rpc MyRank(MyRankRequest) returns (MyRankResponse) {
-    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/my-rank"};
   }
 }
 
@@ -809,9 +942,9 @@ message LedgerEntry {
   string id = 1;
   string currency = 2;
   int64 amount = 3;   // signed: + earn, - spend
-  string reason = 4;  // play | redeem | adjust
+  LedgerReason reason = 4;
   string ref_id = 5;
-  google.protobuf.Timestamp created_at = 6;
+  int64 created_at = 6;
 }
 
 message GetWalletRequest { Scope scope = 1; string scope_key = 2; string player_id = 3; }
@@ -824,14 +957,14 @@ message MilestoneState {
   string milestone_id = 1;
   int64 threshold = 2;
   string prize_id = 3;
-  string status = 4;   // locked | unlocked | granted
+  MilestoneStatus status = 4;
   int64 progress = 5;
   int64 remaining = 6;
 }
 message GetMilestonesRequest { Scope scope = 1; string game_id = 2; string player_id = 3; }
 message GetMilestonesResponse {
   string currency = 1;
-  string mode = 2;
+  MilestoneMode mode = 2;
   int64 balance = 3;
   repeated MilestoneState milestones = 4;
 }
@@ -839,7 +972,7 @@ message GetMilestonesResponse {
 message RedeemRequest { Scope scope = 1; string game_id = 2; string milestone_id = 3; string player_id = 4; }
 message RedeemResponse {
   bool redeemed = 1;
-  string mode = 2;
+  MilestoneMode mode = 2;
   map<string, int64> spent = 3;
   Reward reward = 4;
   map<string, int64> balances = 5;
@@ -865,12 +998,12 @@ service WalletService { // player surface (wallet/ledger/milestones/redeem)
 message Integration {
   Scope scope = 1;
   string id = 2;
-  string type = 3;            // webhook | gsheet | sms | zns | crm | n8n
+  IntegrationType type = 3;
   string campaign_id = 4;     // optional: "" = all campaigns in scope
   repeated string events = 5; // subscribed event types (play_completed, prize_won, ...)
   string config = 6;          // JSON: { url, hmac_secret, sheet_id, ... } (adapter-specific)
-  string status = 7;          // active | paused
-  google.protobuf.Timestamp created_at = 8;
+  IntegrationStatus status = 7;
+  int64 created_at = 8;
 }
 
 message CreateIntegrationRequest { Scope scope = 1; Integration integration = 2; }
@@ -885,17 +1018,17 @@ message DeleteIntegrationResponse {}
 message EmitEventRequest { Scope scope = 1; string type = 2; string payload = 3; } // payload = JSON object
 message EmitEventResponse { int32 dispatched = 1; } // # of integrations the event was delivered to
 
-service IntegrationService { // CRUD = merchant-admin; EmitEvent = internal/manual injection
+service IntegrationService { // integration CRUD + manual EmitEvent injection
   rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/integrations" body: "*"};
+    option (google.api.http) = {post: "/api/v1/integrations" body: "*"};
   }
   rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
-    option (google.api.http) = {get: "/api/v1/admin/integrations"};
+    option (google.api.http) = {get: "/api/v1/integrations"};
   }
   rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse) {
-    option (google.api.http) = {delete: "/api/v1/admin/integrations/{id}"};
+    option (google.api.http) = {delete: "/api/v1/integrations/{id}"};
   }
   rpc EmitEvent(EmitEventRequest) returns (EmitEventResponse) {
-    option (google.api.http) = {post: "/api/v1/admin/integrations/emit" body: "*"};
+    option (google.api.http) = {post: "/api/v1/integrations/emit" body: "*"};
   }
 }

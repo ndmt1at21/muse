@@ -5,6 +5,7 @@ import (
 
 	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/pkg/apierr"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -29,10 +30,9 @@ func gameView(g *gamev1.Game) map[string]any {
 		"seed_generator":   g.GetSeedGenerator(),
 		"reward_handler":   g.GetRewardHandler(),
 		"validator":        g.GetValidator(),
-		"status":           g.GetStatus(),
+		"status":           enumx.Name(g.GetStatus()),
 		"handler_config":   rawJSON(g.GetHandlerConfig()),
 		"validator_config": rawJSON(g.GetValidatorConfig()),
-		"ui":               rawJSON(g.GetUi()),
 		"rules": map[string]any{
 			"max_plays_per_user": g.GetRules().GetMaxPlaysPerUser(),
 			"max_plays_per_day":  g.GetRules().GetMaxPlaysPerDay(),

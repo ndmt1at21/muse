@@ -12,6 +12,7 @@ import (
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/envelope"
 	"github.com/muse/bffkit/middleware"
+	"github.com/muse/pkg/enumx"
 	gamev1 "github.com/muse/pkg/gen/game/v1"
 )
 
@@ -49,10 +50,10 @@ func (b questBody) toProto(id string) *gamev1.Quest {
 	return &gamev1.Quest{
 		Id:         id,
 		CampaignId: b.CampaignID,
-		Type:       b.Type,
+		Type:       enumx.Parse[gamev1.QuestType](b.Type, gamev1.QuestType_value),
 		Name:       b.Name,
-		Status:     b.Status,
-		Reward:     &gamev1.QuestReward{Type: b.Reward.Type, Quantity: b.Reward.Quantity},
+		Status:     enumx.Parse[gamev1.QuestStatus](b.Status, gamev1.QuestStatus_value),
+		Reward:     &gamev1.QuestReward{Type: enumx.Parse[gamev1.QuestRewardType](b.Reward.Type, gamev1.QuestRewardType_value), Quantity: b.Reward.Quantity},
 		Config:     string(orEmptyObj(b.Config)),
 	}
 }

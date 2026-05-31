@@ -14,7 +14,6 @@ import (
 	"github.com/muse/adapters/sqlstore"
 	"github.com/muse/core/internal/integration"
 	"github.com/muse/core/internal/leaderboard"
-	"github.com/muse/core/internal/player"
 	"github.com/muse/core/internal/wallet"
 	"github.com/muse/gamekit"
 	"github.com/muse/gamekit/defaults"
@@ -30,7 +29,7 @@ import (
 // sqlstore adapter.
 type Server struct {
 	gamev1.UnimplementedEngineServiceServer
-	gamev1.UnimplementedGameAdminServiceServer
+	gamev1.UnimplementedGameConfigServiceServer
 	gamev1.UnimplementedRewardServiceServer
 	gamev1.UnimplementedFulfillmentServiceServer
 	gamev1.UnimplementedTenantServiceServer
@@ -47,7 +46,6 @@ type Server struct {
 	store    *sqlstore.DB
 	cache    *redisstore.Cache // optional; nil disables idempotency
 	reg      *gamekit.Registry // quest verifiers (+ game extension points)
-	auth     *player.Authenticator
 	resolver *identity.Resolver
 	lb       *leaderboard.Service // optional; nil when leaderboards aren't wired
 	wallet   *wallet.Service      // optional; nil when the wallet isn't wired
@@ -58,7 +56,6 @@ type Server struct {
 
 // Deps bundles the collaborators the Server needs beyond the engine.
 type Deps struct {
-	Auth        *player.Authenticator
 	Resolver    *identity.Resolver
 	Registry    *gamekit.Registry    // quest verifiers; may be nil when quests aren't wired
 	Leaderboard *leaderboard.Service // may be nil when leaderboards aren't wired
@@ -76,7 +73,7 @@ func NewServer(eng *engine.Engine, store *sqlstore.DB, cache *redisstore.Cache, 
 	}
 	return &Server{
 		eng: eng, store: store, cache: cache, reg: deps.Registry,
-		auth: deps.Auth, resolver: deps.Resolver, lb: deps.Leaderboard, wallet: deps.Wallet,
+		resolver: deps.Resolver, lb: deps.Leaderboard, wallet: deps.Wallet,
 		intg: deps.Integration, clock: clock, log: log,
 	}
 }
@@ -167,7 +164,7 @@ func (s *Server) GetHistory(ctx context.Context, req *gamev1.GetHistoryRequest) 
 	return &gamev1.GetHistoryResponse{Entries: out, NextCursor: next}, nil
 }
 
-// --- GameAdminService ---
+// --- GameConfigService ---
 
 func (s *Server) CreateGame(ctx context.Context, req *gamev1.CreateGameRequest) (*gamev1.CreateGameResponse, error) {
 	scope := scopeFromProto(req.GetScope())

@@ -82,6 +82,7 @@ services:
       BFF_CONSUMER_ADDR: ":8080"
       CORE_GRPC_ADDR: "core:9090"
       JWT_SECRET: "${JWT_SECRET:-dev-jwt-secret}"
+      AUTH_DEV_MODE: "${AUTH_DEV_MODE:-true}"  # reveal dev OTP codes (local/e2e); auth lives in the BFF
       REDIS_ADDR: "dragonfly:6379"          # distributed rate limit + read-model cache
       PLAY_RATE_LIMIT: "${PLAY_RATE_LIMIT:-60}"
     ports: ["8080:8080"]

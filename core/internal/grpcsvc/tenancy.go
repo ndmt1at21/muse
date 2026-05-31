@@ -95,8 +95,8 @@ func (s *Server) ListMerchants(ctx context.Context, req *gamev1.ListMerchantsReq
 // --- IdentityService (internal: global person) ---
 
 // ResolveOrCreate takes an already-verified contact and resolves/creates the
-// identity. Callers (other than the auth flow) use this to attach a known
-// person; the normal player login path goes through VerifyAuth.
+// identity alone. The normal player login path uses PlayerService.ResolvePlayer
+// (identity + tenant player); this is for attaching a known person directly.
 func (s *Server) ResolveOrCreate(ctx context.Context, req *gamev1.ResolveOrCreateRequest) (*gamev1.ResolveOrCreateResponse, error) {
 	c := req.GetContact()
 	t := types.ContactType(c.GetType())
