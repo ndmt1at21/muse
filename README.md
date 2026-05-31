@@ -24,6 +24,19 @@ anti-cheat, rewards/fulfillment, wallet, quests/leaderboard, integrations) · **
 diagrams** (gameplay, auth, fulfillment, wallet, leaderboard, events) · guides (quickstart,
 add-a-game, add-a-shape) · reference (REST API, errors, observability).
 
+## CI & deployment
+
+GitHub Actions in [`.github/workflows/`](.github/workflows/):
+
+- **`ci.yml`** (push + PR) — `go` job (gofmt check, build, vet, unit tests, and the gamekit
+  race test across both modules), an `integration` job (adapter port-contract suite against real
+  Postgres + MySQL + Redis via testcontainers), and a `docs` job that builds the Docusaurus site.
+- **`docs.yml`** (push to `main` touching `website/`) — builds the docs and deploys them to
+  **GitHub Pages**. The Pages base path is injected at build time, so it works for project pages
+  (`https://<owner>.github.io/<repo>/`) with no config edits.
+
+> One-time setup: in the repo **Settings → Pages**, set **Source = GitHub Actions**.
+
 ## Two consumption modes
 
 The engine ships as a pure SDK so it can be consumed two ways:

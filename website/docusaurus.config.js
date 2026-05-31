@@ -4,14 +4,19 @@
 // diagrams render from fenced ```mermaid code blocks.
 const { themes } = require('prism-react-renderer');
 
+// On GitHub Pages the deploy workflow injects DOCS_URL (origin) and DOCS_BASE_URL
+// (the project base path, e.g. "/muse"). Locally these are unset → root at "/".
+// baseUrl must start and end with "/", so we normalize the trailing slash.
+const baseUrl = (process.env.DOCS_BASE_URL || '/').replace(/\/?$/, '/');
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Muse',
   tagline: 'A config-driven game service — add a game, not backend code.',
   favicon: 'img/favicon.svg',
 
-  url: 'https://muse.example.com',
-  baseUrl: '/',
+  url: process.env.DOCS_URL || 'https://example.github.io',
+  baseUrl,
 
   organizationName: 'muse',
   projectName: 'muse',
