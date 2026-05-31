@@ -1,10 +1,17 @@
 syntax = "proto3";
 
-// Package game.v1 is the internal Core service boundary. The BFFs are the only
-// clients. Errors map to gRPC status codes (and back to the REST envelope at
-// the BFF). Versioned by package; a breaking change becomes game.v2.
+// Package game.v1 is the Core service boundary — the central product surface.
+// Core serves this contract over both gRPC and REST: the google.api.http
+// annotations below drive a grpc-gateway that exposes every RPC as JSON/HTTP
+// under /api/v1, wrapped in the uniform {code, message, trace_id, data}
+// envelope. Core is auth-agnostic — it trusts the caller (a BFF the developer
+// builds, see examples/) to authenticate and to pass the tenant/merchant Scope;
+// it only validates and operates on the business object. Errors map to gRPC
+// status codes (and to the envelope at the gateway). Versioned by package; a
+// breaking change becomes game.v2.
 package game.v1;
 
+import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -152,10 +159,18 @@ message GetHistoryResponse {
 }
 
 service EngineService {
-  rpc StartGame(StartGameRequest) returns (StartGameResponse);
-  rpc Play(PlayRequest) returns (PlayResponse);
-  rpc CheckEligibility(CheckEligibilityRequest) returns (CheckEligibilityResponse);
-  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc StartGame(StartGameRequest) returns (StartGameResponse) {
+    option (google.api.http) = {post: "/api/v1/games/{game_id}/start" body: "*"};
+  }
+  rpc Play(PlayRequest) returns (PlayResponse) {
+    option (google.api.http) = {post: "/api/v1/games/{game_id}/play" body: "*"};
+  }
+  rpc CheckEligibility(CheckEligibilityRequest) returns (CheckEligibilityResponse) {
+    option (google.api.http) = {get: "/api/v1/games/{game_id}/eligibility"};
+  }
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse) {
+    option (google.api.http) = {get: "/api/v1/games/{game_id}/history"};
+  }
 }
 
 // --- GameAdminService: minimal config CRUD to seed the slice ---
@@ -173,8 +188,12 @@ message GetGameRequest {
 message GetGameResponse { Game game = 1; }
 
 service GameAdminService {
-  rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
-  rpc GetGame(GetGameRequest) returns (GetGameResponse);
+  rpc CreateGame(CreateGameRequest) returns (CreateGameResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/games" body: "*"};
+  }
+  rpc GetGame(GetGameRequest) returns (GetGameResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/games/{game_id}"};
+  }
 }
 
 // --- RewardService: minimal prize creation to seed the slice ---
@@ -238,18 +257,40 @@ message ListRewardsResponse {
 }
 
 service RewardService {
-  rpc CreatePrize(CreatePrizeRequest) returns (CreatePrizeResponse);
-  rpc ListPrizes(ListPrizesRequest) returns (ListPrizesResponse);
-  rpc GetPrize(GetPrizeRequest) returns (GetPrizeResponse);
-  rpc UpdatePrize(UpdatePrizeRequest) returns (UpdatePrizeResponse);
-  rpc DeletePrize(DeletePrizeRequest) returns (DeletePrizeResponse);
-  rpc ImportCodes(ImportCodesRequest) returns (ImportCodesResponse);
-  rpc GetPrizeSummary(GetPrizeSummaryRequest) returns (GetPrizeSummaryResponse);
+  rpc CreatePrize(CreatePrizeRequest) returns (CreatePrizeResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/prizes" body: "*"};
+  }
+  rpc ListPrizes(ListPrizesRequest) returns (ListPrizesResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/prizes"};
+  }
+  rpc GetPrize(GetPrizeRequest) returns (GetPrizeResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/prizes/{prize_id}"};
+  }
+  rpc UpdatePrize(UpdatePrizeRequest) returns (UpdatePrizeResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/prizes/{prize.id}" body: "*"};
+  }
+  rpc DeletePrize(DeletePrizeRequest) returns (DeletePrizeResponse) {
+    option (google.api.http) = {delete: "/api/v1/admin/prizes/{prize_id}"};
+  }
+  rpc ImportCodes(ImportCodesRequest) returns (ImportCodesResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/prizes/{prize_id}/codes" body: "*"};
+  }
+  rpc GetPrizeSummary(GetPrizeSummaryRequest) returns (GetPrizeSummaryResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/prizes/summary"};
+  }
 
-  rpc ClaimReward(ClaimRewardRequest) returns (ClaimRewardResponse);
-  rpc FulfillReward(FulfillRewardRequest) returns (FulfillRewardResponse);
-  rpc RevokeReward(RevokeRewardRequest) returns (RevokeRewardResponse);
-  rpc ListRewards(ListRewardsRequest) returns (ListRewardsResponse);
+  rpc ClaimReward(ClaimRewardRequest) returns (ClaimRewardResponse) {
+    option (google.api.http) = {post: "/api/v1/rewards/{reward_id}/claim" body: "*"};
+  }
+  rpc FulfillReward(FulfillRewardRequest) returns (FulfillRewardResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/rewards/{reward_id}/fulfill" body: "*"};
+  }
+  rpc RevokeReward(RevokeRewardRequest) returns (RevokeRewardResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/rewards/{reward_id}/revoke" body: "*"};
+  }
+  rpc ListRewards(ListRewardsRequest) returns (ListRewardsResponse) {
+    option (google.api.http) = {get: "/api/v1/rewards"};
+  }
 }
 
 // --- FulfillmentService: the delivery outbox (admin review + machine callback) ---
@@ -307,10 +348,18 @@ message ReportResultRequest {
 message ReportResultResponse { FulfillmentTask task = 1; }
 
 service FulfillmentService {
-  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
-  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
-  rpc RetryTask(RetryTaskRequest) returns (RetryTaskResponse);
-  rpc ReportResult(ReportResultRequest) returns (ReportResultResponse);
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/fulfillment/tasks"};
+  }
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/fulfillment/tasks/{task_id}"};
+  }
+  rpc RetryTask(RetryTaskRequest) returns (RetryTaskResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/fulfillment/tasks/{task_id}/retry" body: "*"};
+  }
+  rpc ReportResult(ReportResultRequest) returns (ReportResultResponse) {
+    option (google.api.http) = {post: "/api/v1/fulfillment/tasks/{task_id}/callback" body: "*"};
+  }
 }
 
 // --- Phase 4: tenancy, identity & player ---
@@ -334,10 +383,18 @@ message ListTenantsRequest { int32 limit = 1; string cursor = 2; }
 message ListTenantsResponse { repeated Tenant tenants = 1; string next_cursor = 2; }
 
 service TenantService { // platform-admin
-  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse);
-  rpc GetTenant(GetTenantRequest) returns (GetTenantResponse);
-  rpc UpdateTenant(UpdateTenantRequest) returns (UpdateTenantResponse);
-  rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse);
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/tenants" body: "*"};
+  }
+  rpc GetTenant(GetTenantRequest) returns (GetTenantResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}"};
+  }
+  rpc UpdateTenant(UpdateTenantRequest) returns (UpdateTenantResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/tenants/{tenant.id}" body: "*"};
+  }
+  rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/tenants"};
+  }
 }
 
 message Merchant {
@@ -360,10 +417,18 @@ message ListMerchantsRequest { string tenant_id = 1; int32 limit = 2; string cur
 message ListMerchantsResponse { repeated Merchant merchants = 1; string next_cursor = 2; }
 
 service MerchantService { // tenant-admin (scoped)
-  rpc CreateMerchant(CreateMerchantRequest) returns (CreateMerchantResponse);
-  rpc GetMerchant(GetMerchantRequest) returns (GetMerchantResponse);
-  rpc UpdateMerchant(UpdateMerchantRequest) returns (UpdateMerchantResponse);
-  rpc ListMerchants(ListMerchantsRequest) returns (ListMerchantsResponse);
+  rpc CreateMerchant(CreateMerchantRequest) returns (CreateMerchantResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/tenants/{tenant_id}/merchants" body: "*"};
+  }
+  rpc GetMerchant(GetMerchantRequest) returns (GetMerchantResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}/merchants/{merchant_id}"};
+  }
+  rpc UpdateMerchant(UpdateMerchantRequest) returns (UpdateMerchantResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/merchants/{merchant.id}" body: "*"};
+  }
+  rpc ListMerchants(ListMerchantsRequest) returns (ListMerchantsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/tenants/{tenant_id}/merchants"};
+  }
 }
 
 // Contact is a verified means of identifying a person (globally unique).
@@ -390,9 +455,15 @@ message GetIdentityRequest { string identity_id = 1; }
 message GetIdentityResponse { Identity identity = 1; }
 
 service IdentityService { // global person (internal)
-  rpc ResolveOrCreate(ResolveOrCreateRequest) returns (ResolveOrCreateResponse);
-  rpc LinkContact(LinkContactRequest) returns (LinkContactResponse);
-  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse);
+  rpc ResolveOrCreate(ResolveOrCreateRequest) returns (ResolveOrCreateResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/identities/resolve" body: "*"};
+  }
+  rpc LinkContact(LinkContactRequest) returns (LinkContactResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/identities/{identity_id}/contacts" body: "*"};
+  }
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/identities/{identity_id}"};
+  }
 }
 
 message Player {
@@ -457,14 +528,30 @@ message ConsumeTurnRequest { Scope scope = 1; string player_id = 2; string scope
 message ConsumeTurnResponse { bool ok = 1; int64 balance = 2; }
 
 service PlayerService {
-  rpc StartAuth(StartAuthRequest) returns (StartAuthResponse);
-  rpc VerifyAuth(VerifyAuthRequest) returns (VerifyAuthResponse);
-  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
-  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
-  rpc AddContact(AddContactRequest) returns (AddContactResponse);
-  rpc GetTurnBalance(GetTurnBalanceRequest) returns (GetTurnBalanceResponse);
-  rpc GrantTurns(GrantTurnsRequest) returns (GrantTurnsResponse);
-  rpc ConsumeTurn(ConsumeTurnRequest) returns (ConsumeTurnResponse);
+  rpc StartAuth(StartAuthRequest) returns (StartAuthResponse) {
+    option (google.api.http) = {post: "/api/v1/auth/start" body: "*"};
+  }
+  rpc VerifyAuth(VerifyAuthRequest) returns (VerifyAuthResponse) {
+    option (google.api.http) = {post: "/api/v1/auth/verify" body: "*"};
+  }
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
+    option (google.api.http) = {get: "/api/v1/players/{player_id}"};
+  }
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (google.api.http) = {put: "/api/v1/players/{player_id}/profile" body: "*"};
+  }
+  rpc AddContact(AddContactRequest) returns (AddContactResponse) {
+    option (google.api.http) = {post: "/api/v1/players/{player_id}/contacts" body: "*"};
+  }
+  rpc GetTurnBalance(GetTurnBalanceRequest) returns (GetTurnBalanceResponse) {
+    option (google.api.http) = {get: "/api/v1/players/{player_id}/turns"};
+  }
+  rpc GrantTurns(GrantTurnsRequest) returns (GrantTurnsResponse) {
+    option (google.api.http) = {post: "/api/v1/players/{player_id}/turns/grant" body: "*"};
+  }
+  rpc ConsumeTurn(ConsumeTurnRequest) returns (ConsumeTurnResponse) {
+    option (google.api.http) = {post: "/api/v1/players/{player_id}/turns/consume" body: "*"};
+  }
 }
 
 // --- Phase 5: campaign aggregate (under a merchant) ---
@@ -514,13 +601,27 @@ message GetPublicConfigRequest { string campaign_id = 1; }
 message GetPublicConfigResponse { Campaign campaign = 1; }
 
 service CampaignService { // merchant-admin (scoped); GetPublicConfig is public
-  rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse);
-  rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse);
-  rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse);
-  rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse);
-  rpc DuplicateCampaign(DuplicateCampaignRequest) returns (DuplicateCampaignResponse);
-  rpc GetCampaignAnalytics(GetCampaignAnalyticsRequest) returns (GetCampaignAnalyticsResponse);
-  rpc GetPublicConfig(GetPublicConfigRequest) returns (GetPublicConfigResponse);
+  rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/campaigns" body: "*"};
+  }
+  rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/campaigns/{campaign_id}"};
+  }
+  rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/campaigns/{campaign.id}" body: "*"};
+  }
+  rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/campaigns"};
+  }
+  rpc DuplicateCampaign(DuplicateCampaignRequest) returns (DuplicateCampaignResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/campaigns/{campaign_id}/duplicate" body: "*"};
+  }
+  rpc GetCampaignAnalytics(GetCampaignAnalyticsRequest) returns (GetCampaignAnalyticsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/campaigns/{campaign_id}/analytics"};
+  }
+  rpc GetPublicConfig(GetPublicConfigRequest) returns (GetPublicConfigResponse) {
+    option (google.api.http) = {get: "/api/v1/public/campaigns/{campaign_id}"};
+  }
 }
 
 // --- Phase 6: quest / mission ---
@@ -582,13 +683,27 @@ message CompleteQuestResponse {
 }
 
 service QuestService { // CRUD = merchant-admin; List/Complete = player
-  rpc CreateQuest(CreateQuestRequest) returns (CreateQuestResponse);
-  rpc GetQuest(GetQuestRequest) returns (GetQuestResponse);
-  rpc UpdateQuest(UpdateQuestRequest) returns (UpdateQuestResponse);
-  rpc DeleteQuest(DeleteQuestRequest) returns (DeleteQuestResponse);
-  rpc ListQuests(ListQuestsRequest) returns (ListQuestsResponse);
-  rpc ListPlayerQuests(ListPlayerQuestsRequest) returns (ListPlayerQuestsResponse);
-  rpc CompleteQuest(CompleteQuestRequest) returns (CompleteQuestResponse);
+  rpc CreateQuest(CreateQuestRequest) returns (CreateQuestResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/quests" body: "*"};
+  }
+  rpc GetQuest(GetQuestRequest) returns (GetQuestResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/quests/{quest_id}"};
+  }
+  rpc UpdateQuest(UpdateQuestRequest) returns (UpdateQuestResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/quests/{quest.id}" body: "*"};
+  }
+  rpc DeleteQuest(DeleteQuestRequest) returns (DeleteQuestResponse) {
+    option (google.api.http) = {delete: "/api/v1/admin/quests/{quest_id}"};
+  }
+  rpc ListQuests(ListQuestsRequest) returns (ListQuestsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/quests"};
+  }
+  rpc ListPlayerQuests(ListPlayerQuestsRequest) returns (ListPlayerQuestsResponse) {
+    option (google.api.http) = {get: "/api/v1/campaigns/{campaign_id}/quests"};
+  }
+  rpc CompleteQuest(CompleteQuestRequest) returns (CompleteQuestResponse) {
+    option (google.api.http) = {post: "/api/v1/quests/{quest_id}/complete" body: "*"};
+  }
 }
 
 // --- Phase 7: leaderboard ---
@@ -653,17 +768,39 @@ message MyRankResponse {
 }
 
 service LeaderboardService { // CRUD/finalize/reset/disqualify/adjust = admin; rankings/around-me/my-rank = player
-  rpc CreateLeaderboard(CreateLeaderboardRequest) returns (CreateLeaderboardResponse);
-  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
-  rpc UpdateLeaderboard(UpdateLeaderboardRequest) returns (UpdateLeaderboardResponse);
-  rpc ListLeaderboards(ListLeaderboardsRequest) returns (ListLeaderboardsResponse);
-  rpc FinalizeLeaderboard(FinalizeLeaderboardRequest) returns (FinalizeLeaderboardResponse);
-  rpc ResetLeaderboard(ResetLeaderboardRequest) returns (ResetLeaderboardResponse);
-  rpc DisqualifyEntry(DisqualifyEntryRequest) returns (DisqualifyEntryResponse);
-  rpc AdjustEntry(AdjustEntryRequest) returns (AdjustEntryResponse);
-  rpc GetRankings(GetRankingsRequest) returns (GetRankingsResponse);
-  rpc AroundMe(AroundMeRequest) returns (AroundMeResponse);
-  rpc MyRank(MyRankRequest) returns (MyRankResponse);
+  rpc CreateLeaderboard(CreateLeaderboardRequest) returns (CreateLeaderboardResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/leaderboards" body: "*"};
+  }
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/leaderboards/{leaderboard_id}"};
+  }
+  rpc UpdateLeaderboard(UpdateLeaderboardRequest) returns (UpdateLeaderboardResponse) {
+    option (google.api.http) = {put: "/api/v1/admin/leaderboards/{leaderboard.id}" body: "*"};
+  }
+  rpc ListLeaderboards(ListLeaderboardsRequest) returns (ListLeaderboardsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/leaderboards"};
+  }
+  rpc FinalizeLeaderboard(FinalizeLeaderboardRequest) returns (FinalizeLeaderboardResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/finalize" body: "*"};
+  }
+  rpc ResetLeaderboard(ResetLeaderboardRequest) returns (ResetLeaderboardResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/reset" body: "*"};
+  }
+  rpc DisqualifyEntry(DisqualifyEntryRequest) returns (DisqualifyEntryResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/disqualify" body: "*"};
+  }
+  rpc AdjustEntry(AdjustEntryRequest) returns (AdjustEntryResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/leaderboards/{leaderboard_id}/adjust" body: "*"};
+  }
+  rpc GetRankings(GetRankingsRequest) returns (GetRankingsResponse) {
+    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/rankings"};
+  }
+  rpc AroundMe(AroundMeRequest) returns (AroundMeResponse) {
+    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/around-me"};
+  }
+  rpc MyRank(MyRankRequest) returns (MyRankResponse) {
+    option (google.api.http) = {get: "/api/v1/leaderboards/{leaderboard_id}/my-rank"};
+  }
 }
 
 // --- Phase 8: wallet, points & exchange ---
@@ -709,10 +846,18 @@ message RedeemResponse {
 }
 
 service WalletService { // player surface (wallet/ledger/milestones/redeem)
-  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
-  rpc GetLedger(GetLedgerRequest) returns (GetLedgerResponse);
-  rpc GetMilestones(GetMilestonesRequest) returns (GetMilestonesResponse);
-  rpc Redeem(RedeemRequest) returns (RedeemResponse);
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
+    option (google.api.http) = {get: "/api/v1/wallet"};
+  }
+  rpc GetLedger(GetLedgerRequest) returns (GetLedgerResponse) {
+    option (google.api.http) = {get: "/api/v1/wallet/ledger"};
+  }
+  rpc GetMilestones(GetMilestonesRequest) returns (GetMilestonesResponse) {
+    option (google.api.http) = {get: "/api/v1/games/{game_id}/milestones"};
+  }
+  rpc Redeem(RedeemRequest) returns (RedeemResponse) {
+    option (google.api.http) = {post: "/api/v1/games/{game_id}/redeem" body: "*"};
+  }
 }
 
 // --- Integration hub (Phase 10): outbound adapters fired on domain events ---
@@ -741,8 +886,16 @@ message EmitEventRequest { Scope scope = 1; string type = 2; string payload = 3;
 message EmitEventResponse { int32 dispatched = 1; } // # of integrations the event was delivered to
 
 service IntegrationService { // CRUD = merchant-admin; EmitEvent = internal/manual injection
-  rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse);
-  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse);
-  rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse);
-  rpc EmitEvent(EmitEventRequest) returns (EmitEventResponse);
+  rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/integrations" body: "*"};
+  }
+  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
+    option (google.api.http) = {get: "/api/v1/admin/integrations"};
+  }
+  rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse) {
+    option (google.api.http) = {delete: "/api/v1/admin/integrations/{id}"};
+  }
+  rpc EmitEvent(EmitEventRequest) returns (EmitEventResponse) {
+    option (google.api.http) = {post: "/api/v1/admin/integrations/emit" body: "*"};
+  }
 }

@@ -23,16 +23,17 @@ flowchart TD
     bus["events<br/>Redis pub/sub bus"]
   end
 
-  subgraph CoreSvc["core — the hosted API"]
+  subgraph CoreSvc["core — the product surface (gRPC + REST)"]
     grpc["grpcsvc<br/>proto ↔ engine"]
+    gw["restgw<br/>grpc-gateway · enveloped"]
     svcs["services<br/>player · leaderboard · wallet · fulfillment · integration"]
     plat["platform<br/>config · health · metrics"]
   end
 
-  subgraph BFF["BFFs — REST edge"]
+  subgraph BFF["BFF — the developer's edge (bffkit toolkit + examples/)"]
     kit["bffkit<br/>envelope · auth · cache · ratelimit · obs"]
-    cons["bff-consumer<br/>widget + player"]
-    adm["bff-admin<br/>dashboard + callbacks"]
+    cons["examples/bff-consumer<br/>widget + player (reference)"]
+    adm["examples/bff-admin<br/>dashboard + callbacks (reference)"]
   end
 
   engine --> ports
@@ -41,6 +42,7 @@ flowchart TD
   sql -.implements.-> ports
   redis -.implements.-> ports
   grpc --> engine
+  gw --> grpc
   svcs --> sql
   svcs --> redis
   grpc --> svcs
@@ -48,6 +50,9 @@ flowchart TD
   adm --> kit
   cons -->|gRPC| grpc
   adm -->|gRPC| grpc
+
+  classDef surface fill:#bbf7d0,stroke:#15803d,color:#052e16;
+  class grpc,gw surface;
 
   classDef pure fill:#ddd6fe,stroke:#6d28d9,color:#1e1b4b;
   class types,ports,engine,reg pure;
@@ -59,25 +64,29 @@ flowchart TD
 |---|---|---|---|
 | **Pure SDK** | `gamekit` | Domain models + the generic engine + the handler/seed/validator registry. **No I/O.** | nothing but Go stdlib |
 | **Adapters** | `adapters/sqlstore`, `adapters/redisstore`, `adapters/events` | Concrete implementations of the SDK's `ports` over SQL / Redis. | `gamekit/ports` |
-| **Core** | `core` | One *composition*: wires `gamekit` + `adapters` and exposes the gRPC contracts; hosts the services that need I/O (player auth, leaderboard, wallet, fulfillment, integration hub). | gamekit + adapters + proto |
-| **BFF** | `bffkit`, `bff-consumer`, `bff-admin` | The REST edge: the uniform JSON envelope, snake_case, auth, caching, rate-limit, metrics. | proto (via a gRPC client) |
+| **Core** | `core` | The product surface. Wires `gamekit` + `adapters`, exposes the contract over **gRPC and REST** (grpc-gateway, enveloped), and hosts the services that need I/O (player auth, leaderboard, wallet, fulfillment, integration hub). **Auth-agnostic.** | gamekit + adapters + proto |
+| **BFF** | `bffkit` (toolkit) + `examples/bff-consumer`, `examples/bff-admin` (reference) | The developer's edge, built on `bffkit`: auth, RBAC, caching, rate-limit, view-model assembly. **Not a shipped tier** — you build your own. | Core (via gRPC or REST) |
 
 ## Responsibility boundary: Core = business, BFF = presentation
 
 This split is deliberate and load-bearing:
 
 - **Core owns business objects & rules only.** It returns whole domain entities and business
-  errors. It does **not** know about the response envelope, snake_case, HTTP status, pagination
-  cursors, localization, or the widget's look. The `ui` block on a game is an **opaque JSON blob**
-  Core stores and returns but never interprets.
-- **BFF owns everything UI-facing.** It aggregates multiple Core RPCs into one view model, shapes
-  & redacts per audience (a public prize list strips `probability`/`stock`), applies the envelope,
-  caches hot reads, and maps gRPC status → HTTP.
+  errors. The `ui` block on a game is an **opaque JSON blob** Core stores and returns but never
+  interprets. Core does **not** authenticate — it trusts the caller to pass the tenant/merchant
+  scope and only validates the business object. Core *does* now own the **transport-level**
+  presentation its REST gateway needs: the envelope and the gRPC-status → HTTP mapping (shared via
+  `pkg/envelope`), so a direct REST caller gets a first-class response without a BFF.
+- **The BFF owns everything audience-facing.** It authenticates callers, enforces RBAC, aggregates
+  multiple Core RPCs into one view model, shapes & redacts per audience (a public prize list strips
+  `probability`/`stock`), caches hot reads, and rate-limits. This is **your** layer — `bffkit` is
+  the toolkit, and `examples/` are runnable references to copy.
 
 > **Consequence:** a new UI requirement is a BFF/widget change, not a Core change — reinforcing the
-> config-driven goal.
+> config-driven goal. And because Core speaks REST directly, a simple integration can skip the BFF
+> entirely and call `/api/v1` with its own auth in front.
 
-## Why two BFFs?
+## Why two reference BFFs?
 
 ```mermaid
 flowchart LR
@@ -89,16 +98,18 @@ flowchart LR
     n8n["n8n / orchestrator"]
   end
 
-  widget -->|"CORS · rate-limit · player JWT"| C["bff-consumer :8080"]
-  dash -->|"role-based authz"| A["bff-admin :8081"]
+  widget -->|"CORS · rate-limit · player JWT"| C["examples/bff-consumer :8080"]
+  dash -->|"role-based authz"| A["examples/bff-admin :8081"]
   n8n -->|"HMAC-signed callback"| A
-  C -->|gRPC| Core[("Core :9090")]
+  C -->|gRPC| Core[("Core :9090 gRPC / :8090 REST")]
   A -->|gRPC| Core
+  direct["direct integration<br/>(own auth)"] -->|REST| Core
 ```
 
-Splitting by audience lets each scale and be secured independently — the admin surface never sits
-on the public edge. Both import the shared **`bffkit`** so behavior (envelope, auth seam, error
-mapping) stays consistent.
+The references split by audience to show the pattern: each can scale and be secured independently —
+the admin surface never sits on the public edge. Both import the shared **`bffkit`** so behavior
+(envelope, auth seam, error mapping) stays consistent. **You're free to structure your own BFF
+differently** — one service, three, or none (call Core's REST directly behind your own gateway).
 
 ## The uniform response envelope
 

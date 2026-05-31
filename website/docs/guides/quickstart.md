@@ -16,17 +16,21 @@ Run the whole stack and play a spin wheel in a few minutes.
 ## 1. Bring it up
 
 ```bash
-make up        # postgres + mysql + dragonfly + core + both BFFs + prometheus + grafana
+make up        # postgres + mysql + dragonfly + core + reference BFFs + prometheus + grafana
 ```
 
 This builds the images, applies migrations on boot, and starts everything. The endpoints:
 
 | URL | What |
 |---|---|
-| `http://localhost:8080` | Consumer BFF (widget + player) |
-| `http://localhost:8081` | Admin BFF (dashboard + callbacks) |
+| `http://localhost:8090` | **Core REST** (`/api/v1`, no auth — the product surface; `make smoke-rest`) |
+| `http://localhost:8080` | Consumer BFF — *reference* (`examples/`, widget + player) |
+| `http://localhost:8081` | Admin BFF — *reference* (`examples/`, dashboard + callbacks) |
 | `http://localhost:3000` | Grafana (anonymous admin) |
 | `http://localhost:9092` | Prometheus |
+
+> The BFF endpoints below are the **reference** edge (auth + view-models). Core also serves the
+> same operations directly at `:8090` — that's the surface you build your own BFF against.
 
 ## 2. Seed a demo game
 

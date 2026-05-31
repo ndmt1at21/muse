@@ -1,6 +1,7 @@
 # Prometheus scrape config for the Muse stack (Phase 11). Each service exposes
-# /metrics: Core on its health port, the BFFs on their HTTP port. Alert rules
-# live in alerts.yml (loaded below).
+# /metrics: Core on its health port (the REST gateway on :8090 is a separate
+# port and not scraped), the reference BFFs on their HTTP port. Alert rules live
+# in alerts.yml (loaded below).
 global:
   scrape_interval: 15s
   evaluation_interval: 15s

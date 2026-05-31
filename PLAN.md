@@ -16,6 +16,18 @@ Campaign, Quest, Reward, Player, Leaderboard, Inventory/Exchange, Integration.
 - **Language**: Go for both tiers.
 - **Topology**: 2 services — **Core** (domain, engine, persistence) + **BFF** (public widget +
   admin edge). Communicate via **gRPC** (typed protobuf contracts).
+
+> **Architecture update (2026-05-31): Core is the product surface; the BFF is the developer's.**
+> Core now serves the full `game.v1` contract over **both gRPC and REST** (a grpc-gateway under
+> `/api/v1`, wrapped in the same uniform envelope), so it is usable directly with no BFF. Core
+> stays **auth-agnostic** — it trusts the caller to authenticate and to pass the tenant/merchant
+> scope, and only validates the business object. The BFF is **no longer a shipped tier**: edge
+> concerns (auth, RBAC, rate limiting, caching, view-model assembly) belong to a BFF the developer
+> builds, using the `bffkit` toolkit. The former `bff-consumer`/`bff-admin` now live under
+> `examples/` as runnable reference BFFs to copy. The rest of this document predates that change;
+> read "the BFF" below as "the reference/your BFF (`bffkit` + `examples/`)", and remember the same
+> envelope/auth seams it describes are now available directly on Core's REST gateway too.
+
 - **DB**: support **MySQL and PostgreSQL**, **no ORM** — `database/sql` + `sqlx`, raw SQL, thin
   dialect layer.
 - **Scope**: plan covers the **full feature set**; build **runnable vertical slice first**, then

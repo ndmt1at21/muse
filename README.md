@@ -43,12 +43,20 @@ The engine ships as a pure SDK so it can be consumed two ways:
 
 - **Mode A — embed the SDK** (`gamekit`): import the engine, register handlers, call
   `engine.Play(...)` directly. Depends only on **port interfaces**; bring your own DB/transport
-  or use our `adapters`. No dependency on Core/BFF/proto. See [`examples/embed`](examples/embed).
-- **Mode B — run the hosted API**: deploy `core` (gRPC) + `bff-consumer`/`bff-admin` (REST).
-  Core is *one composition*: `gamekit` + `adapters` + gRPC transport.
+  or use our `adapters`. No dependency on Core/proto. See [`examples/embed`](examples/embed).
+- **Mode B — run the hosted API**: deploy `core`, the central product surface. Core serves the
+  full `game.v1` contract over **both gRPC and REST** (a grpc-gateway under `/api/v1`, wrapped in
+  the uniform `{code, message, trace_id, data}` envelope), so it is usable directly. Core is
+  **auth-agnostic** — it trusts the caller to authenticate and to pass the tenant/merchant scope,
+  and only validates the business object. **You design your own BFF** for the edge concerns
+  (auth, RBAC, rate limiting, caching, view-model assembly); `bffkit` is the toolkit for that, and
+  [`examples/bff-consumer`](examples/bff-consumer) + [`examples/bff-admin`](examples/bff-admin) are
+  runnable reference BFFs to copy and adapt.
 
 ```
-gamekit (no I/O, no transport)  →  adapters (SQL/Redis port impls)  →  core (wire + gRPC)  →  BFFs (REST)
+gamekit (no I/O, no transport)  →  adapters (SQL/Redis port impls)  →  core (wire + gRPC + REST)
+                                                                          │
+                                                          your BFF (bffkit) ── examples/bff-*
 ```
 
 ## Layout
@@ -60,9 +68,10 @@ gamekit (no I/O, no transport)  →  adapters (SQL/Redis port impls)  →  core 
 | `pkg/apierr`, `pkg/dialect` | Error model (gkerr ↔ gRPC/HTTP) and the SQL dialect abstraction. |
 | `adapters/sqlstore` | Default port impls over **Postgres + MySQL** (no ORM, raw SQL, atomic `Deduct`, goose migrations). |
 | `adapters/redisstore` | Ephemeral state over Redis/Dragonfly (idempotency cache; sessions/leaderboard later). |
-| `core/` | The gRPC service: wires gamekit + adapters, maps proto ↔ engine. |
-| `bffkit/` | Shared BFF library: `envelope`, `coreclient`, `middleware`, `auth` seam. |
-| `bff-consumer/`, `bff-admin/` | The two REST deployables (public widget vs internal admin). |
+| `core/` | The product surface: wires gamekit + adapters, maps proto ↔ engine, serves **gRPC + REST** (grpc-gateway, enveloped). Auth-agnostic. |
+| `pkg/envelope` | The uniform REST envelope + gRPC-status→error mapping, shared by Core's gateway and any BFF. |
+| `bffkit/` | The **BFF toolkit** for building your own edge: `envelope`, `coreclient`, `auth`/RBAC seam, `ratelimit`, `cache`, `obs`, `middleware`. |
+| `examples/bff-consumer/`, `examples/bff-admin/` | **Reference** REST BFFs (public widget vs internal admin) built on `bffkit` — copy & adapt. |
 
 ## Quick start
 
@@ -109,6 +118,15 @@ Target MySQL instead: `make migrate-mysql` + `make run-core-mysql`.
 
 Uniform envelope on every response: `{ code, message, trace_id, data }`. Errors follow the
 Google API error model (canonical code + stable `reason` + `ErrorInfo`).
+
+**Core REST (`:8090`)** — every `game.v1` RPC is exposed as JSON/HTTP under `/api/v1` by the
+grpc-gateway, enveloped identically. Because Core is auth-agnostic, the tenant/merchant scope
+travels as ordinary request fields (in the JSON body, or `?scope.tenant_id=…` on GETs) rather than
+the `X-Tenant-Id` headers a BFF translates. Try it with `make smoke-rest` (Core running). This is
+the surface your own BFF — or a direct integration — calls.
+
+The routes below are the **reference BFFs** (`examples/`): they front Core REST/gRPC with auth, the
+header seam, RBAC, rate limiting, caching, and flatter view-models. Build your own the same way.
 
 Consumer BFF (`:8080`):
 - `POST /api/v1/games/{gameId}/start` — create session + seed
@@ -226,9 +244,10 @@ stock-deducted or fulfilled), so balances **accumulate across plays**.
 
 ## BFF hardening (Phase 9)
 
-Both BFFs share `bffkit` so behavior stays consistent; Phase 9 adds the edge protections. All are
-**optional/degrading** — without Redis, rate limiting and caching become no-ops and gameplay still
-works (correctness-critical limits like stock stay in Core).
+These are **edge concerns that live in the BFF, not Core** — `bffkit` provides them so your own
+BFF (and the reference ones in `examples/`) stay consistent. All are **optional/degrading** —
+without Redis, rate limiting and caching become no-ops and gameplay still works (correctness-critical
+limits like stock stay in Core, which enforces them regardless of which BFF, or no BFF, fronts it).
 
 - **Distributed rate limiting** — `/start` and `/play` sit behind a Redis fixed-window counter
   (atomic Lua INCR+PEXPIRE, so the limit holds across BFF replicas), keyed per player (or per IP for

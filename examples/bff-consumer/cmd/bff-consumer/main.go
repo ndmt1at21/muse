@@ -17,18 +17,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/muse/adapters/redisstore"
-	consumercampaign "github.com/muse/bff-consumer/internal/campaign"
-	"github.com/muse/bff-consumer/internal/game"
-	consumerleaderboard "github.com/muse/bff-consumer/internal/leaderboard"
-	consumerplayer "github.com/muse/bff-consumer/internal/player"
-	consumerquest "github.com/muse/bff-consumer/internal/quest"
-	consumerwallet "github.com/muse/bff-consumer/internal/wallet"
 	"github.com/muse/bffkit/auth"
 	"github.com/muse/bffkit/cache"
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/middleware"
 	"github.com/muse/bffkit/obs"
 	"github.com/muse/bffkit/ratelimit"
+	consumercampaign "github.com/muse/examples/bff-consumer/internal/campaign"
+	"github.com/muse/examples/bff-consumer/internal/game"
+	consumerleaderboard "github.com/muse/examples/bff-consumer/internal/leaderboard"
+	consumerplayer "github.com/muse/examples/bff-consumer/internal/player"
+	consumerquest "github.com/muse/examples/bff-consumer/internal/quest"
+	consumerwallet "github.com/muse/examples/bff-consumer/internal/wallet"
 )
 
 func main() {

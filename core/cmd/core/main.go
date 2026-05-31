@@ -22,6 +22,7 @@ import (
 	"github.com/muse/core/internal/integration"
 	"github.com/muse/core/internal/leaderboard"
 	"github.com/muse/core/internal/player"
+	"github.com/muse/core/internal/restgw"
 	"github.com/muse/core/internal/wallet"
 	"github.com/muse/core/platform"
 	"github.com/muse/gamekit/defaults"
@@ -214,6 +215,27 @@ func main() {
 		}
 	}()
 
+	// REST gateway (grpc-gateway): exposes the same contract as JSON/HTTP under
+	// /api/v1, wrapped in the uniform envelope. It dials Core's own gRPC, so it
+	// works whether a developer talks to Core directly or fronts it with their
+	// own BFF. Empty CORE_REST_ADDR disables it (gRPC-only deployments).
+	var restSrv *http.Server
+	if cfg.RESTAddr != "" {
+		restHandler, closeGW, gwErr := restgw.New(context.Background(), cfg.GRPCAddr)
+		if gwErr != nil {
+			log.Error("rest gateway init failed", "err", gwErr)
+			os.Exit(1)
+		}
+		defer closeGW()
+		restSrv = &http.Server{Addr: cfg.RESTAddr, Handler: restHandler}
+		go func() {
+			log.Info("core REST gateway listening", "addr", cfg.RESTAddr)
+			if err := restSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				log.Error("rest gateway error", "err", err)
+			}
+		}()
+	}
+
 	// Graceful shutdown.
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
@@ -223,6 +245,9 @@ func main() {
 	grpcServer.GracefulStop()
 	shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	if restSrv != nil {
+		_ = restSrv.Shutdown(shutCtx)
+	}
 	_ = healthSrv.Shutdown(shutCtx)
 }
 

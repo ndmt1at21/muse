@@ -7,7 +7,7 @@ REDIS     ?= localhost:6379
 
 .PHONY: help generate build test test-race vet embed up up-mysql down logs \
         migrate migrate-mysql run-core run-core-mysql run-consumer run-admin \
-        e2e e2e-shapes e2e-rewards e2e-fulfillment e2e-identity e2e-wallet e2e-hardening e2e-integration seed \
+        smoke-rest e2e e2e-shapes e2e-rewards e2e-fulfillment e2e-identity e2e-wallet e2e-hardening e2e-integration seed \
         docs docs-build
 
 help: ## List targets
@@ -57,17 +57,20 @@ migrate: ## Apply migrations to Postgres
 migrate-mysql: ## Apply migrations to MySQL
 	DB_ENGINE=mysql DB_DSN="$(MYSQL_DSN)" go run ./core/cmd/core migrate
 
-run-core: ## Run Core locally against Postgres
+run-core: ## Run Core locally against Postgres (gRPC :9090 + REST :8090)
 	DB_ENGINE=postgres DB_DSN="$(PG_DSN)" REDIS_ADDR="$(REDIS)" go run ./core/cmd/core
 
 run-core-mysql: ## Run Core locally against MySQL
 	DB_ENGINE=mysql DB_DSN="$(MYSQL_DSN)" REDIS_ADDR="$(REDIS)" go run ./core/cmd/core
 
-run-consumer: ## Run the consumer BFF locally
-	go run ./bff-consumer/cmd/bff-consumer
+run-consumer: ## Run the reference consumer BFF locally (examples/)
+	go run ./examples/bff-consumer/cmd/bff-consumer
 
-run-admin: ## Run the admin BFF locally
-	go run ./bff-admin/cmd/bff-admin
+run-admin: ## Run the reference admin BFF locally (examples/)
+	go run ./examples/bff-admin/cmd/bff-admin
+
+smoke-rest: ## Smoke-test Core's REST gateway directly (no BFF; expects Core running)
+	./deploy/smoke_rest.sh
 
 e2e: ## Run the scripted end-to-end spin-wheel flow (expects services up)
 	./deploy/e2e.sh
@@ -93,7 +96,7 @@ e2e-hardening: ## Run the BFF-hardening e2e: admin RBAC 403/200, read-model cach
 e2e-integration: ## Run the integration-hub e2e: register adapters, emit events, fan-out dispatch counts (expects services up)
 	./deploy/e2e_integration.sh
 
-seed: ## Seed demo data (campaign + spin-wheel game + prizes + integration) via the admin BFF (expects services up)
+seed: ## Seed demo data (campaign + spin-wheel game + prizes + integration) via the reference admin BFF (expects services up)
 	./deploy/seed.sh
 
 docs: ## Run the Docusaurus docs site locally (architecture + flows, http://localhost:3000)

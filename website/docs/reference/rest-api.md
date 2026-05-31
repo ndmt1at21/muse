@@ -9,6 +9,19 @@ All paths are versioned under `/api/v1`. Every response uses the envelope
 `{ code, message, trace_id, data }`. Snake_case everywhere. IDs are prefixed opaque strings
 (`game_…`, `prize_…`, `sess_…`, `player_…`, `camp_…`, …).
 
+:::info Two REST surfaces
+**Core (`:8090`)** serves every `game.v1` RPC as REST directly (grpc-gateway), 1:1 with the proto:
+the request body is the proto message, the tenant/merchant **scope is a request field** (in the
+body, or `?scope.tenant_id=…` on GETs), and there is **no auth** — Core trusts the caller. Run
+`make smoke-rest` to see it.
+
+The routes documented **below** are the **reference BFFs** (`examples/bff-consumer` `:8080`,
+`examples/bff-admin` `:8081`). They add the developer-facing edge on top of Core: JWT/header auth,
+RBAC, rate limiting, caching, and flatter view-models (e.g. `data.prize_id` instead of
+`data.prize.id`). **Build your own the same way** with `bffkit` — these are a starting point to
+copy, not a fixed contract.
+:::
+
 ## Conventions
 
 - **Auth** — `Authorization: Bearer <jwt>` (player or admin). Dev/legacy fallback headers:

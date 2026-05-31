@@ -1,5 +1,8 @@
 # Vertical-slice stack: Postgres + MySQL + Dragonfly (Redis-compatible) + Core
-# + both BFFs. Default `docker compose up` brings the core path online.
+# + the two reference BFFs from examples/. Core is the product surface and now
+# serves REST (grpc-gateway) on :8090 in addition to gRPC on :9090, so it is
+# usable directly; the BFFs are shipped as a runnable reference for the edge
+# layer a developer builds on top of Core.
 #
 # Switch Core to MySQL by setting DB_ENGINE=mysql and DB_DSN to the mysql_dsn
 # below (or run `make up-mysql`). The full LGTM observability stack
@@ -53,6 +56,7 @@ services:
         SERVICE: core/cmd/core
     environment:
       CORE_GRPC_ADDR: ":9090"
+      CORE_REST_ADDR: ":8090"
       CORE_HEALTH_ADDR: ":9091"
       DB_ENGINE: postgres
       DB_DSN: "postgres://muse:muse@postgres:5432/muse?sslmode=disable"
@@ -61,17 +65,19 @@ services:
       JWT_SECRET: "${JWT_SECRET:-dev-jwt-secret}"
       AUTH_DEV_MODE: "${AUTH_DEV_MODE:-true}"
       FULFILLMENT_CALLBACK_BASE: "http://bff-admin:8081"
-    ports: ["9090:9090", "9091:9091"]
+    ports: ["9090:9090", "9091:9091", "8090:8090"]
     depends_on:
       postgres: { condition: service_healthy }
       dragonfly: { condition: service_healthy }
 
+  # Reference consumer BFF (examples/) — a runnable example of the public edge:
+  # JWT auth, rate limiting, read-model cache, view-model assembly over Core.
   bff-consumer:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
       args:
-        SERVICE: bff-consumer/cmd/bff-consumer
+        SERVICE: examples/bff-consumer/cmd/bff-consumer
     environment:
       BFF_CONSUMER_ADDR: ":8080"
       CORE_GRPC_ADDR: "core:9090"
@@ -83,12 +89,14 @@ services:
       core: { condition: service_started }
       dragonfly: { condition: service_healthy }
 
+  # Reference admin BFF (examples/) — a runnable example of the internal edge:
+  # role-guarded management surface + the signed fulfillment callback.
   bff-admin:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
       args:
-        SERVICE: bff-admin/cmd/bff-admin
+        SERVICE: examples/bff-admin/cmd/bff-admin
     environment:
       BFF_ADMIN_ADDR: ":8081"
       CORE_GRPC_ADDR: "core:9090"

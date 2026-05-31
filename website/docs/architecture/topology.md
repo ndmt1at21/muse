@@ -9,11 +9,11 @@ What actually runs when you `make up`. Everything is in `deploy/docker-compose.y
 
 ```mermaid
 flowchart TB
-  subgraph edge["Edge (REST)"]
+  subgraph edge["Reference BFFs (examples/) — your edge layer"]
     cons["bff-consumer<br/>:8080"]
     adm["bff-admin<br/>:8081"]
   end
-  core["core<br/>:9090 gRPC · :9091 health/metrics"]
+  core["core — product surface<br/>:9090 gRPC · :8090 REST · :9091 health/metrics"]
 
   subgraph data["Stateful backends"]
     pg[("Postgres :5432")]
@@ -28,6 +28,7 @@ flowchart TB
 
   cons -->|gRPC| core
   adm -->|gRPC| core
+  client["direct REST client<br/>(own auth)"] -->|"/api/v1"| core
   core --> pg
   core -. "or" .- my
   core --> df
@@ -43,9 +44,9 @@ flowchart TB
 
 | Service | Port(s) | Role |
 |---|---|---|
-| **core** | `9090` gRPC, `9091` health+metrics | The engine + persistence + all hosting services. The only thing that touches SQL. |
-| **bff-consumer** | `8080` | Public widget + player REST. CORS, per-player/IP rate limit, read-model cache. |
-| **bff-admin** | `8081` | Internal dashboard REST + the signed n8n callback. Role-based authz. |
+| **core** | `9090` gRPC, `8090` REST, `9091` health+metrics | The product surface: engine + persistence + all hosting services, served over gRPC **and** REST (grpc-gateway, enveloped). The only thing that touches SQL. Auth-agnostic. |
+| **bff-consumer** *(reference, `examples/`)* | `8080` | Public widget + player REST. CORS, per-player/IP rate limit, read-model cache. A reference for the public edge **you** build. |
+| **bff-admin** *(reference, `examples/`)* | `8081` | Internal dashboard REST + the signed n8n callback. Role-based authz. A reference for the internal edge **you** build. |
 | **postgres / mysql** | `5432` / `3306` | Durable system of record. Core targets **one** engine per deployment (`DB_ENGINE`); both are supported by the same raw SQL via a dialect layer. |
 | **dragonfly** | `6379` | Redis-compatible: play sessions (TTL), idempotency keys, distributed rate-limit, leaderboard sorted sets, BFF read-model cache, and the event pub/sub bus. **Never** the source of truth for money/stock. |
 | **prometheus** | `9092` | Scrapes `/metrics` from all three services; loads `alerts.yml`. |

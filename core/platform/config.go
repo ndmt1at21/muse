@@ -10,6 +10,7 @@ import (
 // Config is the Core service configuration, loaded from the environment.
 type Config struct {
 	GRPCAddr   string // host:port for the gRPC server
+	RESTAddr   string // host:port for the HTTP/REST grpc-gateway (empty disables REST)
 	HealthAddr string // host:port for the HTTP health/metrics server
 	DBEngine   string // postgres | mysql
 	DSN        string // database connection string
@@ -32,6 +33,7 @@ type Config struct {
 func LoadConfig() Config {
 	return Config{
 		GRPCAddr:   env("CORE_GRPC_ADDR", ":9090"),
+		RESTAddr:   env("CORE_REST_ADDR", ":8090"),
 		HealthAddr: env("CORE_HEALTH_ADDR", ":9091"),
 		DBEngine:   env("DB_ENGINE", "postgres"),
 		DSN:        env("DB_DSN", "postgres://muse:muse@localhost:5432/muse?sslmode=disable"),

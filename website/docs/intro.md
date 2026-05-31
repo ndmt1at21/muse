@@ -27,9 +27,9 @@ flowchart LR
     D["Dashboard"]
   end
 
-  W -->|"REST /api/v1"| C["Consumer BFF"]
-  D -->|"REST /api/v1/admin"| A["Admin BFF"]
-  C -->|gRPC| Core["Core service<br/>(engine + persistence)"]
+  W -->|"REST /api/v1"| C["Consumer BFF<br/>(reference, examples/)"]
+  D -->|"REST /api/v1/admin"| A["Admin BFF<br/>(reference, examples/)"]
+  C -->|gRPC| Core["Core service<br/>(engine + persistence)<br/>gRPC + REST /api/v1"]
   A -->|gRPC| Core
   Core --> DB[("SQL<br/>Postgres / MySQL")]
   Core --> R[("Redis / Dragonfly<br/>sessions · cache · pub/sub")]
@@ -50,20 +50,22 @@ Muse ships the engine as a **pure Go SDK** (`gamekit`) and also as a **hosted AP
 | Mode | You write | You get |
 |---|---|---|
 | **A — embed the SDK** | `import ".../gamekit"`, implement a few port interfaces (or use the provided `adapters`), call `engine.Play(...)` | The game logic only — bring your own DB/auth/transport |
-| **B — run the hosted API** | nothing — deploy `core` + the two BFFs | Full REST API, multi-tenant, batteries included |
+| **B — run the hosted API** | deploy `core`; front it with your own BFF for auth/edge (or copy `examples/`) | Full gRPC **+ REST** API, multi-tenant, batteries included |
 
 ```mermaid
 flowchart TD
   gk["gamekit<br/><i>pure logic, no I/O</i>"] --> ad["adapters<br/><i>SQL + Redis port impls</i>"]
-  ad --> core["core<br/><i>wire + gRPC</i>"]
-  core --> bff["BFFs<br/><i>REST, envelope, auth</i>"]
+  ad --> core["core<br/><i>wire + gRPC + REST /api/v1</i>"]
+  core --> bff["your BFF<br/><i>bffkit: auth, RBAC, cache</i><br/>(examples/ = reference)"]
   gk -. "Mode A: embed" .-> you["Your app"]
-  bff -. "Mode B: hosted" .-> client["Widget / Dashboard"]
+  core -. "Mode B: REST direct" .-> client2["Integration<br/>(own auth)"]
+  bff -. "Mode B: via your BFF" .-> client["Widget / Dashboard"]
 ```
 
 The boundary is strict: **`gamekit` knows nothing about gRPC, HTTP, the JSON envelope, or
-snake_case** — those live only in Core/BFF. That is what makes "use my logic, build your own API"
-a first-class path.
+snake_case** — those live only in Core (its REST gateway) and your BFF. Core is **auth-agnostic**:
+it trusts the caller to authenticate and pass the tenant/merchant scope. That is what makes "use my
+logic, build your own API" — and "use my API, build your own edge" — first-class paths.
 
 ## Where to go next
 

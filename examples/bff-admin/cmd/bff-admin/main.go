@@ -15,18 +15,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/muse/adapters/redisstore"
-	admincampaign "github.com/muse/bff-admin/internal/campaign"
-	adminfulfillment "github.com/muse/bff-admin/internal/fulfillment"
-	admingame "github.com/muse/bff-admin/internal/game"
-	adminintegration "github.com/muse/bff-admin/internal/integration"
-	adminleaderboard "github.com/muse/bff-admin/internal/leaderboard"
-	adminquest "github.com/muse/bff-admin/internal/quest"
-	admintenancy "github.com/muse/bff-admin/internal/tenancy"
 	"github.com/muse/bffkit/auth"
 	"github.com/muse/bffkit/cache"
 	"github.com/muse/bffkit/coreclient"
 	"github.com/muse/bffkit/middleware"
 	"github.com/muse/bffkit/obs"
+	admincampaign "github.com/muse/examples/bff-admin/internal/campaign"
+	adminfulfillment "github.com/muse/examples/bff-admin/internal/fulfillment"
+	admingame "github.com/muse/examples/bff-admin/internal/game"
+	adminintegration "github.com/muse/examples/bff-admin/internal/integration"
+	adminleaderboard "github.com/muse/examples/bff-admin/internal/leaderboard"
+	adminquest "github.com/muse/examples/bff-admin/internal/quest"
+	admintenancy "github.com/muse/examples/bff-admin/internal/tenancy"
 )
 
 func main() {
