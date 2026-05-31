@@ -1,0 +1,71 @@
+# Prometheus alert rules (Phase 11). Grounded in the metrics the services emit:
+#   core: grpc_server_requests_total{method,code}, grpc_server_request_duration_seconds,
+#         game_events_total{type}, fulfillment_tasks_total{outcome}
+#   bff:  http_requests_total{route,method,code}, http_request_duration_seconds, bff_cache_ops_total{result}
+groups:
+  - name: muse-slo
+    rules:
+      - alert: CoreGRPCErrorRateHigh
+        expr: |
+          sum(rate(grpc_server_requests_total{code!="OK"}[5m]))
+            / sum(rate(grpc_server_requests_total[5m])) > 0.05
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Core gRPC error rate >5% (5m)"
+          description: "More than 5% of gRPC calls are returning non-OK over the last 5 minutes."
+
+      - alert: BFFHTTPErrorRateHigh
+        expr: |
+          sum(rate(http_requests_total{code=~"5.."}[5m])) by (service)
+            / sum(rate(http_requests_total[5m])) by (service) > 0.05
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.service }} 5xx rate >5% (5m)"
+          description: "Edge error-rate SLO burn on {{ $labels.service }}."
+
+      - alert: BFFLatencyP99High
+        expr: |
+          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.service }} p99 latency >1s (5m)"
+          description: "99th-percentile request latency exceeds 1s."
+
+  - name: muse-business
+    rules:
+      - alert: FulfillmentDeadLetterGrowth
+        expr: increase(fulfillment_tasks_total{outcome="dead"}[10m]) > 0
+        for: 0m
+        labels: { severity: critical }
+        annotations:
+          summary: "Fulfillment tasks hitting the dead-letter state"
+          description: "{{ $value }} task(s) moved to dead-letter in the last 10m — deliveries are failing past their retry budget."
+
+      - alert: FulfillmentRetryStorm
+        expr: sum(rate(fulfillment_tasks_total{outcome="retry"}[5m])) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Sustained fulfillment retries"
+          description: "Delivery retries are elevated — a downstream channel may be degraded."
+
+      - alert: PrizeOutOfStockSpike
+        # PRIZE_OUT_OF_STOCK surfaces as gRPC Aborted on Play.
+        expr: sum(rate(grpc_server_requests_total{method="Play",code="Aborted"}[5m])) > 1
+        for: 5m
+        labels: { severity: info }
+        annotations:
+          summary: "Plays hitting out-of-stock prizes"
+          description: "A campaign may have exhausted prize stock (Play returning Aborted)."
+
+      - alert: PlayRejectionSpike
+        # CHEAT_DETECTED / VALIDATION_FAILED surface as gRPC InvalidArgument on Play.
+        expr: sum(rate(grpc_server_requests_total{method="Play",code="InvalidArgument"}[5m])) > 1
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Elevated rejected plays (validation/anti-cheat)"
+          description: "Play is rejecting an unusual number of requests (cheat flags or bad payloads)."

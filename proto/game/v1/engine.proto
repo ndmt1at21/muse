@@ -1,0 +1,748 @@
+syntax = "proto3";
+
+// Package game.v1 is the internal Core service boundary. The BFFs are the only
+// clients. Errors map to gRPC status codes (and back to the REST envelope at
+// the BFF). Versioned by package; a breaking change becomes game.v2.
+package game.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// Scope is the tenant/merchant isolation boundary on every request.
+message Scope {
+  string tenant_id = 1;
+  string merchant_id = 2;
+}
+
+// Rules are engine-enforced gameplay constraints.
+message Rules {
+  int32 max_plays_per_user = 1;
+  int32 max_plays_per_day = 2;
+  bool require_login = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  bool use_turns = 6; // gate on quest-granted turn balance (keyed by campaign)
+}
+
+// Game is the config-driven game definition. handler_config and ui are opaque
+// JSON the engine never interprets (handler_config is decoded by the handler;
+// ui only by the widget).
+message Game {
+  string id = 1;
+  Scope scope = 2;
+  string campaign_id = 3;
+  string name = 4;
+  string type = 5;
+  string seed_generator = 6;
+  string reward_handler = 7;
+  string validator = 8;
+  string status = 9;
+  Rules rules = 10;
+  string handler_config = 11;   // raw JSON, decoded by the reward handler/seed
+  string ui = 12;               // raw JSON, opaque to Core
+  string validator_config = 13; // raw JSON, decoded by the validator (anti-cheat)
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
+  string wallet_scope = 16;     // campaign|merchant|tenant ("" → campaign)
+  string milestones = 17;       // raw JSON: milestone config (currency, mode, auto_grant, thresholds)
+}
+
+// Prize is an awardable item with finite stock.
+message Prize {
+  string id = 1;
+  Scope scope = 2;
+  string name = 3;
+  string type = 4;
+  string image = 5;
+  int64 value = 6;
+  int64 total = 7;
+  int64 remaining = 8;
+  string metadata = 9;           // raw JSON
+  string award_constraints = 10; // raw JSON: {max_per_user, max_per_day}
+  string fulfillment = 11;       // raw JSON: {redemption_mode, method}
+}
+
+// RewardRecord is a durable record that a player won one unit of a prize.
+message RewardRecord {
+  string id = 1;
+  Scope scope = 2;
+  string game_id = 3;
+  string player_id = 4;
+  string prize_id = 5;
+  string play_id = 6;
+  string name = 7;
+  string type = 8;
+  int64 value = 9;
+  string code = 10;
+  string status = 11; // won | claimed | fulfilled | revoked
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp claimed_at = 13;
+  google.protobuf.Timestamp fulfilled_at = 14;
+  google.protobuf.Timestamp revoked_at = 15;
+}
+
+// Reward is a single awarded item in a play result.
+message Reward {
+  string prize_id = 1;
+  string name = 2;
+  string image = 3;
+  string type = 4;
+  int64 quantity = 5;
+  int64 value = 6;
+  string reward_id = 7; // durable reward record id (for claim)
+  string code = 8;      // assigned voucher code, if any
+}
+
+// --- EngineService: the generic gameplay surface ---
+
+message StartGameRequest {
+  Scope scope = 1;
+  string game_id = 2;
+  string player_id = 3;
+}
+message StartGameResponse {
+  string session_id = 1;
+  string seed_data = 2; // raw JSON, may be empty
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message PlayRequest {
+  Scope scope = 1;
+  string game_id = 2;
+  string session_id = 3;
+  string player_id = 4;
+  google.protobuf.Struct payload = 5; // shape-specific
+  string idempotency_key = 6;
+}
+message PlayResponse {
+  string play_id = 1;
+  repeated Reward rewards = 2;
+  google.protobuf.Struct metadata = 3;
+}
+
+message CheckEligibilityRequest {
+  Scope scope = 1;
+  string game_id = 2;
+  string player_id = 3;
+}
+message CheckEligibilityResponse {
+  bool can_play = 1;
+  int32 remaining_plays = 2;
+  string reason = 3;
+  google.protobuf.Timestamp next_reset_at = 4;
+}
+
+message GetHistoryRequest {
+  Scope scope = 1;
+  string game_id = 2;
+  string player_id = 3;
+  int32 limit = 4;
+  string cursor = 5;
+}
+message HistoryEntry {
+  string play_id = 1;
+  string game_id = 2;
+  string rewards = 3;  // raw JSON
+  string metadata = 4; // raw JSON
+  google.protobuf.Timestamp created_at = 5;
+}
+message GetHistoryResponse {
+  repeated HistoryEntry entries = 1;
+  string next_cursor = 2;
+}
+
+service EngineService {
+  rpc StartGame(StartGameRequest) returns (StartGameResponse);
+  rpc Play(PlayRequest) returns (PlayResponse);
+  rpc CheckEligibility(CheckEligibilityRequest) returns (CheckEligibilityResponse);
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+}
+
+// --- GameAdminService: minimal config CRUD to seed the slice ---
+
+message CreateGameRequest {
+  Scope scope = 1;
+  Game game = 2;
+}
+message CreateGameResponse { Game game = 1; }
+
+message GetGameRequest {
+  Scope scope = 1;
+  string game_id = 2;
+}
+message GetGameResponse { Game game = 1; }
+
+service GameAdminService {
+  rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
+  rpc GetGame(GetGameRequest) returns (GetGameResponse);
+}
+
+// --- RewardService: minimal prize creation to seed the slice ---
+
+message CreatePrizeRequest {
+  Scope scope = 1;
+  Prize prize = 2;
+  string game_id = 3; // associates the prize with a game for stock listing
+}
+message CreatePrizeResponse { Prize prize = 1; }
+
+message ListPrizesRequest {
+  Scope scope = 1;
+  string game_id = 2;
+}
+message ListPrizesResponse { repeated Prize prizes = 1; }
+
+message GetPrizeRequest { Scope scope = 1; string prize_id = 2; }
+message GetPrizeResponse { Prize prize = 1; }
+
+message UpdatePrizeRequest { Scope scope = 1; Prize prize = 2; }
+message UpdatePrizeResponse { Prize prize = 1; }
+
+message DeletePrizeRequest { Scope scope = 1; string prize_id = 2; }
+message DeletePrizeResponse {}
+
+message ImportCodesRequest {
+  Scope scope = 1;
+  string prize_id = 2;
+  repeated string codes = 3;
+}
+message ImportCodesResponse { int32 imported = 1; }
+
+message PrizeSummaryItem {
+  string prize_id = 1;
+  string name = 2;
+  int64 total = 3;
+  int64 remaining = 4;
+  int64 awarded = 5;
+  int64 codes_available = 6;
+}
+message GetPrizeSummaryRequest { Scope scope = 1; string game_id = 2; }
+message GetPrizeSummaryResponse { repeated PrizeSummaryItem items = 1; }
+
+message ClaimRewardRequest { Scope scope = 1; string reward_id = 2; string player_id = 3; }
+message ClaimRewardResponse { RewardRecord reward = 1; }
+message FulfillRewardRequest { Scope scope = 1; string reward_id = 2; }
+message FulfillRewardResponse { RewardRecord reward = 1; }
+message RevokeRewardRequest { Scope scope = 1; string reward_id = 2; }
+message RevokeRewardResponse { RewardRecord reward = 1; }
+
+message ListRewardsRequest {
+  Scope scope = 1;
+  string player_id = 2;
+  int32 limit = 3;
+  string cursor = 4;
+}
+message ListRewardsResponse {
+  repeated RewardRecord rewards = 1;
+  string next_cursor = 2;
+}
+
+service RewardService {
+  rpc CreatePrize(CreatePrizeRequest) returns (CreatePrizeResponse);
+  rpc ListPrizes(ListPrizesRequest) returns (ListPrizesResponse);
+  rpc GetPrize(GetPrizeRequest) returns (GetPrizeResponse);
+  rpc UpdatePrize(UpdatePrizeRequest) returns (UpdatePrizeResponse);
+  rpc DeletePrize(DeletePrizeRequest) returns (DeletePrizeResponse);
+  rpc ImportCodes(ImportCodesRequest) returns (ImportCodesResponse);
+  rpc GetPrizeSummary(GetPrizeSummaryRequest) returns (GetPrizeSummaryResponse);
+
+  rpc ClaimReward(ClaimRewardRequest) returns (ClaimRewardResponse);
+  rpc FulfillReward(FulfillRewardRequest) returns (FulfillRewardResponse);
+  rpc RevokeReward(RevokeRewardRequest) returns (RevokeRewardResponse);
+  rpc ListRewards(ListRewardsRequest) returns (ListRewardsResponse);
+}
+
+// --- FulfillmentService: the delivery outbox (admin review + machine callback) ---
+
+// FulfillmentTask is one row of the transactional outbox: a unit of delivery
+// work committed atomically with the reward it delivers.
+message FulfillmentTask {
+  string id = 1;
+  Scope scope = 2;
+  string reward_id = 3;
+  string prize_id = 4;
+  string player_id = 5;
+  string game_id = 6;
+  string campaign_id = 7;
+  string channel = 8;
+  string channel_config = 9; // raw JSON
+  string status = 10;        // pending|processing|fulfilled|failed|dead
+  int32 attempts = 11;
+  int32 max_attempts = 12;
+  string last_error = 13;
+  string receipt = 14;       // raw JSON: voucher code, tracking no., ...
+  google.protobuf.Timestamp next_attempt_at = 15;
+  google.protobuf.Timestamp created_at = 16;
+  google.protobuf.Timestamp updated_at = 17;
+}
+
+message ListTasksRequest {
+  Scope scope = 1;
+  string status = 2;      // filter (optional)
+  string campaign_id = 3; // filter (optional)
+  string prize_id = 4;    // filter (optional)
+  int32 limit = 5;
+  string cursor = 6;
+}
+message ListTasksResponse {
+  repeated FulfillmentTask tasks = 1;
+  string next_cursor = 2;
+}
+
+message GetTaskRequest { Scope scope = 1; string task_id = 2; }
+message GetTaskResponse { FulfillmentTask task = 1; }
+
+message RetryTaskRequest { Scope scope = 1; string task_id = 2; }
+message RetryTaskResponse { FulfillmentTask task = 1; }
+
+// ReportResult finalizes a task from an external orchestrator (n8n) callback.
+// Looked up by the globally-unique task_id; scope is advisory.
+message ReportResultRequest {
+  Scope scope = 1;
+  string task_id = 2;
+  string status = 3;  // fulfilled | failed
+  string receipt = 4; // raw JSON
+  string error = 5;   // populated when status == failed
+}
+message ReportResultResponse { FulfillmentTask task = 1; }
+
+service FulfillmentService {
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  rpc RetryTask(RetryTaskRequest) returns (RetryTaskResponse);
+  rpc ReportResult(ReportResultRequest) returns (ReportResultResponse);
+}
+
+// --- Phase 4: tenancy, identity & player ---
+
+message Tenant {
+  string id = 1;
+  string name = 2;
+  string plan = 3;
+  string settings = 4; // raw JSON: {identity_linking, default_locale, wallet_scope}
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message CreateTenantRequest { Tenant tenant = 1; }
+message CreateTenantResponse { Tenant tenant = 1; }
+message GetTenantRequest { string tenant_id = 1; }
+message GetTenantResponse { Tenant tenant = 1; }
+message UpdateTenantRequest { Tenant tenant = 1; }
+message UpdateTenantResponse { Tenant tenant = 1; }
+message ListTenantsRequest { int32 limit = 1; string cursor = 2; }
+message ListTenantsResponse { repeated Tenant tenants = 1; string next_cursor = 2; }
+
+service TenantService { // platform-admin
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse);
+  rpc GetTenant(GetTenantRequest) returns (GetTenantResponse);
+  rpc UpdateTenant(UpdateTenantRequest) returns (UpdateTenantResponse);
+  rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse);
+}
+
+message Merchant {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string logo = 4;
+  string settings = 5; // raw JSON: {wallet_scope_override}
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message CreateMerchantRequest { string tenant_id = 1; Merchant merchant = 2; }
+message CreateMerchantResponse { Merchant merchant = 1; }
+message GetMerchantRequest { string tenant_id = 1; string merchant_id = 2; }
+message GetMerchantResponse { Merchant merchant = 1; }
+message UpdateMerchantRequest { Merchant merchant = 1; }
+message UpdateMerchantResponse { Merchant merchant = 1; }
+message ListMerchantsRequest { string tenant_id = 1; int32 limit = 2; string cursor = 3; }
+message ListMerchantsResponse { repeated Merchant merchants = 1; string next_cursor = 2; }
+
+service MerchantService { // tenant-admin (scoped)
+  rpc CreateMerchant(CreateMerchantRequest) returns (CreateMerchantResponse);
+  rpc GetMerchant(GetMerchantRequest) returns (GetMerchantResponse);
+  rpc UpdateMerchant(UpdateMerchantRequest) returns (UpdateMerchantResponse);
+  rpc ListMerchants(ListMerchantsRequest) returns (ListMerchantsResponse);
+}
+
+// Contact is a verified means of identifying a person (globally unique).
+message Contact {
+  string type = 1;  // phone | email
+  string value = 2; // normalized
+  bool verified = 3;
+}
+
+message Identity {
+  string id = 1;
+  repeated Contact contacts = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+// ResolveOrCreate takes a VERIFIED contact and returns the identity (created if
+// new). The hosting auth layer calls this after a provider verifies the contact.
+message ResolveOrCreateRequest { Contact contact = 1; }
+message ResolveOrCreateResponse { Identity identity = 1; bool created = 2; }
+message LinkContactRequest { string identity_id = 1; Contact contact = 2; }
+message LinkContactResponse { Identity identity = 1; }
+message GetIdentityRequest { string identity_id = 1; }
+message GetIdentityResponse { Identity identity = 1; }
+
+service IdentityService { // global person (internal)
+  rpc ResolveOrCreate(ResolveOrCreateRequest) returns (ResolveOrCreateResponse);
+  rpc LinkContact(LinkContactRequest) returns (LinkContactResponse);
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse);
+}
+
+message Player {
+  string id = 1;
+  string tenant_id = 2;
+  string merchant_id = 3;
+  string identity_id = 4;
+  string profile = 5; // raw JSON (collected fields)
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// StartAuth begins a login by phone/email; the provider issues a challenge.
+message StartAuthRequest {
+  Scope scope = 1;          // tenant_id (+ optional merchant_id)
+  string contact_type = 2;  // phone | email
+  string contact_value = 3; // raw; normalized server-side
+  string method = 4;        // code | otp | magic_link | social
+  string campaign_id = 5;   // optional context
+}
+message StartAuthResponse {
+  string challenge_id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  string dev_code = 3; // populated only by dev-stub providers (never in prod)
+}
+
+// VerifyAuth completes a challenge → resolves identity, upserts player, returns
+// a player token (JWT) issued by Core.
+message VerifyAuthRequest {
+  Scope scope = 1;
+  string challenge_id = 2;
+  string code = 3;     // for code/otp methods
+  string proof = 4;    // for magic_link/social (opaque to the engine)
+}
+message VerifyAuthResponse {
+  string token = 1;       // player JWT (claims: tenant_id, merchant_id?, player_id, identity_id)
+  Player player = 2;
+  Identity identity = 3;
+  bool identity_is_new = 4;
+  bool player_is_new = 5;
+}
+
+message GetProfileRequest { Scope scope = 1; string player_id = 2; }
+message GetProfileResponse { Player player = 1; Identity identity = 2; }
+message UpdateProfileRequest { Scope scope = 1; string player_id = 2; string profile = 3; } // raw JSON
+message UpdateProfileResponse { Player player = 1; }
+message AddContactRequest {
+  Scope scope = 1;
+  string player_id = 2;
+  string identity_id = 3;
+  string contact_type = 4;
+  string contact_value = 5;
+  string method = 6; // verification method (dev stubs auto-verify)
+}
+message AddContactResponse { Identity identity = 1; }
+
+message GetTurnBalanceRequest { Scope scope = 1; string player_id = 2; string scope_key = 3; }
+message GetTurnBalanceResponse { int64 balance = 1; string scope_key = 2; }
+message GrantTurnsRequest { Scope scope = 1; string player_id = 2; string scope_key = 3; int64 delta = 4; }
+message GrantTurnsResponse { int64 balance = 1; }
+message ConsumeTurnRequest { Scope scope = 1; string player_id = 2; string scope_key = 3; }
+message ConsumeTurnResponse { bool ok = 1; int64 balance = 2; }
+
+service PlayerService {
+  rpc StartAuth(StartAuthRequest) returns (StartAuthResponse);
+  rpc VerifyAuth(VerifyAuthRequest) returns (VerifyAuthResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc AddContact(AddContactRequest) returns (AddContactResponse);
+  rpc GetTurnBalance(GetTurnBalanceRequest) returns (GetTurnBalanceResponse);
+  rpc GrantTurns(GrantTurnsRequest) returns (GrantTurnsResponse);
+  rpc ConsumeTurn(ConsumeTurnRequest) returns (ConsumeTurnResponse);
+}
+
+// --- Phase 5: campaign aggregate (under a merchant) ---
+
+// Campaign groups games + quests under a merchant, with channels, auth methods,
+// a run window, and widget/eligibility settings. tenant_id + merchant_id are the
+// isolation boundary (from the scope, never the path).
+message Campaign {
+  string id = 1;
+  string tenant_id = 2;
+  string merchant_id = 3;
+  string name = 4;
+  string status = 5; // draft | active | paused | ended
+  google.protobuf.Timestamp start_date = 6;
+  google.protobuf.Timestamp end_date = 7;
+  repeated string channels = 8;
+  repeated string games = 9;   // linked game ids
+  repeated string quests = 10; // linked quest ids
+  string settings = 11;        // raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+message CreateCampaignRequest { Scope scope = 1; Campaign campaign = 2; }
+message CreateCampaignResponse { Campaign campaign = 1; }
+message GetCampaignRequest { Scope scope = 1; string campaign_id = 2; }
+message GetCampaignResponse { Campaign campaign = 1; }
+message UpdateCampaignRequest { Scope scope = 1; Campaign campaign = 2; }
+message UpdateCampaignResponse { Campaign campaign = 1; }
+message ListCampaignsRequest { Scope scope = 1; int32 limit = 2; string cursor = 3; }
+message ListCampaignsResponse { repeated Campaign campaigns = 1; string next_cursor = 2; }
+message DuplicateCampaignRequest { Scope scope = 1; string campaign_id = 2; string name = 3; }
+message DuplicateCampaignResponse { Campaign campaign = 1; }
+
+message CampaignAnalytics {
+  string campaign_id = 1;
+  int64 total_plays = 2;
+  int64 total_wins = 3;
+  int64 unique_players = 4;
+  double conversion = 5; // wins / plays
+}
+message GetCampaignAnalyticsRequest { Scope scope = 1; string campaign_id = 2; }
+message GetCampaignAnalyticsResponse { CampaignAnalytics analytics = 1; }
+
+// GetPublicConfig resolves a campaign by id alone (no scope) for the FE widget.
+message GetPublicConfigRequest { string campaign_id = 1; }
+message GetPublicConfigResponse { Campaign campaign = 1; }
+
+service CampaignService { // merchant-admin (scoped); GetPublicConfig is public
+  rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse);
+  rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse);
+  rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse);
+  rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse);
+  rpc DuplicateCampaign(DuplicateCampaignRequest) returns (DuplicateCampaignResponse);
+  rpc GetCampaignAnalytics(GetCampaignAnalyticsRequest) returns (GetCampaignAnalyticsResponse);
+  rpc GetPublicConfig(GetPublicConfigRequest) returns (GetPublicConfigResponse);
+}
+
+// --- Phase 6: quest / mission ---
+
+message QuestReward {
+  string type = 1;     // play_turn
+  int64 quantity = 2;  // turns granted on completion
+}
+
+// Quest is an admin-configured mission under a campaign. config is verifier-
+// specific raw JSON (decoded only by the matching quest-type verifier).
+message Quest {
+  string id = 1;
+  string tenant_id = 2;
+  string merchant_id = 3;
+  string campaign_id = 4;
+  string type = 5; // daily_checkin | share_social | invite_friend | scan_qr | view_page | answer_question | external_event
+  string name = 6;
+  string status = 7; // active | inactive
+  QuestReward reward = 8;
+  string config = 9; // raw JSON
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message CreateQuestRequest { Scope scope = 1; Quest quest = 2; }
+message CreateQuestResponse { Quest quest = 1; }
+message GetQuestRequest { Scope scope = 1; string quest_id = 2; }
+message GetQuestResponse { Quest quest = 1; }
+message UpdateQuestRequest { Scope scope = 1; Quest quest = 2; }
+message UpdateQuestResponse { Quest quest = 1; }
+message DeleteQuestRequest { Scope scope = 1; string quest_id = 2; }
+message DeleteQuestResponse {}
+message ListQuestsRequest { Scope scope = 1; string campaign_id = 2; int32 limit = 3; string cursor = 4; }
+message ListQuestsResponse { repeated Quest quests = 1; string next_cursor = 2; }
+
+// QuestState is a quest plus the caller's completion status (player list).
+message QuestState {
+  Quest quest = 1;
+  bool completed = 2;       // ever completed (daily: today)
+  bool can_complete = 3;    // eligible to complete now
+  int32 completions = 4;    // lifetime count
+  google.protobuf.Timestamp last_completed = 5;
+}
+message ListPlayerQuestsRequest { Scope scope = 1; string campaign_id = 2; string player_id = 3; }
+message ListPlayerQuestsResponse { repeated QuestState quests = 1; }
+
+// CompleteQuest verifies the proof, gates re-completion, and grants the reward.
+message CompleteQuestRequest {
+  Scope scope = 1;
+  string quest_id = 2;
+  string player_id = 3;
+  string proof = 4; // raw JSON, verifier-specific
+}
+message CompleteQuestResponse {
+  bool completed = 1;
+  int64 turns_granted = 2;
+  int64 turn_balance = 3;
+}
+
+service QuestService { // CRUD = merchant-admin; List/Complete = player
+  rpc CreateQuest(CreateQuestRequest) returns (CreateQuestResponse);
+  rpc GetQuest(GetQuestRequest) returns (GetQuestResponse);
+  rpc UpdateQuest(UpdateQuestRequest) returns (UpdateQuestResponse);
+  rpc DeleteQuest(DeleteQuestRequest) returns (DeleteQuestResponse);
+  rpc ListQuests(ListQuestsRequest) returns (ListQuestsResponse);
+  rpc ListPlayerQuests(ListPlayerQuestsRequest) returns (ListPlayerQuestsResponse);
+  rpc CompleteQuest(CompleteQuestRequest) returns (CompleteQuestResponse);
+}
+
+// --- Phase 7: leaderboard ---
+
+// Leaderboard config. time_window/prize_tiers/anti_cheat are raw JSON (decoded
+// by the hosting layer): time_window={type,period,start,end},
+// prize_tiers=[{from_rank,to_rank,prize_id}], anti_cheat={score_ceiling,flag_outliers}.
+message Leaderboard {
+  string id = 1;
+  string tenant_id = 2;
+  string merchant_id = 3;
+  string campaign_id = 4;
+  string name = 5;
+  string metric = 6; // high_score | total_score | total_wins | total_plays | quest_points | collection_count
+  string time_window = 7;
+  string prize_tiers = 8;
+  string anti_cheat = 9;
+  string status = 10; // active | finalized
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// RankedEntry is one player's standing (player list / rankings).
+message RankedEntry {
+  string player_id = 1;
+  int64 score = 2;
+  int64 plays = 3;
+  int64 rank = 4;
+  string state = 5; // active | flagged | disqualified
+}
+
+message CreateLeaderboardRequest { Scope scope = 1; Leaderboard leaderboard = 2; }
+message CreateLeaderboardResponse { Leaderboard leaderboard = 1; }
+message GetLeaderboardRequest { Scope scope = 1; string leaderboard_id = 2; }
+message GetLeaderboardResponse { Leaderboard leaderboard = 1; }
+message UpdateLeaderboardRequest { Scope scope = 1; Leaderboard leaderboard = 2; }
+message UpdateLeaderboardResponse { Leaderboard leaderboard = 1; }
+message ListLeaderboardsRequest { Scope scope = 1; string campaign_id = 2; int32 limit = 3; string cursor = 4; }
+message ListLeaderboardsResponse { repeated Leaderboard leaderboards = 1; string next_cursor = 2; }
+
+message FinalizeLeaderboardRequest { Scope scope = 1; string leaderboard_id = 2; }
+message TierAward { int32 rank = 1; string player_id = 2; string prize_id = 3; string reward_id = 4; }
+message FinalizeLeaderboardResponse { int32 awarded = 1; repeated TierAward awards = 2; }
+
+message ResetLeaderboardRequest { Scope scope = 1; string leaderboard_id = 2; }
+message ResetLeaderboardResponse { int64 cleared = 1; }
+
+message DisqualifyEntryRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; }
+message DisqualifyEntryResponse { RankedEntry entry = 1; }
+message AdjustEntryRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; int64 delta = 4; }
+message AdjustEntryResponse { RankedEntry entry = 1; }
+
+message GetRankingsRequest { Scope scope = 1; string leaderboard_id = 2; int32 limit = 3; int32 offset = 4; }
+message GetRankingsResponse { repeated RankedEntry entries = 1; int64 total = 2; string window_key = 3; }
+message AroundMeRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; int32 radius = 4; }
+message AroundMeResponse { repeated RankedEntry entries = 1; }
+message MyRankRequest { Scope scope = 1; string leaderboard_id = 2; string player_id = 3; }
+message MyRankResponse {
+  RankedEntry entry = 1;
+  int32 next_tier_from_rank = 2;  // the better tier the player is climbing toward (0 = top tier / none)
+  int64 ranks_to_next_tier = 3;
+}
+
+service LeaderboardService { // CRUD/finalize/reset/disqualify/adjust = admin; rankings/around-me/my-rank = player
+  rpc CreateLeaderboard(CreateLeaderboardRequest) returns (CreateLeaderboardResponse);
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
+  rpc UpdateLeaderboard(UpdateLeaderboardRequest) returns (UpdateLeaderboardResponse);
+  rpc ListLeaderboards(ListLeaderboardsRequest) returns (ListLeaderboardsResponse);
+  rpc FinalizeLeaderboard(FinalizeLeaderboardRequest) returns (FinalizeLeaderboardResponse);
+  rpc ResetLeaderboard(ResetLeaderboardRequest) returns (ResetLeaderboardResponse);
+  rpc DisqualifyEntry(DisqualifyEntryRequest) returns (DisqualifyEntryResponse);
+  rpc AdjustEntry(AdjustEntryRequest) returns (AdjustEntryResponse);
+  rpc GetRankings(GetRankingsRequest) returns (GetRankingsResponse);
+  rpc AroundMe(AroundMeRequest) returns (AroundMeResponse);
+  rpc MyRank(MyRankRequest) returns (MyRankResponse);
+}
+
+// --- Phase 8: wallet, points & exchange ---
+
+message LedgerEntry {
+  string id = 1;
+  string currency = 2;
+  int64 amount = 3;   // signed: + earn, - spend
+  string reason = 4;  // play | redeem | adjust
+  string ref_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message GetWalletRequest { Scope scope = 1; string scope_key = 2; string player_id = 3; }
+message GetWalletResponse { map<string, int64> balances = 1; }
+
+message GetLedgerRequest { Scope scope = 1; string scope_key = 2; string player_id = 3; int32 limit = 4; string cursor = 5; }
+message GetLedgerResponse { repeated LedgerEntry entries = 1; string next_cursor = 2; }
+
+message MilestoneState {
+  string milestone_id = 1;
+  int64 threshold = 2;
+  string prize_id = 3;
+  string status = 4;   // locked | unlocked | granted
+  int64 progress = 5;
+  int64 remaining = 6;
+}
+message GetMilestonesRequest { Scope scope = 1; string game_id = 2; string player_id = 3; }
+message GetMilestonesResponse {
+  string currency = 1;
+  string mode = 2;
+  int64 balance = 3;
+  repeated MilestoneState milestones = 4;
+}
+
+message RedeemRequest { Scope scope = 1; string game_id = 2; string milestone_id = 3; string player_id = 4; }
+message RedeemResponse {
+  bool redeemed = 1;
+  string mode = 2;
+  map<string, int64> spent = 3;
+  Reward reward = 4;
+  map<string, int64> balances = 5;
+}
+
+service WalletService { // player surface (wallet/ledger/milestones/redeem)
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
+  rpc GetLedger(GetLedgerRequest) returns (GetLedgerResponse);
+  rpc GetMilestones(GetMilestonesRequest) returns (GetMilestonesResponse);
+  rpc Redeem(RedeemRequest) returns (RedeemResponse);
+}
+
+// --- Integration hub (Phase 10): outbound adapters fired on domain events ---
+
+message Integration {
+  Scope scope = 1;
+  string id = 2;
+  string type = 3;            // webhook | gsheet | sms | zns | crm | n8n
+  string campaign_id = 4;     // optional: "" = all campaigns in scope
+  repeated string events = 5; // subscribed event types (play_completed, prize_won, ...)
+  string config = 6;          // JSON: { url, hmac_secret, sheet_id, ... } (adapter-specific)
+  string status = 7;          // active | paused
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message CreateIntegrationRequest { Scope scope = 1; Integration integration = 2; }
+message CreateIntegrationResponse { Integration integration = 1; }
+
+message ListIntegrationsRequest { Scope scope = 1; string campaign_id = 2; int32 limit = 3; string cursor = 4; }
+message ListIntegrationsResponse { repeated Integration integrations = 1; string next_cursor = 2; }
+
+message DeleteIntegrationRequest { Scope scope = 1; string id = 2; }
+message DeleteIntegrationResponse {}
+
+message EmitEventRequest { Scope scope = 1; string type = 2; string payload = 3; } // payload = JSON object
+message EmitEventResponse { int32 dispatched = 1; } // # of integrations the event was delivered to
+
+service IntegrationService { // CRUD = merchant-admin; EmitEvent = internal/manual injection
+  rpc CreateIntegration(CreateIntegrationRequest) returns (CreateIntegrationResponse);
+  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse);
+  rpc DeleteIntegration(DeleteIntegrationRequest) returns (DeleteIntegrationResponse);
+  rpc EmitEvent(EmitEventRequest) returns (EmitEventResponse);
+}

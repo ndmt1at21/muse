@@ -1,0 +1,12 @@
+# Auto-provisioned dashboard provider (Phase 11): loads every JSON in the
+# mounted dashboards directory.
+apiVersion: 1
+providers:
+  - name: muse
+    orgId: 1
+    folder: Muse
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

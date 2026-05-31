@@ -1,0 +1,30 @@
+/* Muse docs theme — calm, high-contrast, readable. */
+:root {
+  --ifm-color-primary: #6d28d9;
+  --ifm-color-primary-dark: #6024c3;
+  --ifm-color-primary-darker: #5a22b8;
+  --ifm-color-primary-darkest: #4a1c97;
+  --ifm-color-primary-light: #7a3ade;
+  --ifm-color-primary-lighter: #8348e0;
+  --ifm-color-primary-lightest: #9b6be7;
+  --ifm-code-font-size: 92%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #a78bfa;
+  --ifm-color-primary-dark: #8f69f8;
+  --ifm-color-primary-darker: #8358f7;
+  --ifm-color-primary-darkest: #6326f4;
+  --ifm-color-primary-light: #bfadfc;
+  --ifm-color-primary-lighter: #cbbcfd;
+  --ifm-color-primary-lightest: #efe9ff;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* Give Mermaid diagrams room to breathe. */
+.docusaurus-mermaid-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.25rem 0;
+}

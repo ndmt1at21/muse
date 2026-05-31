@@ -1,0 +1,11 @@
+# Dependencies
+/node_modules
+
+# Production build
+/build
+/.docusaurus
+
+# Misc
+.DS_Store
+*.log
+npm-debug.log*
