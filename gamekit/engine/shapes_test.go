@@ -104,6 +104,28 @@ func TestEggCatcherCheatTooFast(t *testing.T) {
 	}
 }
 
+// A configured min_duration_ms is mandatory: a play that omits duration_ms or
+// reports zero must not bypass the too-fast anti-cheat by dodging the field.
+func TestEggCatcherCheatZeroOrMissingDuration(t *testing.T) {
+	ctx := context.Background()
+	for name, payload := range map[string]string{
+		"omitted": `{"score":50}`,
+		"zero":    `{"score":50,"duration_ms":0}`,
+	} {
+		t.Run(name, func(t *testing.T) {
+			clk := &fixedClock{t: time.Now().UTC()}
+			eng, store, _ := buildEngine(t, clk, memstore.NewSeqRand(0.0))
+			store.PutGame(eggGame())
+
+			start, _ := eng.Start(ctx, testScope, "game_egg", "p1")
+			_, err := eng.Play(ctx, testScope, "game_egg", start.SessionID, "p1", json.RawMessage(payload), "")
+			if gkerr.ReasonOf(err) != gkerr.ReasonCheatDetected {
+				t.Fatalf("expected CHEAT_DETECTED for %s duration, got %v", name, err)
+			}
+		})
+	}
+}
+
 // --- gift-catcher: drop_sequence + collect_items + drop_plan ---
 
 func giftGame() *types.Game {

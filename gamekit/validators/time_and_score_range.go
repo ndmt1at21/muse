@@ -51,7 +51,10 @@ func (TimeAndScoreRange) Validate(ctx context.Context, game *types.Game, session
 		return gkerr.Newf(gkerr.ReasonCheatDetected, "score %d exceeds ceiling %d", p.Score, cfg.MaxScore).
 			WithMeta("score", p.Score).WithMeta("max_score", cfg.MaxScore)
 	}
-	if cfg.MinDurationMS > 0 && p.DurationMS > 0 && p.DurationMS < cfg.MinDurationMS {
+	// When a minimum duration is configured it is mandatory: a missing, zero, or
+	// negative duration_ms is treated as too fast rather than skipping the check
+	// (otherwise a bot bypasses the anti-cheat by simply omitting the field).
+	if cfg.MinDurationMS > 0 && p.DurationMS < cfg.MinDurationMS {
 		return gkerr.Newf(gkerr.ReasonCheatDetected, "play too fast: %dms < %dms", p.DurationMS, cfg.MinDurationMS).
 			WithMeta("duration_ms", p.DurationMS)
 	}
