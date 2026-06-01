@@ -78,7 +78,7 @@ func (h *Handler) createCampaign(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.CreateCampaign(ctx, &gamev1.CreateCampaignRequest{
-		TenantId:    tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		Campaign: body.toProto("", tenant, merchant),
 	})
 	if err != nil {
@@ -93,7 +93,7 @@ func (h *Handler) listCampaigns(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.ListCampaigns(ctx, &gamev1.ListCampaignsRequest{
-		TenantId:  tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		Limit:  int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor: r.URL.Query().Get("cursor"),
 	})
@@ -113,7 +113,7 @@ func (h *Handler) getCampaign(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.GetCampaign(ctx, &gamev1.GetCampaignRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		CampaignId: chi.URLParam(r, "campaignId"),
 	})
 	if err != nil {
@@ -133,7 +133,7 @@ func (h *Handler) updateCampaign(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.UpdateCampaign(ctx, &gamev1.UpdateCampaignRequest{
-		TenantId:    tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		Campaign: body.toProto(chi.URLParam(r, "campaignId"), tenant, merchant),
 	})
 	if err != nil {
@@ -154,7 +154,7 @@ func (h *Handler) duplicateCampaign(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body) // name is optional (defaults to "… (copy)")
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.DuplicateCampaign(ctx, &gamev1.DuplicateCampaignRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		CampaignId: chi.URLParam(r, "campaignId"),
 		Name:       body.Name,
 	})
@@ -170,7 +170,7 @@ func (h *Handler) analytics(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Campaign.GetCampaignAnalytics(ctx, &gamev1.GetCampaignAnalyticsRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		CampaignId: chi.URLParam(r, "campaignId"),
 	})
 	if err != nil {

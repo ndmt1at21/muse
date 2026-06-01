@@ -60,6 +60,7 @@ func gameFromProto(scope types.Scope, g *gamev1.Game) *types.Game {
 		Status:          domGameStatus(g.GetStatus()),
 		HandlerConfig:   json.RawMessage(g.GetHandlerConfig()),
 		ValidatorConfig: json.RawMessage(g.GetValidatorConfig()),
+		UI:              json.RawMessage(g.GetUi()),
 		WalletScope:     domWalletScope(g.GetWalletScope()),
 		Milestones:      json.RawMessage(g.GetMilestones()),
 	}
@@ -100,6 +101,8 @@ func gameToProto(g *types.Game) *gamev1.Game {
 		},
 		HandlerConfig:   string(g.HandlerConfig),
 		ValidatorConfig: string(g.ValidatorConfig),
+		Ui:              string(g.UI),
+		Milestones:      string(g.Milestones),
 		CreatedAt:       ts(g.CreatedAt),
 		UpdatedAt:       ts(g.UpdatedAt),
 	}

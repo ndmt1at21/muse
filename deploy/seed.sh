@@ -54,7 +54,8 @@ for key in $(jq -r '.games | keys_unsorted[]' "$CFG"); do
       status:"GAME_STATUS_ACTIVE",
       rules:{max_plays_per_user:($g.max_plays_per_user // 100)},
       handler_config:$g.handler_config
-    } + (if $g.validator_config then {validator_config:$g.validator_config} else {} end)')
+    } + (if $g.validator_config then {validator_config:$g.validator_config} else {} end)
+      + (if $g.ui then {ui:$g.ui} else {} end)')
   gid=$(curl -s "${ahdr[@]}" -X POST "${ADMIN}/api/v1/admin/games" -d "$body" | jq -r '.data.game_id')
   GID[$key]=$gid
   say "Game: ${key} ($(jq -r '.type' <<<"$gdef"))"

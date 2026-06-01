@@ -7,7 +7,7 @@
 // server-decided result in the modal.
 
 import { loadConfig, MuseClient, MuseError } from "./client.js";
-import { el, toast, showResult, renderEligibility, gameHeader } from "./ui.js";
+import { el, toast, showResult, renderEligibility, gameHeader, loadRenderConfig } from "./ui.js";
 
 const cfg = loadConfig();
 const gameId = new URLSearchParams(location.search).get("game") || cfg.games.spin;
@@ -31,12 +31,16 @@ if (!gameId) {
 }
 
 // ---- wheel rendering ----
-const SEGMENTS = ["🧧", "🎁", "💰", "🍀", "⭐", "🎊", "🪙", "🎈"];
-const N = SEGMENTS.length;
+// The wheel is purely decorative — segments are NOT the prize layout (the BFF
+// never exposes odds/prizes), so per-segment images/emoji/colors from the game's
+// render config are safe to show. Defaults are the built-in Tết emoji ring.
 const COLORS = ["#c1121f", "#f4c430"];
 const TEXT_COLORS = ["#fff8f0", "#780000"];
 const TWO_PI = Math.PI * 2;
-const SEG = TWO_PI / N;
+const DEFAULT_EMOJIS = ["🧧", "🎁", "💰", "🍀", "⭐", "🎊", "🪙", "🎈"];
+let segments = DEFAULT_EMOJIS.map((emoji, i) => ({ emoji, color: COLORS[i % COLORS.length] }));
+let N = segments.length;
+let SEG = TWO_PI / N;
 
 const size = 320;
 const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -58,22 +62,28 @@ function draw() {
   ctx.translate(cx, cy);
   ctx.rotate(rotation);
   for (let i = 0; i < N; i++) {
+    const seg = segments[i];
     const start = i * SEG;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, R, start, start + SEG);
     ctx.closePath();
-    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fillStyle = seg.color || COLORS[i % COLORS.length];
     ctx.fill();
     ctx.save();
     ctx.rotate(start + SEG / 2);
     ctx.translate(R * 0.66, 0);
     ctx.rotate(Math.PI / 2);
-    ctx.fillStyle = TEXT_COLORS[i % TEXT_COLORS.length];
-    ctx.font = "26px serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(SEGMENTS[i], 0, 0);
+    const img = seg._img;
+    if (img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img, -20, -20, 40, 40);
+    } else {
+      ctx.fillStyle = TEXT_COLORS[i % TEXT_COLORS.length];
+      ctx.font = "26px serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(seg.emoji || "🎁", 0, 0);
+    }
     ctx.restore();
   }
   ctx.restore();
@@ -133,6 +143,29 @@ root.replaceChildren(
   ]),
 );
 draw();
+
+// Apply per-game render config: theme/background, plus decorative wheel segments
+// (emoji/image/color). Redraws once images load. Best-effort — never blocks play.
+loadRenderConfig(client, gameId).then((ui) => {
+  const segs = ui.wheel && Array.isArray(ui.wheel.segments) ? ui.wheel.segments : null;
+  if (segs && segs.length) {
+    segments = segs.map((s, i) => ({
+      emoji: s.emoji || "🎁",
+      color: s.color || COLORS[i % COLORS.length],
+    }));
+    N = segments.length;
+    SEG = TWO_PI / N;
+    segs.forEach((s, i) => {
+      if (s.image) {
+        const im = new Image();
+        im.onload = draw;
+        im.src = s.image;
+        segments[i]._img = im;
+      }
+    });
+  }
+  draw();
+});
 
 async function refreshEligibility() {
   try {

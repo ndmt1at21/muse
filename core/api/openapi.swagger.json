@@ -822,6 +822,60 @@
         ]
       }
     },
+    "/api/v1/games/{game.id}": {
+      "put": {
+        "operationId": "GameConfigService_UpdateGame",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "trace_id": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/v1UpdateGameResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/apiErrorEnvelope"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "game.id",
+            "description": "Stable unique identifier (server-assigned on create).",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GameConfigServiceUpdateGameBody"
+            }
+          }
+        ],
+        "tags": [
+          "GameConfigService"
+        ]
+      }
+    },
     "/api/v1/games/{game_id}": {
       "get": {
         "operationId": "GameConfigService_GetGame",
@@ -4289,6 +4343,97 @@
       },
       "description": "RetryTaskRequest re-queues a failed task for delivery."
     },
+    "GameConfigServiceUpdateGameBody": {
+      "type": "object",
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
+        },
+        "game": {
+          "type": "object",
+          "properties": {
+            "tenant_id": {
+              "type": "string",
+              "description": "Tenant isolation key (required)."
+            },
+            "merchant_id": {
+              "type": "string",
+              "description": "Merchant isolation key within the tenant."
+            },
+            "campaign_id": {
+              "type": "string",
+              "description": "Campaign this game belongs to."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable game name."
+            },
+            "type": {
+              "type": "string",
+              "description": "Registry-driven game type (e.g. \"spin_wheel\", \"scratch_card\")."
+            },
+            "seed_generator": {
+              "type": "string",
+              "description": "Registry key selecting the seed generator."
+            },
+            "reward_handler": {
+              "type": "string",
+              "description": "Registry key selecting the reward handler."
+            },
+            "validator": {
+              "type": "string",
+              "description": "Registry key selecting the play validator (anti-cheat)."
+            },
+            "status": {
+              "$ref": "#/definitions/v1GameStatus",
+              "description": "Lifecycle state."
+            },
+            "rules": {
+              "$ref": "#/definitions/v1Rules",
+              "description": "Engine-enforced gameplay constraints."
+            },
+            "handler_config": {
+              "type": "string",
+              "description": "Raw JSON, decoded by the reward handler/seed; never interpreted by the engine."
+            },
+            "ui": {
+              "type": "string",
+              "description": "Raw JSON render config, opaque to Core (stored & returned verbatim, never\ninterpreted). Decoded by the BFF/widget for per-game background, theme, and\nslot/item images. Field 18 (was reserved when this lived only in the BFF)."
+            },
+            "validator_config": {
+              "type": "string",
+              "description": "Raw JSON, decoded by the validator (anti-cheat)."
+            },
+            "created_at": {
+              "type": "string",
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
+            },
+            "wallet_scope": {
+              "$ref": "#/definitions/v1WalletScope",
+              "description": "Wallet isolation level for points/milestones (UNSPECIFIED → campaign)."
+            },
+            "milestones": {
+              "type": "string",
+              "description": "Raw JSON milestone config (currency, mode, auto_grant, thresholds)."
+            }
+          },
+          "description": "Game with id set; mutable fields are applied.",
+          "title": "Game with id set; mutable fields are applied."
+        }
+      },
+      "description": "UpdateGameRequest replaces a game's mutable fields (the embedded game's id\nidentifies the target). Used by admins to change config — including the `ui`\nrender block — after creation."
+    },
     "IdentityServiceLinkContactBody": {
       "type": "object",
       "properties": {
@@ -5542,6 +5687,10 @@
           "type": "string",
           "description": "Raw JSON, decoded by the reward handler/seed; never interpreted by the engine."
         },
+        "ui": {
+          "type": "string",
+          "description": "Raw JSON render config, opaque to Core (stored & returned verbatim, never\ninterpreted). Decoded by the BFF/widget for per-game background, theme, and\nslot/item images. Field 18 (was reserved when this lived only in the BFF)."
+        },
         "validator_config": {
           "type": "string",
           "description": "Raw JSON, decoded by the validator (anti-cheat)."
@@ -5565,7 +5714,7 @@
           "description": "Raw JSON milestone config (currency, mode, auto_grant, thresholds)."
         }
       },
-      "description": "Game is the config-driven game definition. handler_config is opaque JSON the\nengine never interprets (decoded only by the reward handler/seed). Widget/UI\nrender config is NOT a Core concern — it lives in the presentation layer (BFF)."
+      "description": "Game is the config-driven game definition. handler_config is opaque JSON the\nengine never interprets (decoded only by the reward handler/seed). The `ui`\nblock is likewise opaque to the engine: Core stores and returns it verbatim\nbut never interprets it — the presentation layer (BFF/widget) decodes it to\nrender per-game backgrounds, theme colors, and slot/item images. Keeping it\nopaque preserves the Core = business / BFF = presentation boundary."
     },
     "v1GameStatus": {
       "type": "string",
@@ -7033,6 +7182,15 @@
         "campaign": {
           "$ref": "#/definitions/v1Campaign",
           "description": "The updated campaign."
+        }
+      }
+    },
+    "v1UpdateGameResponse": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "$ref": "#/definitions/v1Game",
+          "description": "The updated game."
         }
       }
     },

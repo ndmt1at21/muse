@@ -29,7 +29,7 @@ jobs:
 
       - name: gofmt
         run: |
-          unformatted=$(gofmt -l adapters bff-admin bff-consumer bffkit core gamekit pkg)
+          unformatted=$(gofmt -l adapters bffkit core examples gamekit pkg)
           if [ -n "$unformatted" ]; then
             echo "::error::These files are not gofmt-clean:"; echo "$unformatted"
             exit 1

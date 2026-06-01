@@ -49,12 +49,16 @@ curl -s $A -X POST localhost:8081/api/v1/admin/games -d "{
     { \"prize_id\": \"$JACKPOT\", \"probability\": 0.05 },
     { \"prize_id\": \"$MISS\",    \"probability\": 0.95 }
   ] },
-  \"ui\": { \"theme\": { \"primary_color\": \"#FF5733\" }, \"custom_assets\": { \"wheel\": \"…\" } }
+  \"ui\": { \"theme\": { \"primary\": \"#FF5733\", \"accent\": \"#f4c430\" },
+           \"wheel\": { \"segments\": [ { \"emoji\": \"💎\" }, { \"image\": \"https://cdn/seg.png\" } ] } }
 }" | jq .data
 ```
 
-That's it — the game is live. `ui` is an **opaque blob**: Core stores and returns it; only the
-widget reads it. A new visual is a widget change, never a Core change.
+That's it — the game is live. `ui` is an **opaque blob**: Core stores and returns it (and
+`PUT /api/v1/games/{id}` updates it any time); only the widget reads it, via the redacted
+`GET /games/{id}/render`. All `ui` fields are optional and fall back to built-in defaults. A new
+visual is a config change, never a Core change. See the widget README for the full `ui` schema
+(background, theme, `wheel.segments`, `items`, `egg`).
 
 ## handler_config by shape
 

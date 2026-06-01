@@ -27,6 +27,7 @@ func New(core *coreclient.Client) *Handler { return &Handler{core: core} }
 func (h *Handler) Routes(r chi.Router) {
 	r.Post("/admin/games", h.createGame)
 	r.Get("/admin/games/{gameId}", h.getGame)
+	r.Put("/admin/games/{gameId}", h.updateGame)
 
 	r.Post("/admin/prizes", h.createPrize)
 	r.Get("/admin/prizes", h.listPrizes)
@@ -55,6 +56,7 @@ type createGameBody struct {
 	} `json:"rules"`
 	HandlerConfig   json.RawMessage `json:"handler_config"`
 	ValidatorConfig json.RawMessage `json:"validator_config"`
+	UI              json.RawMessage `json:"ui"`           // opaque render config (background, theme, slot/item images)
 	WalletScope     string          `json:"wallet_scope"` // campaign|merchant|tenant (override)
 	Milestones      json.RawMessage `json:"milestones"`   // lucky_item/points milestone config
 }
@@ -81,6 +83,7 @@ func (h *Handler) createGame(w http.ResponseWriter, r *http.Request) {
 			Status:          enumx.Parse[gamev1.GameStatus](body.Status, gamev1.GameStatus_value),
 			HandlerConfig:   string(orEmptyObj(body.HandlerConfig)),
 			ValidatorConfig: string(orEmptyObj(body.ValidatorConfig)),
+			Ui:              string(orEmptyObj(body.UI)),
 			WalletScope:     enumx.Parse[gamev1.WalletScope](body.WalletScope, gamev1.WalletScope_value),
 			Milestones:      string(orEmptyObj(body.Milestones)),
 			Rules: &gamev1.Rules{
@@ -95,6 +98,46 @@ func (h *Handler) createGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	envelope.WriteCreated(w, tid, gameView(resp.GetGame()))
+}
+
+func (h *Handler) updateGame(w http.ResponseWriter, r *http.Request) {
+	tid := middleware.TraceIDFrom(r.Context())
+	tenant, merchant := auth.Scope(r)
+
+	var body createGameBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		envelope.WriteError(w, tid, invalidArg("malformed request body"))
+		return
+	}
+	ctx := coreclient.WithTrace(r.Context(), tid)
+	resp, err := h.core.GameConfig.UpdateGame(ctx, &gamev1.UpdateGameRequest{
+		TenantId: tenant, MerchantId: merchant,
+		Game: &gamev1.Game{
+			Id:              chi.URLParam(r, "gameId"),
+			Name:            body.Name,
+			Type:            body.Type,
+			CampaignId:      body.CampaignID,
+			SeedGenerator:   body.SeedGenerator,
+			RewardHandler:   body.RewardHandler,
+			Validator:       body.Validator,
+			Status:          enumx.Parse[gamev1.GameStatus](body.Status, gamev1.GameStatus_value),
+			HandlerConfig:   string(orEmptyObj(body.HandlerConfig)),
+			ValidatorConfig: string(orEmptyObj(body.ValidatorConfig)),
+			Ui:              string(orEmptyObj(body.UI)),
+			WalletScope:     enumx.Parse[gamev1.WalletScope](body.WalletScope, gamev1.WalletScope_value),
+			Milestones:      string(orEmptyObj(body.Milestones)),
+			Rules: &gamev1.Rules{
+				MaxPlaysPerUser: int32(body.Rules.MaxPlaysPerUser),
+				MaxPlaysPerDay:  int32(body.Rules.MaxPlaysPerDay),
+				RequireLogin:    body.Rules.RequireLogin,
+			},
+		},
+	})
+	if err != nil {
+		envelope.WriteError(w, tid, err)
+		return
+	}
+	envelope.WriteSuccess(w, tid, gameView(resp.GetGame()))
 }
 
 func (h *Handler) getGame(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +179,7 @@ func (h *Handler) createPrize(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.CreatePrize(ctx, &gamev1.CreatePrizeRequest{
-		TenantId:  tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		GameId: body.GameID,
 		Prize: &gamev1.Prize{
 			Name:             body.Name,

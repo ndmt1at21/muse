@@ -4,9 +4,11 @@ A generic, **config-driven game backend** for a website-builder platform. Adding
 game of an existing *shape* needs **zero backend code** — just a JSON config; adding a new
 *shape* needs only a small handler/validator, never engine changes.
 
-This repository is the **runnable vertical slice** (Phase 0 + Phase 1 of [PLAN.md](PLAN.md)):
-a spin-wheel game working `start → play` end-to-end with atomic stock deduction, single-use
-anti-cheat sessions, and the uniform REST envelope — on **both Postgres and MySQL**.
+The repo is a complete, runnable implementation: the generic engine, three game shapes,
+rewards & fulfillment, tenancy/identity/players, wallet/points/exchange, campaigns, quests &
+leaderboards, an outbound integration hub, and observability — all on **both Postgres and
+MySQL** behind one uniform REST envelope. This README is organized by **capability**; the
+internal build history lives in [PLAN.md](PLAN.md).
 
 ## 📖 Documentation site
 
@@ -99,7 +101,7 @@ make seed         # demo data: campaign + spin-wheel game + prizes + integration
 make e2e          # scripted spin-wheel flow: create prize+game → start → play → history
 make down
 ```
-Observability (Phase 11): **Grafana** at http://localhost:3000 (anonymous admin) with a provisioned
+Observability: **Grafana** at http://localhost:3000 (anonymous admin) with a provisioned
 "Muse — Overview" dashboard, **Prometheus** at http://localhost:9092. Each service exposes `/metrics`.
 
 Run services locally instead of in containers:
@@ -114,7 +116,7 @@ make run-admin                    # terminal 3
 
 Target MySQL instead: `make migrate-mysql` + `make run-core-mysql`.
 
-## API surface (this slice)
+## API surface
 
 Uniform envelope on every response: `{ code, message, trace_id, data }`. Errors follow the
 Google API error model (canonical code + stable `reason` + `ErrorInfo`).
@@ -133,18 +135,19 @@ Consumer BFF (`:8080`):
 - `POST /api/v1/games/{gameId}/play` — submit payload → rewards (atomic stock deduction)
 - `GET  /api/v1/games/{gameId}/eligibility` — remaining turns / can-play
 - `GET  /api/v1/games/{gameId}/history/me` — caller's play history (paginated)
+- `GET  /api/v1/games/{gameId}/render` — per-game presentation config (opaque `ui`: background, theme, slot/item images; redacted — never odds)
 - `GET  /api/v1/wallet?scope_key=…` — player's per-currency balances (player JWT)
 - `GET  /api/v1/wallet/ledger?scope_key=…` — wallet movements, newest-first (player JWT)
 - `GET  /api/v1/games/{gameId}/milestones` — milestone progress + per-rung status (player JWT)
 - `POST /api/v1/games/{gameId}/redeem` — claim/exchange a milestone for its prize (player JWT)
 
 Admin BFF (`:8081`):
-- `POST /api/v1/admin/games`, `GET /api/v1/admin/games/{gameId}`
+- `POST /api/v1/admin/games`, `GET /api/v1/admin/games/{gameId}`, `PUT /api/v1/admin/games/{gameId}` (update config incl. the `ui` render block)
 - `POST /api/v1/admin/prizes`
 
-> Auth is a seam: a player JWT (Bearer) is verified into request claims when present (Phase 4),
+> Auth is a seam: a player JWT (Bearer) is verified into request claims when present,
 > falling back to the `X-Tenant-Id` / `X-Merchant-Id` / `X-Player-Id` / `X-Roles` headers — handler
-> code is unchanged either way. The admin management surface is **role-guarded** (Phase 9):
+> code is unchanged either way. The admin management surface is **role-guarded**:
 > requests need an `admin` / `designer` / `reward_manager` role (from the admin JWT, or the
 > `X-Roles` dev header); the HMAC-signed n8n callback stays outside the role gate.
 
@@ -172,7 +175,7 @@ make e2e-hardening   # BFF hardening: admin RBAC 403/200, read-model cache + inv
 make e2e-integration # integration hub: register adapters, emit events, fan-out dispatch counts
 ```
 
-## Reward system (Phase 3)
+## Reward system
 
 Prizes carry **constraints** (`max_per_user`/`max_per_day`, enforced inside the Play txn —
 a capped prize the wheel lands on is dropped to no-win) and **fulfillment** policy
@@ -181,7 +184,7 @@ becomes a durable **reward record** with a `won → claimed → fulfilled → re
 voucher prizes pop a **code** from an imported pool at win time. Admin endpoints cover prize
 CRUD, code import, stock summary, and `fulfill`/`revoke`; players `list`/`claim` their rewards.
 
-## Tenancy, identity & players (Phase 4)
+## Tenancy, identity & players
 
 Three layers model "the same person plays in many tenants, fully isolated":
 
@@ -202,7 +205,7 @@ into request claims, falling back to the `X-Tenant-Id`/`X-Player-Id` headers so 
 keep working. The pure resolver lives in `gamekit/identity` (ports-only, embeddable); `TenantStore`/
 `IdentityStore`/`PlayerStore` let an embedder plug their own user system.
 
-## Fulfillment & delivery (Phase 3.5)
+## Fulfillment & delivery
 
 Delivery is **configured per prize, not coded per prize**. A prize's `fulfillment.channel`
 (`voucher_code` | `sms` | `zns` | `email` | `points_credit` | `physical_shipping` | `crm_sync` |
@@ -224,7 +227,7 @@ synchronously at win; every other channel hands off out-of-band:
 - **Admin** — `GET /api/v1/admin/fulfillment/tasks` (filter status/campaign/prize) and
   `POST /api/v1/admin/fulfillment/tasks/{id}/retry` re-arms a failed/dead task.
 
-## Wallet, points & exchange (Phase 8)
+## Wallet, points & exchange
 
 Some games award an intermediate **wallet currency** instead of (or alongside) a real prize: the
 `lucky_item` handler credits a named item, and any handler's `points` reward credits points. The
@@ -242,7 +245,7 @@ stock-deducted or fulfilled), so balances **accumulate across plays**.
 - **Player surface** — `GET /wallet` (balances), `GET /wallet/ledger` (movements), `GET
   /games/{id}/milestones` (progress + per-rung status), `POST /games/{id}/redeem`.
 
-## BFF hardening (Phase 9)
+## BFF hardening
 
 These are **edge concerns that live in the BFF, not Core** — `bffkit` provides them so your own
 BFF (and the reference ones in `examples/`) stay consistent. All are **optional/degrading** —
@@ -263,7 +266,7 @@ limits like stock stay in Core, which enforces them regardless of which BFF, or 
   via `auth.RequireRole`. The signed n8n fulfillment callback is a machine route and stays outside
   the gate. A `X-Roles` dev header mirrors the existing header seam for local/e2e.
 
-## Integration hub (Phase 10)
+## Integration hub
 
 Domain events fan out to **outbound integrations** so a campaign can push wins to a webhook, an n8n
 flow, a Google Sheet, SMS/ZNS, or a CRM — configured, not coded.
@@ -272,8 +275,8 @@ flow, a Google Sheet, SMS/ZNS, or a CRM — configured, not coded.
   (engine, post-commit), `prize_claimed` (reward claim), `quest_completed` (quest complete),
   `leaderboard_finalized` (finalize). All best-effort — an integration never fails the play/claim.
 - **Hub** (`core/internal/integration`) is the engine's `EventSink`. On each event it (1) publishes
-  to the **Redis pub/sub bus** (`adapters/events`) for cross-process fan-out (extra replicas, the
-  Phase 9.5 realtime gateway), and (2) looks up the active integrations in the event's scope that
+  to the **Redis pub/sub bus** (`adapters/events`) for cross-process fan-out (extra replicas, a
+  future realtime gateway), and (2) looks up the active integrations in the event's scope that
   **subscribe** to that type (campaign-narrowed or scope-wide) and delivers through their providers.
 - **Providers** are a pluggable registry (same pattern as reward handlers / fulfillment channels):
   a real **webhook** (JSON POST, optional HMAC-SHA256 `X-Muse-Signature` — also serves `n8n`), plus
@@ -283,7 +286,7 @@ flow, a Google Sheet, SMS/ZNS, or a CRM — configured, not coded.
   adapters; `POST /api/v1/admin/integrations/emit` injects an event for testing a wiring and returns
   the dispatch count. `IntegrationService` is the Core gRPC contract.
 
-## Observability (Phase 11)
+## Observability
 
 Prometheus metrics on every service, scraped into a provisioned Grafana dashboard with alert rules.
 
@@ -300,8 +303,8 @@ Prometheus metrics on every service, scraped into a provisioned Grafana dashboar
 - **Error reference**: [docs/ERRORS.md](docs/ERRORS.md) — the canonical `reason` → gRPC code → HTTP
   status table (the stable machine-readable contract), generated from `gkerr`/`apierr`.
 
-> Distributed tracing (Tempo/Loki, OTLP) and per-BFF OpenAPI specs remain the open items in this
-> phase; metrics + dashboards + the error reference + seed data are done.
+> Distributed tracing (Tempo/Loki, OTLP) and per-BFF OpenAPI specs are open items; metrics +
+> dashboards + the error reference + seed data are done.
 
 ## What's proven here
 - Generic engine (`Start`/`Play`/`Eligibility`/`History`) driven entirely by config.
@@ -316,8 +319,9 @@ Prometheus metrics on every service, scraped into a provisioned Grafana dashboar
 - **BFF hardening**: distributed rate limiting, read-model cache + cross-service invalidation, admin RBAC.
 - **Integration hub**: domain events fan out to pluggable outbound adapters over a Redis pub/sub bus.
 - **Observability**: Prometheus RED + business metrics on every service, provisioned Grafana + alerts.
+- **Per-game theming**: an opaque `ui` block (background, theme colors, slot/item images) stored on the game, editable any time, rendered by the widget via a redacted `/render` endpoint — never an engine change.
 
-Phases 0–11 are implemented (engine, game shapes, rewards, fulfillment, tenancy/identity/players,
-campaign, quest, leaderboard, wallet/points/exchange, BFF hardening, integration hub, and the
-observability + docs polish). Remaining in the roadmap: distributed tracing (Tempo/Loki) and
-OpenAPI specs (Phase 11 tail), the realtime gateway (Phase 9.5), and multiplayer (Phases 12–13).
+Everything above is implemented and runnable — engine, the three game shapes, rewards,
+fulfillment, tenancy/identity/players, campaigns, quests, leaderboards, wallet/points/exchange,
+BFF hardening, the integration hub, and observability + docs. On the roadmap: distributed tracing
+(Tempo/Loki) and per-BFF OpenAPI specs, a realtime gateway, and multiplayer.

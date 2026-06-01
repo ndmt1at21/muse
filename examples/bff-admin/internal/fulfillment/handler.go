@@ -52,7 +52,7 @@ func (h *Handler) listTasks(w http.ResponseWriter, r *http.Request) {
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	q := r.URL.Query()
 	resp, err := h.core.Fulfillment.ListTasks(ctx, &gamev1.ListTasksRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		Status:     enumx.Parse[gamev1.TaskStatus](q.Get("status"), gamev1.TaskStatus_value),
 		CampaignId: q.Get("campaign_id"),
 		PrizeId:    q.Get("prize_id"),

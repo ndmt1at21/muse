@@ -7,7 +7,7 @@
 // line of the shape-specific metadata (score, tier, total_caught, …).
 
 import { loadConfig, MuseClient, MuseError } from "./client.js";
-import { el, toast, rewardItem, gameHeader, formatTimestamp } from "./ui.js";
+import { el, toast, rewardItem, gameHeader, formatTimestamp, loadRenderConfig } from "./ui.js";
 
 const cfg = loadConfig();
 const gameId = new URLSearchParams(location.search).get("game") || "";
@@ -26,6 +26,9 @@ if (!gameId) {
   );
   throw new Error("no game id");
 }
+
+// Match the game's theme/background so history feels part of the same skin.
+loadRenderConfig(client, gameId);
 
 const list = el("div", { class: "history-list" });
 const moreBtn = el("button", { class: "btn btn--primary", onclick: () => load() }, "Load more");

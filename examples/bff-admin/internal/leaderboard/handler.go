@@ -81,7 +81,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.ListLeaderboards(ctx, &gamev1.ListLeaderboardsRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaignId"),
 		Limit:      int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor:     r.URL.Query().Get("cursor"),

@@ -25,6 +25,7 @@ type gameRow struct {
 	Rules           []byte    `db:"rules"`
 	HandlerConfig   []byte    `db:"handler_config"`
 	ValidatorConfig []byte    `db:"validator_config"`
+	UI              []byte    `db:"ui"`
 	WalletScope     string    `db:"wallet_scope"`
 	Milestones      []byte    `db:"milestones"`
 	CreatedAt       time.Time `db:"created_at"`
@@ -44,6 +45,7 @@ func (r gameRow) toDomain() (*types.Game, error) {
 		Status:          types.GameStatus(r.Status),
 		HandlerConfig:   json.RawMessage(r.HandlerConfig),
 		ValidatorConfig: json.RawMessage(r.ValidatorConfig),
+		UI:              json.RawMessage(r.UI),
 		WalletScope:     r.WalletScope,
 		Milestones:      json.RawMessage(r.Milestones),
 		CreatedAt:       r.CreatedAt,
@@ -62,7 +64,7 @@ func (db *DB) GetGame(ctx context.Context, scope types.Scope, gameID string) (*t
 	var row gameRow
 	err := db.getContext(ctx, &row,
 		`SELECT id, tenant_id, merchant_id, campaign_id, name, type, seed_generator,
-		        reward_handler, validator, status, rules, handler_config, validator_config, wallet_scope, milestones, created_at, updated_at
+		        reward_handler, validator, status, rules, handler_config, validator_config, ui, wallet_scope, milestones, created_at, updated_at
 		   FROM games WHERE id = ? AND tenant_id = ? AND merchant_id = ?`,
 		gameID, scope.TenantID, scope.MerchantID)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -93,16 +95,57 @@ func (db *DB) CreateGame(ctx context.Context, g *types.Game) (*types.Game, error
 	rules, _ := json.Marshal(g.Rules)
 	hc := nonEmptyJSON(g.HandlerConfig)
 	vc := nonEmptyJSON(g.ValidatorConfig)
+	ui := nonEmptyJSON(g.UI)
 	ms := nonEmptyJSON(g.Milestones)
 
 	_, err := db.execContext(ctx,
 		`INSERT INTO games (id, tenant_id, merchant_id, campaign_id, name, type, seed_generator,
-		                    reward_handler, validator, status, rules, handler_config, validator_config, wallet_scope, milestones, created_at, updated_at)
-		 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		                    reward_handler, validator, status, rules, handler_config, validator_config, ui, wallet_scope, milestones, created_at, updated_at)
+		 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 		g.ID, g.Scope.TenantID, g.Scope.MerchantID, g.CampaignID, g.Name, g.Type, g.SeedGenerator,
-		g.RewardHandler, g.Validator, string(g.Status), string(rules), string(hc), string(vc), g.WalletScope, string(ms), g.CreatedAt, g.UpdatedAt)
+		g.RewardHandler, g.Validator, string(g.Status), string(rules), string(hc), string(vc), string(ui), g.WalletScope, string(ms), g.CreatedAt, g.UpdatedAt)
 	if err != nil {
 		return nil, gkerr.New(gkerr.ReasonInternal, "insert game").Wrap(err)
+	}
+	return g, nil
+}
+
+// UpdateGame replaces a game's mutable fields by id within scope. Returns
+// NotFound when no row matches. Stable fields (id, scope, created_at, type) are
+// not changed here.
+func (db *DB) UpdateGame(ctx context.Context, g *types.Game) (*types.Game, error) {
+	g.UpdatedAt = time.Now().UTC()
+	if g.SeedGenerator == "" {
+		g.SeedGenerator = "none"
+	}
+	if g.Validator == "" {
+		g.Validator = "basic"
+	}
+	if g.Status == "" {
+		g.Status = types.StatusDraft
+	}
+	rules, _ := json.Marshal(g.Rules)
+	hc := nonEmptyJSON(g.HandlerConfig)
+	vc := nonEmptyJSON(g.ValidatorConfig)
+	ui := nonEmptyJSON(g.UI)
+	ms := nonEmptyJSON(g.Milestones)
+
+	res, err := db.execContext(ctx,
+		`UPDATE games SET campaign_id=?, name=?, seed_generator=?, reward_handler=?, validator=?,
+		                  status=?, rules=?, handler_config=?, validator_config=?, ui=?, wallet_scope=?, milestones=?, updated_at=?
+		   WHERE id=? AND tenant_id=? AND merchant_id=?`,
+		g.CampaignID, g.Name, g.SeedGenerator, g.RewardHandler, g.Validator,
+		string(g.Status), string(rules), string(hc), string(vc), string(ui), g.WalletScope, string(ms), g.UpdatedAt,
+		g.ID, g.Scope.TenantID, g.Scope.MerchantID)
+	if err != nil {
+		return nil, gkerr.New(gkerr.ReasonInternal, "update game").Wrap(err)
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return nil, gkerr.New(gkerr.ReasonInternal, "update game rows").Wrap(err)
+	}
+	if n == 0 {
+		return nil, gkerr.New(gkerr.ReasonNotFound, "game not found").WithMeta("game_id", g.ID)
 	}
 	return g, nil
 }

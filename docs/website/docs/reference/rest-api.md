@@ -49,7 +49,8 @@ copy, not a fixed contract.
 | POST | `/games/{id}/play` | public/player | submit payload → rewards |
 | GET | `/games/{id}/eligibility` | public/player | remaining turns / can-play |
 | GET | `/games/{id}/history/me` | player | caller's play history |
-| GET | `/public/campaigns/{id}` | public | widget render config (cached) |
+| GET | `/games/{id}/render` | public/player | per-game presentation config (opaque `ui`: background, theme, slot/item images) — redacted, never returns `handler_config` |
+| GET | `/public/campaigns/{id}` | public | campaign view (games/quests, settings) |
 | POST | `/players/auth/start` · `/players/auth/verify` | public | phone/email login (BFF-owned: challenge, verify, JWT mint; calls Core `ResolvePlayer`) |
 | GET · PUT | `/players/me` | player | profile |
 | POST | `/players/me/contacts` | player | link a contact |

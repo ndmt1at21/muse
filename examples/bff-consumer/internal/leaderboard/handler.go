@@ -48,7 +48,7 @@ func (h *Handler) rankings(w http.ResponseWriter, r *http.Request) {
 
 	data, err := h.cache.Fetch(ctx, cache.LeaderboardRankingsKey(lbID, limit, offset), func() (any, error) {
 		resp, gErr := h.core.Leaderboard.GetRankings(ctx, &gamev1.GetRankingsRequest{
-			TenantId:         tenant, MerchantId: merchant,
+			TenantId: tenant, MerchantId: merchant,
 			LeaderboardId: lbID,
 			Limit:         int32(limit),
 			Offset:        int32(offset),

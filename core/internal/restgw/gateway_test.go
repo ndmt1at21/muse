@@ -35,11 +35,11 @@ func decode(t *testing.T, b []byte) map[string]any {
 
 func TestNumberizeTimestamps_TimestampsBecomeNumbers(t *testing.T) {
 	g := &gamev1.Game{
-		Id:        "game_1",                              // string id stays a string
-		TenantId:  "tenant_1",                            // string stays a string
-		Status:    gamev1.GameStatus_GAME_STATUS_ACTIVE,  // enum stays a name
-		CreatedAt: 1717200000,                            // timestamp -> number
-		UpdatedAt: 0,                                     // unset timestamp -> 0 (number)
+		Id:        "game_1",                             // string id stays a string
+		TenantId:  "tenant_1",                           // string stays a string
+		Status:    gamev1.GameStatus_GAME_STATUS_ACTIVE, // enum stays a name
+		CreatedAt: 1717200000,                           // timestamp -> number
+		UpdatedAt: 0,                                    // unset timestamp -> 0 (number)
 		Rules:     &gamev1.Rules{StartDate: 1700000000, EndDate: 0, MaxPlaysPerUser: 3},
 	}
 

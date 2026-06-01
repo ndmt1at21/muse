@@ -9,7 +9,7 @@
 // over-cap catches — so we mirror the per-type cap here to keep honest plays valid.
 
 import { loadConfig, MuseClient, MuseError } from "./client.js";
-import { el, toast, showResult, renderEligibility, gameHeader } from "./ui.js";
+import { el, toast, showResult, renderEligibility, gameHeader, imageOrEmoji, loadRenderConfig } from "./ui.js";
 
 const cfg = loadConfig();
 const gameId = new URLSearchParams(location.search).get("game") || cfg.games.gift;
@@ -42,6 +42,19 @@ function emojiForType(type) {
   let h = 0;
   for (const ch of type) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return GIFT_EMOJIS[h % GIFT_EMOJIS.length];
+}
+
+// Per-game render config (background, theme, per-item images). Best-effort:
+// applied as soon as it loads; gameplay never waits on it.
+let renderUI = {};
+loadRenderConfig(client, gameId).then((ui) => { renderUI = ui; });
+
+// dropContent picks an item's visual: a configured image (ui.items[type].image),
+// else a configured emoji, else the hashed default emoji.
+function dropContent(type) {
+  const item = type === EMPTY ? {} : (renderUI.items && renderUI.items[type]) || {};
+  const emoji = type === EMPTY ? "🍂" : item.emoji || emojiForType(type);
+  return imageOrEmoji(item.image, emoji, "drop__content", 1);
 }
 
 const caughtEl = el("span", { class: "big" }, "0");
@@ -86,7 +99,7 @@ function reset() {
 function spawnDrop(drop) {
   if (!playing) return;
   const stageW = field.clientWidth || 380;
-  const node = el("div", { class: "drop" }, emojiForType(drop.type));
+  const node = el("div", { class: "drop" }, dropContent(drop.type));
   const x = 12 + Math.random() * (stageW - 48);
   node.style.left = x + "px";
   node.style.top = "-40px";

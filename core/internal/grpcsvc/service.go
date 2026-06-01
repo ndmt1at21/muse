@@ -18,6 +18,7 @@ import (
 	"github.com/muse/gamekit"
 	"github.com/muse/gamekit/defaults"
 	"github.com/muse/gamekit/engine"
+	"github.com/muse/gamekit/gkerr"
 	"github.com/muse/gamekit/identity"
 	"github.com/muse/gamekit/ports"
 	"github.com/muse/pkg/apierr"
@@ -186,6 +187,19 @@ func (s *Server) GetGame(ctx context.Context, req *gamev1.GetGameRequest) (*game
 		return nil, s.fail(err)
 	}
 	return &gamev1.GetGameResponse{Game: gameToProto(g)}, nil
+}
+
+func (s *Server) UpdateGame(ctx context.Context, req *gamev1.UpdateGameRequest) (*gamev1.UpdateGameResponse, error) {
+	scope := scopeFromProto(req)
+	g := gameFromProto(scope, req.GetGame())
+	if g.ID == "" {
+		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "game id is required"))
+	}
+	saved, err := s.store.UpdateGame(ctx, g)
+	if err != nil {
+		return nil, s.fail(err)
+	}
+	return &gamev1.UpdateGameResponse{Game: gameToProto(saved)}, nil
 }
 
 // --- RewardService ---

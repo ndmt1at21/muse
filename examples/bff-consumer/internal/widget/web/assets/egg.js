@@ -7,7 +7,7 @@
 // score honestly.
 
 import { loadConfig, MuseClient, MuseError } from "./client.js";
-import { el, toast, showResult, renderEligibility, gameHeader } from "./ui.js";
+import { el, toast, showResult, renderEligibility, gameHeader, loadRenderConfig } from "./ui.js";
 
 const cfg = loadConfig();
 const gameId = new URLSearchParams(location.search).get("game") || cfg.games.egg;
@@ -34,6 +34,10 @@ const ROUND_MS = 15000;
 const CELLS = 8;
 const SPAWN_EVERY = 520;
 const EGG_LIFE = 1100;
+
+// Per-game render config (background, theme, egg image/emoji). Best-effort.
+let renderUI = {};
+loadRenderConfig(client, gameId).then((ui) => { renderUI = ui; });
 
 let score = 0;
 let playing = false;
@@ -65,7 +69,8 @@ root.replaceChildren(
 function clearCell(i) {
   const c = cells[i];
   c.textContent = "";
-  c.classList.remove("egg--live", "egg--cracked");
+  c.style.backgroundImage = "";
+  c.classList.remove("egg--live", "egg--cracked", "egg--img");
   const t = cellTimers.get(i);
   if (t) {
     clearTimeout(t);
@@ -79,7 +84,14 @@ function spawn() {
   const i = empty[Math.floor(Math.random() * empty.length)];
   const c = cells[i];
   c.classList.add("egg--live");
-  c.textContent = "🥚";
+  const egg = renderUI.egg || {};
+  if (egg.image) {
+    c.textContent = "";
+    c.style.backgroundImage = `url("${egg.image}")`;
+    c.classList.add("egg--img");
+  } else {
+    c.textContent = egg.emoji || "🥚";
+  }
   cellTimers.set(i, setTimeout(() => clearCell(i), EGG_LIFE));
 }
 
@@ -89,7 +101,8 @@ function whack(i) {
   if (!c.classList.contains("egg--live")) return;
   score++;
   scoreEl.textContent = String(score);
-  c.classList.remove("egg--live");
+  c.classList.remove("egg--live", "egg--img");
+  c.style.backgroundImage = "";
   c.classList.add("egg--cracked");
   c.textContent = "🐣";
   const t = cellTimers.get(i);

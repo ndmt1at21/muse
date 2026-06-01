@@ -107,6 +107,11 @@ export class MuseClient {
       payload: payload || {},
     });
   }
+  // render fetches the game's public presentation config (the opaque `ui` block
+  // plus name/type). Odds/anti-cheat config are never exposed here.
+  render(gameId) {
+    return this.req("GET", `/games/${encodeURIComponent(gameId)}/render`);
+  }
   history(gameId, { cursor, limit } = {}) {
     const q = new URLSearchParams();
     if (cursor) q.set("cursor", cursor);

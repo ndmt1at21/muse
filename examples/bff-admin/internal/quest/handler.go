@@ -83,7 +83,7 @@ func (h *Handler) listQuests(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.ListQuests(ctx, &gamev1.ListQuestsRequest{
-		TenantId:      tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaignId"),
 		Limit:      int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor:     r.URL.Query().Get("cursor"),
@@ -124,7 +124,7 @@ func (h *Handler) deleteQuest(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	if _, err := h.core.Quest.DeleteQuest(ctx, &gamev1.DeleteQuestRequest{
-		TenantId:   tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		QuestId: chi.URLParam(r, "questId"),
 	}); err != nil {
 		envelope.WriteError(w, tid, err)

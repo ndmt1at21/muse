@@ -135,7 +135,7 @@ func (h *Handler) verifyAuth(w http.ResponseWriter, r *http.Request) {
 	// Contact is now verified — ask Core to resolve-or-create the player.
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.ResolvePlayer(ctx, &gamev1.ResolvePlayerRequest{
-		TenantId:        ch.tenantID, MerchantId: ch.merchantID,
+		TenantId: ch.tenantID, MerchantId: ch.merchantID,
 		ContactType:  contactTypeEnum(ch.contactType),
 		ContactValue: ch.contactValue,
 	})
@@ -210,7 +210,7 @@ func (h *Handler) addContact(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.AddContact(ctx, &gamev1.AddContactRequest{
-		TenantId:        tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		PlayerId:     auth.PlayerID(r),
 		IdentityId:   auth.IdentityID(r),
 		ContactType:  contactTypeEnum(body.Type),

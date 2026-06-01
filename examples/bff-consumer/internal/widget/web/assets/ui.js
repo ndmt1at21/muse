@@ -32,14 +32,65 @@ export function toast(message, kind = "info") {
   toastTimer = setTimeout(() => box.classList.remove("toast--show"), 3200);
 }
 
-// rewardItem renders one awarded prize as "🎁 Name ×2 (worth 100,000)".
-// Shared by the result modal and the history view.
+// imageOrEmoji renders an <img src=url> when url is set, falling back to the
+// emoji if the URL is empty or the image fails to load. `cls` is applied either
+// way; `em` sizes the image relative to the surrounding font-size box so it
+// scales with its context (a 1.3rem icon vs a 2rem drop).
+export function imageOrEmoji(url, emoji, cls, em = 1) {
+  if (!url) return el("span", { class: cls }, emoji);
+  const img = el("img", {
+    class: cls,
+    src: url,
+    alt: "",
+    loading: "lazy",
+    style: `width:${em}em;height:${em}em;object-fit:contain;vertical-align:middle`,
+  });
+  img.addEventListener("error", () => img.replaceWith(el("span", { class: cls }, emoji)));
+  return img;
+}
+
+// applyRenderConfig themes the current page from a game's opaque `ui` block —
+// theme colors (as CSS custom properties overriding the stylesheet defaults)
+// and an optional background image. Every field is optional; absent fields keep
+// the built-in "Lì Xì" defaults. Returns the ui object so callers can read the
+// game-specific bits (wheel.segments, items, egg).
+export function applyRenderConfig(ui) {
+  ui = ui || {};
+  const root = document.documentElement;
+  const theme = ui.theme || {};
+  const map = { primary: "--red", accent: "--gold", ink: "--ink", paper: "--paper" };
+  for (const [key, cssVar] of Object.entries(map)) {
+    if (theme[key]) root.style.setProperty(cssVar, theme[key]);
+  }
+  if (ui.background_image) {
+    // Darkening gradient keeps the foreground cards legible over any image.
+    document.body.style.background =
+      `linear-gradient(rgba(80,0,0,0.55), rgba(80,0,0,0.7)), url("${ui.background_image}") center/cover fixed`;
+  }
+  return ui;
+}
+
+// loadRenderConfig fetches a game's render config, applies the theme/background
+// immediately, and resolves to the ui object (or {} on any error — theming is
+// best-effort and must never block gameplay).
+export async function loadRenderConfig(client, gameId) {
+  try {
+    const data = await client.render(gameId);
+    return applyRenderConfig(data && data.ui);
+  } catch {
+    return applyRenderConfig({});
+  }
+}
+
+// rewardItem renders one awarded prize as "🎁 Name ×2 (worth 100,000)", using
+// the prize image when set (emoji fallback). Shared by the result modal and the
+// history view.
 export function rewardItem(r) {
   const qty = r.quantity && r.quantity > 1 ? ` ×${r.quantity}` : "";
   const worth = r.value ? ` · worth ${Number(r.value).toLocaleString()}` : "";
   const code = r.code ? ` · code ${r.code}` : "";
   return el("li", { class: "reward" }, [
-    el("span", { class: "reward__icon" }, r.image ? "" : "🎁"),
+    imageOrEmoji(r.image, "🎁", "reward__icon", 1.4),
     el("span", {}, `${r.name || r.prize_id || "Prize"}${qty}${worth}${code}`),
   ]);
 }

@@ -198,8 +198,11 @@ message Rules {
 }
 
 // Game is the config-driven game definition. handler_config is opaque JSON the
-// engine never interprets (decoded only by the reward handler/seed). Widget/UI
-// render config is NOT a Core concern — it lives in the presentation layer (BFF).
+// engine never interprets (decoded only by the reward handler/seed). The `ui`
+// block is likewise opaque to the engine: Core stores and returns it verbatim
+// but never interprets it — the presentation layer (BFF/widget) decodes it to
+// render per-game backgrounds, theme colors, and slot/item images. Keeping it
+// opaque preserves the Core = business / BFF = presentation boundary.
 message Game {
   // Stable unique identifier (server-assigned on create).
   string id = 1;
@@ -225,7 +228,10 @@ message Game {
   Rules rules = 11;
   // Raw JSON, decoded by the reward handler/seed; never interpreted by the engine.
   string handler_config = 12;
-  reserved "ui"; // removed: widget render config moved to the BFF
+  // Raw JSON render config, opaque to Core (stored & returned verbatim, never
+  // interpreted). Decoded by the BFF/widget for per-game background, theme, and
+  // slot/item images. Field 18 (was reserved when this lived only in the BFF).
+  string ui = 18;
   // Raw JSON, decoded by the validator (anti-cheat).
   string validator_config = 13;
   // Creation time (unix seconds).
@@ -458,6 +464,22 @@ message CreateGameResponse {
   Game game = 1;
 }
 
+// UpdateGameRequest replaces a game's mutable fields (the embedded game's id
+// identifies the target). Used by admins to change config — including the `ui`
+// render block — after creation.
+message UpdateGameRequest {
+  // Tenant isolation key (required).
+  string tenant_id = 1;
+  // Merchant isolation key within the tenant.
+  string merchant_id = 2;
+  // Game with id set; mutable fields are applied.
+  Game game = 3;
+}
+message UpdateGameResponse {
+  // The updated game.
+  Game game = 1;
+}
+
 // GetGameRequest fetches a single game by id.
 message GetGameRequest {
   // Tenant isolation key (required).
@@ -478,6 +500,9 @@ service GameConfigService {
   }
   rpc GetGame(GetGameRequest) returns (GetGameResponse) {
     option (google.api.http) = {get: "/api/v1/games/{game_id}"};
+  }
+  rpc UpdateGame(UpdateGameRequest) returns (UpdateGameResponse) {
+    option (google.api.http) = {put: "/api/v1/games/{game.id}" body: "*"};
   }
 }
 

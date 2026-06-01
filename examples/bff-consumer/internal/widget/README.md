@@ -3,8 +3,8 @@
 A buildless, dependency-free game widget embedded into the `bff-consumer`
 binary (`//go:embed web`). It is the **presentation layer** the architecture
 keeps out of Core: the pages are plain clients of the public `/api/v1` gameplay
-endpoints (`/start`, `/play`, `/eligibility`, `/history/me`) — no privileged
-access, no build step, no framework.
+endpoints (`/start`, `/play`, `/eligibility`, `/history/me`, `/render`) — no
+privileged access, no build step, no framework.
 
 ## Run it
 
@@ -46,6 +46,38 @@ egg game's score is validated against a ceiling and a minimum duration, and the
 gift game's catches are checked against the server-issued drop sequence. The
 gift UI mirrors each type's `max_catchable` cap client-side so an honest play
 never trips the `drop_plan` anti-cheat.
+
+## Theming (per-game render config)
+
+Each game carries an opaque `ui` JSON block. Core stores and returns it but
+**never interprets** it — the widget decodes it to theme itself per game, so an
+admin can restyle a game any time (via `PUT /admin/games/{id}`) with no rebuild.
+The widget fetches it from the **redacted** `GET /games/{gameId}/render`
+endpoint, which returns only `{game_id, name, type, ui}` — never the odds in
+`handler_config`. Every field is optional; absent fields keep the built-in "Lì
+Xì" defaults, and a broken image URL falls back to its emoji.
+
+```jsonc
+{
+  "background_image": "https://cdn.example/bg.jpg",        // page background (optional)
+  "theme": { "primary": "#c1121f", "accent": "#f4c430",    // CSS-var overrides
+             "ink": "#2b1216", "paper": "#fff8f0" },
+  "wheel": { "segments": [                                 // spin: decorative ring (NOT the prize layout)
+    { "emoji": "💎", "color": "#1f6feb" },
+    { "image": "https://cdn.example/seg.png", "color": "#f4c430" }
+  ] },
+  "items": {                                               // gift: by drop type
+    "gift_big":   { "image": "https://cdn.example/big.png", "emoji": "💎" },
+    "gift_small": { "emoji": "🎀" }
+  },
+  "egg": { "emoji": "🟡", "image": "https://cdn.example/egg.png" }  // egg-catcher
+}
+```
+
+Anti-cheat note: the spin wheel is decorative — `wheel.segments` are not tied to
+prizes (the BFF never exposes the prize table or odds), so configuring segment
+images can't leak which slot wins. `deploy/games.json` seeds an example `ui` per
+game (emoji + theme colors; image URLs work the same way).
 
 ## History
 

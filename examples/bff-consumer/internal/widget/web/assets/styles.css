@@ -201,6 +201,12 @@ canvas { max-width: 100%; touch-action: manipulation; }
   transform: scale(0.92);
   cursor: default;
 }
+/* live egg rendered from a configured image (ui.egg.image) instead of an emoji */
+.egg--img {
+  background-size: 72% auto;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 /* ---- shared controls ---- */
 

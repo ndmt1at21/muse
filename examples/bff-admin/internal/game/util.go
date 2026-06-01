@@ -33,6 +33,7 @@ func gameView(g *gamev1.Game) map[string]any {
 		"status":           enumx.Name(g.GetStatus()),
 		"handler_config":   rawJSON(g.GetHandlerConfig()),
 		"validator_config": rawJSON(g.GetValidatorConfig()),
+		"ui":               rawJSON(g.GetUi()),
 		"rules": map[string]any{
 			"max_plays_per_user": g.GetRules().GetMaxPlaysPerUser(),
 			"max_plays_per_day":  g.GetRules().GetMaxPlaysPerDay(),

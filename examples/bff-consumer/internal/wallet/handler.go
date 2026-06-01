@@ -42,7 +42,7 @@ func (h *Handler) balances(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Wallet.GetWallet(ctx, &gamev1.GetWalletRequest{
-		TenantId:    tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		ScopeKey: r.URL.Query().Get("scope_key"),
 		PlayerId: auth.PlayerID(r),
 	})
@@ -58,7 +58,7 @@ func (h *Handler) ledger(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Wallet.GetLedger(ctx, &gamev1.GetLedgerRequest{
-		TenantId:    tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		ScopeKey: r.URL.Query().Get("scope_key"),
 		PlayerId: auth.PlayerID(r),
 		Limit:    int32(atoiDefault(r.URL.Query().Get("limit"), 20)),
@@ -83,7 +83,7 @@ func (h *Handler) milestones(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Wallet.GetMilestones(ctx, &gamev1.GetMilestonesRequest{
-		TenantId:    tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		GameId:   chi.URLParam(r, "gameId"),
 		PlayerId: auth.PlayerID(r),
 	})
@@ -119,7 +119,7 @@ func (h *Handler) redeem(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Wallet.Redeem(ctx, &gamev1.RedeemRequest{
-		TenantId:       tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		GameId:      chi.URLParam(r, "gameId"),
 		MilestoneId: body.MilestoneID,
 		PlayerId:    auth.PlayerID(r),

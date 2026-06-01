@@ -41,6 +41,34 @@ func (h *Handler) Routes(r chi.Router) {
 	})
 	r.Get("/games/{gameId}/eligibility", h.eligibility)
 	r.Get("/games/{gameId}/history/me", h.history)
+	r.Get("/games/{gameId}/render", h.render)
+}
+
+// render returns the game's public presentation config: the opaque `ui` render
+// block plus name/type. It deliberately omits handler_config and
+// validator_config — those carry odds/anti-cheat params the widget must never
+// see (the BFF's redaction responsibility). The widget calls this on load to
+// theme itself per game.
+func (h *Handler) render(w http.ResponseWriter, r *http.Request) {
+	tid := middleware.TraceIDFrom(r.Context())
+	tenant, merchant := auth.Scope(r)
+	gameID := chi.URLParam(r, "gameId")
+
+	ctx := coreclient.WithTrace(r.Context(), tid)
+	resp, err := h.core.GameConfig.GetGame(ctx, &gamev1.GetGameRequest{
+		TenantId: tenant, MerchantId: merchant, GameId: gameID,
+	})
+	if err != nil {
+		envelope.WriteError(w, tid, err)
+		return
+	}
+	g := resp.GetGame()
+	envelope.WriteSuccess(w, tid, map[string]any{
+		"game_id": g.GetId(),
+		"name":    g.GetName(),
+		"type":    g.GetType(),
+		"ui":      rawJSON(g.GetUi()),
+	})
 }
 
 func (h *Handler) start(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +122,7 @@ func (h *Handler) play(w http.ResponseWriter, r *http.Request) {
 
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Engine.Play(ctx, &gamev1.PlayRequest{
-		TenantId:          tenant, MerchantId: merchant,
+		TenantId: tenant, MerchantId: merchant,
 		GameId:         gameID,
 		SessionId:      body.SessionID,
 		PlayerId:       auth.PlayerID(r),
