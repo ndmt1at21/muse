@@ -325,3 +325,13 @@ Everything above is implemented and runnable — engine, the three game shapes, 
 fulfillment, tenancy/identity/players, campaigns, quests, leaderboards, wallet/points/exchange,
 BFF hardening, the integration hub, and observability + docs. On the roadmap: distributed tracing
 (Tempo/Loki) and per-BFF OpenAPI specs, a realtime gateway, and multiplayer.
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for the repo
+layout (the three Go modules), how to build and test, and the add-a-game /
+add-a-shape extension flow. `gofmt` is enforced in CI.
+
+## License
+
+[MIT](LICENSE) © tri.ndm
