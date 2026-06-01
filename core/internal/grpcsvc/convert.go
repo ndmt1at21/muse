@@ -10,7 +10,16 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-func scopeFromProto(s *gamev1.Scope) types.Scope {
+// scoped is satisfied by every request/entity proto that carries the flat
+// tenant_id + merchant_id isolation keys.
+type scoped interface {
+	GetTenantId() string
+	GetMerchantId() string
+}
+
+// scopeFromProto reads the flat tenant/merchant isolation keys off any proto
+// that carries them.
+func scopeFromProto(s scoped) types.Scope {
 	if s == nil {
 		return types.Scope{}
 	}
@@ -71,7 +80,8 @@ func gameFromProto(scope types.Scope, g *gamev1.Game) *types.Game {
 func gameToProto(g *types.Game) *gamev1.Game {
 	return &gamev1.Game{
 		Id:            g.ID,
-		Scope:         &gamev1.Scope{TenantId: g.Scope.TenantID, MerchantId: g.Scope.MerchantID},
+		TenantId:      g.Scope.TenantID,
+		MerchantId:    g.Scope.MerchantID,
 		CampaignId:    g.CampaignID,
 		Name:          g.Name,
 		Type:          g.Type,
@@ -129,7 +139,8 @@ func prizeToProto(p *types.Prize) *gamev1.Prize {
 	ful, _ := json.Marshal(p.Fulfillment)
 	return &gamev1.Prize{
 		Id:               p.ID,
-		Scope:            &gamev1.Scope{TenantId: p.Scope.TenantID, MerchantId: p.Scope.MerchantID},
+		TenantId:         p.Scope.TenantID,
+		MerchantId:       p.Scope.MerchantID,
 		Name:             p.Name,
 		Type:             p.Type,
 		Image:            p.Image,
@@ -145,7 +156,8 @@ func prizeToProto(p *types.Prize) *gamev1.Prize {
 func rewardToProto(r *types.RewardRecord) *gamev1.RewardRecord {
 	return &gamev1.RewardRecord{
 		Id:          r.ID,
-		Scope:       &gamev1.Scope{TenantId: r.Scope.TenantID, MerchantId: r.Scope.MerchantID},
+		TenantId:    r.Scope.TenantID,
+		MerchantId:  r.Scope.MerchantID,
 		GameId:      r.GameID,
 		PlayerId:    r.PlayerID,
 		PrizeId:     r.PrizeID,
@@ -165,7 +177,8 @@ func rewardToProto(r *types.RewardRecord) *gamev1.RewardRecord {
 func taskToProto(t *types.FulfillmentTask) *gamev1.FulfillmentTask {
 	return &gamev1.FulfillmentTask{
 		Id:            t.ID,
-		Scope:         &gamev1.Scope{TenantId: t.Scope.TenantID, MerchantId: t.Scope.MerchantID},
+		TenantId:      t.Scope.TenantID,
+		MerchantId:    t.Scope.MerchantID,
 		RewardId:      t.RewardID,
 		PrizeId:       t.PrizeID,
 		PlayerId:      t.PlayerID,

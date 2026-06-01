@@ -12,7 +12,7 @@ import (
 // --- QuestService: admin CRUD (merchant-scoped) + player list/complete ---
 
 func (s *Server) CreateQuest(ctx context.Context, req *gamev1.CreateQuestRequest) (*gamev1.CreateQuestResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -28,7 +28,7 @@ func (s *Server) CreateQuest(ctx context.Context, req *gamev1.CreateQuestRequest
 }
 
 func (s *Server) GetQuest(ctx context.Context, req *gamev1.GetQuestRequest) (*gamev1.GetQuestResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	q, err := s.store.GetQuest(ctx, scope.TenantID, scope.MerchantID, req.GetQuestId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -37,7 +37,7 @@ func (s *Server) GetQuest(ctx context.Context, req *gamev1.GetQuestRequest) (*ga
 }
 
 func (s *Server) UpdateQuest(ctx context.Context, req *gamev1.UpdateQuestRequest) (*gamev1.UpdateQuestResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -53,7 +53,7 @@ func (s *Server) UpdateQuest(ctx context.Context, req *gamev1.UpdateQuestRequest
 }
 
 func (s *Server) DeleteQuest(ctx context.Context, req *gamev1.DeleteQuestRequest) (*gamev1.DeleteQuestResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if err := s.store.DeleteQuest(ctx, scope.TenantID, scope.MerchantID, req.GetQuestId()); err != nil {
 		return nil, s.fail(err)
 	}
@@ -61,7 +61,7 @@ func (s *Server) DeleteQuest(ctx context.Context, req *gamev1.DeleteQuestRequest
 }
 
 func (s *Server) ListQuests(ctx context.Context, req *gamev1.ListQuestsRequest) (*gamev1.ListQuestsResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	qs, next, err := s.store.ListQuests(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId(), int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -76,7 +76,7 @@ func (s *Server) ListQuests(ctx context.Context, req *gamev1.ListQuestsRequest) 
 // ListPlayerQuests returns a campaign's quests with the caller's completion
 // state (lifetime count, last completion, and whether they may complete now).
 func (s *Server) ListPlayerQuests(ctx context.Context, req *gamev1.ListPlayerQuestsRequest) (*gamev1.ListPlayerQuestsResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	playerID := req.GetPlayerId()
 	qs, _, err := s.store.ListQuests(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId(), 100, "")
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *Server) ListPlayerQuests(ctx context.Context, req *gamev1.ListPlayerQue
 // success, inside one transaction — records the completion and grants the
 // reward turns to the player's campaign turn balance.
 func (s *Server) CompleteQuest(ctx context.Context, req *gamev1.CompleteQuestRequest) (*gamev1.CompleteQuestResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	playerID := req.GetPlayerId()
 	if playerID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonUnauthenticated, "player_id is required"))

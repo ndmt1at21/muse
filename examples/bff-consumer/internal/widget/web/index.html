@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Muse · Game Demos</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="hero">
+        <div class="lantern">🏮</div>
+        <h1>Muse Game Demos</h1>
+        <p>Three game shapes, one generic engine. Pick a game to play.</p>
+      </div>
+
+      <div class="card-grid" id="cards"></div>
+
+      <section class="panel">
+        <h2>Demo settings</h2>
+        <p class="muted">
+          Scope &amp; player id are sent as dev headers. Paste the game ids from
+          <code>deploy/seed.sh</code> (it also prints a link that fills these in).
+        </p>
+        <div class="field-grid">
+          <div class="field"><label for="tenant">Tenant id</label><input id="tenant" /></div>
+          <div class="field"><label for="merchant">Merchant id</label><input id="merchant" /></div>
+          <div class="field"><label for="player">Player id</label><input id="player" /></div>
+          <div class="field"><label for="api">API base</label><input id="api" /></div>
+          <div class="field"><label for="spin">Spin Wheel game id</label><input id="spin" /></div>
+          <div class="field"><label for="egg">Egg Catcher game id</label><input id="egg" /></div>
+          <div class="field"><label for="gift">Gift Catcher game id</label><input id="gift" /></div>
+        </div>
+        <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center">
+          <button class="btn btn--primary" id="save">Save settings</button>
+          <span class="muted" id="saved-note"></span>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { loadConfig, saveConfig } from "./assets/client.js";
+      import { el, toast } from "./assets/ui.js";
+
+      const GAMES = [
+        {
+          key: "spin",
+          page: "spin.html",
+          emoji: "🎡",
+          title: "Vòng Quay May Mắn",
+          desc: "Spin the wheel — the server picks a weighted prize. Pure luck.",
+          shape: "none + probability + basic",
+        },
+        {
+          key: "egg",
+          page: "egg.html",
+          emoji: "🥚",
+          title: "Đập Trứng Vàng",
+          desc: "Smash as many golden eggs as you can before the timer ends. Your score sets the prize tier.",
+          shape: "none + score_to_tier + time_and_score_range",
+        },
+        {
+          key: "gift",
+          page: "gift.html",
+          emoji: "🎁",
+          title: "Hứng Quà",
+          desc: "Catch the falling gifts. The server drops a fixed sequence and caps how many of each you can win.",
+          shape: "drop_sequence + collect_items + drop_plan",
+        },
+      ];
+
+      let cfg = loadConfig();
+
+      function renderCards() {
+        const cards = document.getElementById("cards");
+        cards.replaceChildren(
+          ...GAMES.map((g) => {
+            const id = cfg.games[g.key];
+            const attrs = { class: "game-card", href: id ? `${g.page}?game=${encodeURIComponent(id)}` : "#" };
+            if (!id) attrs["aria-disabled"] = "true";
+            return el("a", attrs, [
+              el("div", { class: "game-card__emoji" }, g.emoji),
+              el("div", { class: "game-card__title" }, g.title),
+              el("div", { class: "game-card__desc" }, g.desc),
+              el("div", { class: "game-card__shape" }, id ? g.shape : "set a game id below to enable"),
+            ]);
+          }),
+        );
+      }
+
+      function fillForm() {
+        for (const k of ["tenant", "merchant", "player", "api"]) {
+          document.getElementById(k).value = k === "api" ? cfg.apiBase : cfg[k];
+        }
+        for (const k of ["spin", "egg", "gift"]) {
+          document.getElementById(k).value = cfg.games[k];
+        }
+      }
+
+      document.getElementById("save").addEventListener("click", () => {
+        cfg = {
+          apiBase: document.getElementById("api").value.trim() || "/api/v1",
+          tenant: document.getElementById("tenant").value.trim(),
+          merchant: document.getElementById("merchant").value.trim(),
+          player: document.getElementById("player").value.trim(),
+          games: {
+            spin: document.getElementById("spin").value.trim(),
+            egg: document.getElementById("egg").value.trim(),
+            gift: document.getElementById("gift").value.trim(),
+          },
+        };
+        saveConfig(cfg);
+        renderCards();
+        toast("Settings saved", "success");
+      });
+
+      fillForm();
+      renderCards();
+    </script>
+  </body>
+</html>

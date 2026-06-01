@@ -26,6 +26,7 @@ import (
 	adminintegration "github.com/muse/examples/bff-admin/internal/integration"
 	adminleaderboard "github.com/muse/examples/bff-admin/internal/leaderboard"
 	adminquest "github.com/muse/examples/bff-admin/internal/quest"
+	"github.com/muse/examples/bff-admin/internal/studio"
 	admintenancy "github.com/muse/examples/bff-admin/internal/tenancy"
 )
 
@@ -67,6 +68,11 @@ func main() {
 
 	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
 	r.Handle("/metrics", metrics.Handler())
+
+	// Demo Game Studio (embedded static bundle) at /studio: a dev tool to tune +
+	// create the example games from the browser. Static page; its admin API calls
+	// carry the caller's role like any other management request.
+	studio.Routes(r)
 
 	gh := admingame.New(core)
 	fh := adminfulfillment.New(core, env("FULFILLMENT_CALLBACK_SECRET", ""), log)

@@ -20,7 +20,7 @@ func (s *Server) ResolvePlayer(ctx context.Context, req *gamev1.ResolvePlayerReq
 	if s.resolver == nil {
 		return nil, s.fail(gkerr.New(gkerr.ReasonInternal, "identity resolver not configured"))
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	login, err := s.resolver.ResolveLogin(ctx, identity.VerifiedLogin{
 		Tenant: scope,
 		Contact: types.Contact{
@@ -41,7 +41,7 @@ func (s *Server) ResolvePlayer(ctx context.Context, req *gamev1.ResolvePlayerReq
 }
 
 func (s *Server) GetProfile(ctx context.Context, req *gamev1.GetProfileRequest) (*gamev1.GetProfileResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	p, err := s.store.GetPlayer(ctx, scope.TenantID, req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -54,7 +54,7 @@ func (s *Server) GetProfile(ctx context.Context, req *gamev1.GetProfileRequest) 
 }
 
 func (s *Server) UpdateProfile(ctx context.Context, req *gamev1.UpdateProfileRequest) (*gamev1.UpdateProfileResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	var profile map[string]any
 	if raw := req.GetProfile(); raw != "" {
 		if err := json.Unmarshal([]byte(raw), &profile); err != nil {
@@ -75,7 +75,7 @@ func (s *Server) AddContact(ctx context.Context, req *gamev1.AddContactRequest) 
 	if s.resolver == nil {
 		return nil, s.fail(gkerr.New(gkerr.ReasonInternal, "identity resolver not configured"))
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	identityID := req.GetIdentityId()
 	if identityID == "" {
 		// Resolve from the player if the caller only supplied player_id.
@@ -95,7 +95,7 @@ func (s *Server) AddContact(ctx context.Context, req *gamev1.AddContactRequest) 
 }
 
 func (s *Server) GetTurnBalance(ctx context.Context, req *gamev1.GetTurnBalanceRequest) (*gamev1.GetTurnBalanceResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	scopeKey := turnScopeKey(scope, req.GetScopeKey())
 	bal, err := s.store.GetTurnBalance(ctx, scope.TenantID, req.GetPlayerId(), scopeKey)
 	if err != nil {
@@ -105,7 +105,7 @@ func (s *Server) GetTurnBalance(ctx context.Context, req *gamev1.GetTurnBalanceR
 }
 
 func (s *Server) GrantTurns(ctx context.Context, req *gamev1.GrantTurnsRequest) (*gamev1.GrantTurnsResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	scopeKey := turnScopeKey(scope, req.GetScopeKey())
 	bal, err := s.store.GrantTurns(ctx, scope.TenantID, req.GetPlayerId(), scopeKey, req.GetDelta())
 	if err != nil {
@@ -115,7 +115,7 @@ func (s *Server) GrantTurns(ctx context.Context, req *gamev1.GrantTurnsRequest) 
 }
 
 func (s *Server) ConsumeTurn(ctx context.Context, req *gamev1.ConsumeTurnRequest) (*gamev1.ConsumeTurnResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	scopeKey := turnScopeKey(scope, req.GetScopeKey())
 	ok, bal, err := s.store.ConsumeTurn(ctx, scope.TenantID, req.GetPlayerId(), scopeKey)
 	if err != nil {

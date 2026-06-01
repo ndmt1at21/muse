@@ -12,7 +12,7 @@ import (
 // --- CampaignService (merchant-admin; tenant_id + merchant_id from the scope) ---
 
 func (s *Server) CreateCampaign(ctx context.Context, req *gamev1.CreateCampaignRequest) (*gamev1.CreateCampaignResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -24,7 +24,7 @@ func (s *Server) CreateCampaign(ctx context.Context, req *gamev1.CreateCampaignR
 }
 
 func (s *Server) GetCampaign(ctx context.Context, req *gamev1.GetCampaignRequest) (*gamev1.GetCampaignResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	c, err := s.store.GetCampaign(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -33,7 +33,7 @@ func (s *Server) GetCampaign(ctx context.Context, req *gamev1.GetCampaignRequest
 }
 
 func (s *Server) UpdateCampaign(ctx context.Context, req *gamev1.UpdateCampaignRequest) (*gamev1.UpdateCampaignResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -45,7 +45,7 @@ func (s *Server) UpdateCampaign(ctx context.Context, req *gamev1.UpdateCampaignR
 }
 
 func (s *Server) ListCampaigns(ctx context.Context, req *gamev1.ListCampaignsRequest) (*gamev1.ListCampaignsResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	cs, next, err := s.store.ListCampaigns(ctx, scope.TenantID, scope.MerchantID, int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -58,7 +58,7 @@ func (s *Server) ListCampaigns(ctx context.Context, req *gamev1.ListCampaignsReq
 }
 
 func (s *Server) DuplicateCampaign(ctx context.Context, req *gamev1.DuplicateCampaignRequest) (*gamev1.DuplicateCampaignResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	c, err := s.store.DuplicateCampaign(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId(), req.GetName())
 	if err != nil {
 		return nil, s.fail(err)
@@ -67,7 +67,7 @@ func (s *Server) DuplicateCampaign(ctx context.Context, req *gamev1.DuplicateCam
 }
 
 func (s *Server) GetCampaignAnalytics(ctx context.Context, req *gamev1.GetCampaignAnalyticsRequest) (*gamev1.GetCampaignAnalyticsResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	a, err := s.store.CampaignAnalytics(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId())
 	if err != nil {
 		return nil, s.fail(err)

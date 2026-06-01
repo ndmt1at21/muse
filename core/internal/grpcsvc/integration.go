@@ -23,7 +23,7 @@ func (s *Server) CreateIntegration(ctx context.Context, req *gamev1.CreateIntegr
 	if err := s.intgReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -39,7 +39,7 @@ func (s *Server) ListIntegrations(ctx context.Context, req *gamev1.ListIntegrati
 	if err := s.intgReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	integs, next, err := s.intg.List(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId(), int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -55,7 +55,7 @@ func (s *Server) DeleteIntegration(ctx context.Context, req *gamev1.DeleteIntegr
 	if err := s.intgReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if err := s.intg.Delete(ctx, scope.TenantID, scope.MerchantID, req.GetId()); err != nil {
 		return nil, s.fail(err)
 	}
@@ -77,7 +77,7 @@ func (s *Server) EmitEvent(ctx context.Context, req *gamev1.EmitEventRequest) (*
 			return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "payload must be a JSON object"))
 		}
 	}
-	n := s.intg.Dispatch(ctx, ports.Event{Type: req.GetType(), Scope: scopeFromProto(req.GetScope()), Payload: payload})
+	n := s.intg.Dispatch(ctx, ports.Event{Type: req.GetType(), Scope: scopeFromProto(req), Payload: payload})
 	return &gamev1.EmitEventResponse{Dispatched: int32(n)}, nil
 }
 
@@ -113,7 +113,8 @@ func integrationFromProto(scope types.Scope, p *gamev1.Integration) *types.Integ
 func integrationToProto(i *types.Integration) *gamev1.Integration {
 	return &gamev1.Integration{
 		Id:         i.ID,
-		Scope:      &gamev1.Scope{TenantId: i.TenantID, MerchantId: i.MerchantID},
+		TenantId:   i.TenantID,
+		MerchantId: i.MerchantID,
 		CampaignId: i.CampaignID,
 		Type:       pbIntegrationType(i.Type),
 		Events:     i.Events,

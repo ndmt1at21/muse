@@ -41,7 +41,7 @@ func (h *Handler) listQuests(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.ListPlayerQuests(ctx, &gamev1.ListPlayerQuestsRequest{
-		Scope:      coreclient.Scope(tenant, merchant),
+		TenantId:      tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaign_id"),
 		PlayerId:   auth.PlayerID(r), // "" for anonymous → completion state omitted
 	})
@@ -65,7 +65,7 @@ func (h *Handler) completeQuest(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body) // proof is optional (e.g. daily_checkin)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.CompleteQuest(ctx, &gamev1.CompleteQuestRequest{
-		Scope:    coreclient.Scope(tenant, merchant),
+		TenantId:    tenant, MerchantId: merchant,
 		QuestId:  chi.URLParam(r, "questId"),
 		PlayerId: auth.PlayerID(r),
 		Proof:    string(body.Proof),

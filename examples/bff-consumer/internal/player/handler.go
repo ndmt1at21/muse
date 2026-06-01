@@ -135,7 +135,7 @@ func (h *Handler) verifyAuth(w http.ResponseWriter, r *http.Request) {
 	// Contact is now verified — ask Core to resolve-or-create the player.
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.ResolvePlayer(ctx, &gamev1.ResolvePlayerRequest{
-		Scope:        coreclient.Scope(ch.tenantID, ch.merchantID),
+		TenantId:        ch.tenantID, MerchantId: ch.merchantID,
 		ContactType:  contactTypeEnum(ch.contactType),
 		ContactValue: ch.contactValue,
 	})
@@ -165,7 +165,7 @@ func (h *Handler) getMe(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.GetProfile(ctx, &gamev1.GetProfileRequest{
-		Scope: coreclient.Scope(tenant, merchant), PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, PlayerId: auth.PlayerID(r),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -186,7 +186,7 @@ func (h *Handler) updateMe(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.UpdateProfile(ctx, &gamev1.UpdateProfileRequest{
-		Scope: coreclient.Scope(tenant, merchant), PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, PlayerId: auth.PlayerID(r),
 		Profile: string(orEmptyObj(body.Profile)),
 	})
 	if err != nil {
@@ -210,7 +210,7 @@ func (h *Handler) addContact(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.AddContact(ctx, &gamev1.AddContactRequest{
-		Scope:        coreclient.Scope(tenant, merchant),
+		TenantId:        tenant, MerchantId: merchant,
 		PlayerId:     auth.PlayerID(r),
 		IdentityId:   auth.IdentityID(r),
 		ContactType:  contactTypeEnum(body.Type),
@@ -228,7 +228,7 @@ func (h *Handler) getTurns(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Player.GetTurnBalance(ctx, &gamev1.GetTurnBalanceRequest{
-		Scope: coreclient.Scope(tenant, merchant), PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, PlayerId: auth.PlayerID(r),
 		ScopeKey: r.URL.Query().Get("campaign_id"),
 	})
 	if err != nil {

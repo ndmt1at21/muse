@@ -56,7 +56,7 @@ func (h *Handler) start(w http.ResponseWriter, r *http.Request) {
 
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Engine.StartGame(ctx, &gamev1.StartGameRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: gameID, PlayerId: playerID,
+		TenantId: tenant, MerchantId: merchant, GameId: gameID, PlayerId: playerID,
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -94,7 +94,7 @@ func (h *Handler) play(w http.ResponseWriter, r *http.Request) {
 
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Engine.Play(ctx, &gamev1.PlayRequest{
-		Scope:          coreclient.Scope(tenant, merchant),
+		TenantId:          tenant, MerchantId: merchant,
 		GameId:         gameID,
 		SessionId:      body.SessionID,
 		PlayerId:       auth.PlayerID(r),
@@ -118,7 +118,7 @@ func (h *Handler) eligibility(w http.ResponseWriter, r *http.Request) {
 
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Engine.CheckEligibility(ctx, &gamev1.CheckEligibilityRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: gameID, PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, GameId: gameID, PlayerId: auth.PlayerID(r),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -142,7 +142,7 @@ func (h *Handler) history(w http.ResponseWriter, r *http.Request) {
 
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Engine.GetHistory(ctx, &gamev1.GetHistoryRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: gameID, PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, GameId: gameID, PlayerId: auth.PlayerID(r),
 		Limit: int32(parseLimit(r)), Cursor: r.URL.Query().Get("cursor"),
 	})
 	if err != nil {

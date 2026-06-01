@@ -21,7 +21,7 @@ func (s *Server) GetWallet(ctx context.Context, req *gamev1.GetWalletRequest) (*
 	if err := s.walletReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	balances, err := s.wallet.Balances(ctx, scope.TenantID, req.GetScopeKey(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -33,7 +33,7 @@ func (s *Server) GetLedger(ctx context.Context, req *gamev1.GetLedgerRequest) (*
 	if err := s.walletReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	entries, next, err := s.wallet.Ledger(ctx, scope.TenantID, req.GetScopeKey(), req.GetPlayerId(), int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -49,7 +49,7 @@ func (s *Server) GetMilestones(ctx context.Context, req *gamev1.GetMilestonesReq
 	if err := s.walletReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	res, err := s.wallet.Milestones(ctx, scope, req.GetGameId(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -78,7 +78,7 @@ func (s *Server) Redeem(ctx context.Context, req *gamev1.RedeemRequest) (*gamev1
 	if err := s.walletReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	res, err := s.wallet.Redeem(ctx, scope, req.GetGameId(), req.GetMilestoneId(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)

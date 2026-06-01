@@ -29,6 +29,7 @@ import (
 	consumerplayer "github.com/muse/examples/bff-consumer/internal/player"
 	consumerquest "github.com/muse/examples/bff-consumer/internal/quest"
 	consumerwallet "github.com/muse/examples/bff-consumer/internal/wallet"
+	"github.com/muse/examples/bff-consumer/internal/widget"
 )
 
 func main() {
@@ -71,12 +72,19 @@ func main() {
 	r.Use(middleware.Logger(log))
 	r.Use(metrics.Middleware) // RED metrics per route
 	r.Use(middleware.CORS)
-	r.Handle("/metrics", metrics.Handler())
 	// Soft player-JWT verification: attaches claims when a Bearer token is
 	// present, else passes through (public/widget + legacy header callers).
+	// chi requires every r.Use(...) to precede any route registration, so this
+	// sits with the other middlewares, above /metrics.
 	r.Use(auth.NewVerifier(jwtSecret).Bearer)
 
+	r.Handle("/metrics", metrics.Handler())
+
 	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
+
+	// Demo game widget (embedded static bundle) at /play; "/" redirects there.
+	// It is a plain client of the public /api/v1 gameplay endpoints below.
+	widget.Routes(r)
 
 	gh := game.New(core, playLimit)
 	ph := consumerplayer.New(core, jwtSecret, env("AUTH_DEV_MODE", "") == "true")

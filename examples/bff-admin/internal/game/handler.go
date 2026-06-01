@@ -70,7 +70,7 @@ func (h *Handler) createGame(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.GameConfig.CreateGame(ctx, &gamev1.CreateGameRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Game: &gamev1.Game{
 			Name:            body.Name,
 			Type:            body.Type,
@@ -102,7 +102,7 @@ func (h *Handler) getGame(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.GameConfig.GetGame(ctx, &gamev1.GetGameRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: chi.URLParam(r, "gameId"),
+		TenantId: tenant, MerchantId: merchant, GameId: chi.URLParam(r, "gameId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -136,7 +136,7 @@ func (h *Handler) createPrize(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.CreatePrize(ctx, &gamev1.CreatePrizeRequest{
-		Scope:  coreclient.Scope(tenant, merchant),
+		TenantId:  tenant, MerchantId: merchant,
 		GameId: body.GameID,
 		Prize: &gamev1.Prize{
 			Name:             body.Name,

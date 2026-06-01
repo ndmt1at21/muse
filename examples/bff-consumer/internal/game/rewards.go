@@ -23,7 +23,7 @@ func (h *Handler) listMyRewards(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.ListRewards(ctx, &gamev1.ListRewardsRequest{
-		Scope: coreclient.Scope(tenant, merchant), PlayerId: auth.PlayerID(r),
+		TenantId: tenant, MerchantId: merchant, PlayerId: auth.PlayerID(r),
 		Limit: int32(parseLimit(r)), Cursor: r.URL.Query().Get("cursor"),
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func (h *Handler) claimReward(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.ClaimReward(ctx, &gamev1.ClaimRewardRequest{
-		Scope: coreclient.Scope(tenant, merchant), RewardId: chi.URLParam(r, "rewardId"),
+		TenantId: tenant, MerchantId: merchant, RewardId: chi.URLParam(r, "rewardId"),
 		PlayerId: auth.PlayerID(r),
 	})
 	if err != nil {

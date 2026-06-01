@@ -54,7 +54,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Integration.CreateIntegration(ctx, &gamev1.CreateIntegrationRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Integration: &gamev1.Integration{
 			Type:       enumx.Parse[gamev1.IntegrationType](body.Type, gamev1.IntegrationType_value),
 			CampaignId: body.CampaignID,
@@ -75,7 +75,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Integration.ListIntegrations(ctx, &gamev1.ListIntegrationsRequest{
-		Scope:      coreclient.Scope(tenant, merchant),
+		TenantId:      tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaignId"),
 		Limit:      int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor:     r.URL.Query().Get("cursor"),
@@ -96,7 +96,7 @@ func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	_, err := h.core.Integration.DeleteIntegration(ctx, &gamev1.DeleteIntegrationRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Id:    chi.URLParam(r, "integrationId"),
 	})
 	if err != nil {
@@ -119,7 +119,7 @@ func (h *Handler) emit(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Integration.EmitEvent(ctx, &gamev1.EmitEventRequest{
-		Scope:   coreclient.Scope(tenant, merchant),
+		TenantId:   tenant, MerchantId: merchant,
 		Type:    body.Type,
 		Payload: string(body.Payload),
 	})

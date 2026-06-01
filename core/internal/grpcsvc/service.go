@@ -86,7 +86,7 @@ func (s *Server) fail(err error) error {
 // --- EngineService ---
 
 func (s *Server) StartGame(ctx context.Context, req *gamev1.StartGameRequest) (*gamev1.StartGameResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	res, err := s.eng.Start(ctx, scope, req.GetGameId(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -99,7 +99,7 @@ func (s *Server) StartGame(ctx context.Context, req *gamev1.StartGameRequest) (*
 }
 
 func (s *Server) Play(ctx context.Context, req *gamev1.PlayRequest) (*gamev1.PlayResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	traceID := traceIDFrom(ctx)
 
 	// Idempotency: a retried Play with the same key returns the stored result.
@@ -132,7 +132,7 @@ func (s *Server) Play(ctx context.Context, req *gamev1.PlayRequest) (*gamev1.Pla
 }
 
 func (s *Server) CheckEligibility(ctx context.Context, req *gamev1.CheckEligibilityRequest) (*gamev1.CheckEligibilityResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	el, err := s.eng.Eligibility(ctx, scope, req.GetGameId(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -146,7 +146,7 @@ func (s *Server) CheckEligibility(ctx context.Context, req *gamev1.CheckEligibil
 }
 
 func (s *Server) GetHistory(ctx context.Context, req *gamev1.GetHistoryRequest) (*gamev1.GetHistoryResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	entries, next, err := s.eng.History(ctx, scope, req.GetGameId(), req.GetPlayerId(), int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -167,7 +167,7 @@ func (s *Server) GetHistory(ctx context.Context, req *gamev1.GetHistoryRequest) 
 // --- GameConfigService ---
 
 func (s *Server) CreateGame(ctx context.Context, req *gamev1.CreateGameRequest) (*gamev1.CreateGameResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	g := gameFromProto(scope, req.GetGame())
 	if g.ID == "" {
 		g.ID = "game_" + randSuffix()
@@ -180,7 +180,7 @@ func (s *Server) CreateGame(ctx context.Context, req *gamev1.CreateGameRequest) 
 }
 
 func (s *Server) GetGame(ctx context.Context, req *gamev1.GetGameRequest) (*gamev1.GetGameResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	g, err := s.store.GetGame(ctx, scope, req.GetGameId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -191,7 +191,7 @@ func (s *Server) GetGame(ctx context.Context, req *gamev1.GetGameRequest) (*game
 // --- RewardService ---
 
 func (s *Server) CreatePrize(ctx context.Context, req *gamev1.CreatePrizeRequest) (*gamev1.CreatePrizeResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	p := prizeFromProto(scope, req.GetPrize())
 	if p.ID == "" {
 		p.ID = "prize_" + randSuffix()
@@ -204,7 +204,7 @@ func (s *Server) CreatePrize(ctx context.Context, req *gamev1.CreatePrizeRequest
 }
 
 func (s *Server) ListPrizes(ctx context.Context, req *gamev1.ListPrizesRequest) (*gamev1.ListPrizesResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	prizes, err := s.store.ListPrizes(ctx, scope, req.GetGameId())
 	if err != nil {
 		return nil, s.fail(err)

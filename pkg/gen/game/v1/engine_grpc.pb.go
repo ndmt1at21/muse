@@ -9,10 +9,10 @@
 // annotations below drive a grpc-gateway that exposes every RPC as JSON/HTTP
 // under /api/v1, wrapped in the uniform {code, message, trace_id, data}
 // envelope. Core is auth-agnostic — it trusts the caller (a BFF the developer
-// builds, see examples/) to authenticate and to pass the tenant/merchant Scope;
-// it only validates and operates on the business object. Errors map to gRPC
-// status codes (and to the envelope at the gateway). Versioned by package; a
-// breaking change becomes game.v2.
+// builds, see examples/) to authenticate and to pass the tenant/merchant
+// isolation keys (tenant_id + merchant_id); it only validates and operates on
+// the business object. Errors map to gRPC status codes (and to the envelope at
+// the gateway). Versioned by package; a breaking change becomes game.v2.
 
 package gamev1
 

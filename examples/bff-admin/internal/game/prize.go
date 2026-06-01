@@ -54,7 +54,7 @@ func (h *Handler) listPrizes(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.ListPrizes(ctx, &gamev1.ListPrizesRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: r.URL.Query().Get("game_id"),
+		TenantId: tenant, MerchantId: merchant, GameId: r.URL.Query().Get("game_id"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -72,7 +72,7 @@ func (h *Handler) getPrize(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.GetPrize(ctx, &gamev1.GetPrizeRequest{
-		Scope: coreclient.Scope(tenant, merchant), PrizeId: chi.URLParam(r, "prizeId"),
+		TenantId: tenant, MerchantId: merchant, PrizeId: chi.URLParam(r, "prizeId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -91,7 +91,7 @@ func (h *Handler) updatePrize(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.UpdatePrize(ctx, &gamev1.UpdatePrizeRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Prize: &gamev1.Prize{
 			Id:               chi.URLParam(r, "prizeId"),
 			Name:             body.Name,
@@ -115,7 +115,7 @@ func (h *Handler) deletePrize(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	if _, err := h.core.Reward.DeletePrize(ctx, &gamev1.DeletePrizeRequest{
-		Scope: coreclient.Scope(tenant, merchant), PrizeId: chi.URLParam(r, "prizeId"),
+		TenantId: tenant, MerchantId: merchant, PrizeId: chi.URLParam(r, "prizeId"),
 	}); err != nil {
 		envelope.WriteError(w, tid, err)
 		return
@@ -135,7 +135,7 @@ func (h *Handler) importCodes(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.ImportCodes(ctx, &gamev1.ImportCodesRequest{
-		Scope: coreclient.Scope(tenant, merchant), PrizeId: chi.URLParam(r, "prizeId"), Codes: body.Codes,
+		TenantId: tenant, MerchantId: merchant, PrizeId: chi.URLParam(r, "prizeId"), Codes: body.Codes,
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -149,7 +149,7 @@ func (h *Handler) prizeSummary(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.GetPrizeSummary(ctx, &gamev1.GetPrizeSummaryRequest{
-		Scope: coreclient.Scope(tenant, merchant), GameId: r.URL.Query().Get("game_id"),
+		TenantId: tenant, MerchantId: merchant, GameId: r.URL.Query().Get("game_id"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -170,7 +170,7 @@ func (h *Handler) fulfillReward(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.FulfillReward(ctx, &gamev1.FulfillRewardRequest{
-		Scope: coreclient.Scope(tenant, merchant), RewardId: chi.URLParam(r, "rewardId"),
+		TenantId: tenant, MerchantId: merchant, RewardId: chi.URLParam(r, "rewardId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -184,7 +184,7 @@ func (h *Handler) revokeReward(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Reward.RevokeReward(ctx, &gamev1.RevokeRewardRequest{
-		Scope: coreclient.Scope(tenant, merchant), RewardId: chi.URLParam(r, "rewardId"),
+		TenantId: tenant, MerchantId: merchant, RewardId: chi.URLParam(r, "rewardId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)

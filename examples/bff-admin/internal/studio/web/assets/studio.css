@@ -1,0 +1,101 @@
+/* studio.css — compact, form-oriented styling for the demo Game Studio.
+   Self-contained (no external assets); shares the red/gold "Lì Xì" palette. */
+
+:root {
+  --red: #c1121f;
+  --red-dark: #780000;
+  --gold: #f4c430;
+  --ink: #2b1216;
+  --paper: #fff8f0;
+  --line: #e8d3cf;
+  --ok: #2e7d32;
+  --bad: #b3261e;
+  --shadow: 0 8px 24px rgba(120, 0, 0, 0.16);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #e23744 0%, var(--red) 45%, var(--red-dark) 100%) fixed;
+  min-height: 100vh;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 24px 18px 64px; }
+
+.top { color: var(--paper); text-align: center; margin-bottom: 18px; }
+.top h1 { margin: 0 0 4px; font-size: 1.8rem; }
+.top p { margin: 0; opacity: 0.9; font-size: 0.92rem; }
+.top a { color: #ffe08a; }
+
+.settings {
+  background: rgba(255, 248, 240, 0.96);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+.panel {
+  background: var(--paper);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.panel h2 { margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+.panel .shape { font-size: 0.68rem; font-family: ui-monospace, Consolas, monospace; color: #9a6a6a; }
+
+fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 0; padding: 10px 12px; }
+legend { font-size: 0.74rem; font-weight: 700; color: #7a4a4a; padding: 0 4px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+.fld { display: flex; flex-direction: column; gap: 3px; }
+.fld label { font-size: 0.72rem; color: #7a4a4a; }
+.fld input {
+  padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; font-size: 0.88rem; background: #fff;
+}
+.fld input:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+
+.btn {
+  font: inherit; font-weight: 700; border: none; border-radius: 999px; padding: 9px 18px; cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:not(:disabled):hover { transform: translateY(-1px); }
+.btn--primary { background: var(--gold); color: var(--red-dark); box-shadow: 0 4px 0 #caa024; }
+.btn--ghost { background: #fff; color: var(--red-dark); border: 1px solid var(--line); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.status { font-size: 0.8rem; min-height: 1.1em; }
+.status--ok { color: var(--ok); }
+.status--err { color: var(--bad); }
+.muted { color: #8a5a5a; font-size: 0.8rem; }
+.link { font-size: 0.8rem; }
+
+.play {
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.play[hidden] { display: none; }
+canvas { max-width: 100%; }
+
+.result { font-size: 0.9rem; text-align: center; min-height: 1.2em; }
+.result b { color: var(--red); }
+
+/* distribution bars */
+.dist { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.bar { display: grid; grid-template-columns: 110px 1fr 40px; gap: 8px; align-items: center; font-size: 0.78rem; }
+.bar .track { background: #f0ddc8; border-radius: 6px; height: 16px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--gold); }
+
+input[type="range"] { accent-color: var(--red); }

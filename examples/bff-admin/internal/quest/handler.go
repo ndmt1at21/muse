@@ -68,7 +68,7 @@ func (h *Handler) createQuest(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.CreateQuest(ctx, &gamev1.CreateQuestRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Quest: body.toProto(""),
 	})
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *Handler) listQuests(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.ListQuests(ctx, &gamev1.ListQuestsRequest{
-		Scope:      coreclient.Scope(tenant, merchant),
+		TenantId:      tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaignId"),
 		Limit:      int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor:     r.URL.Query().Get("cursor"),
@@ -109,7 +109,7 @@ func (h *Handler) updateQuest(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Quest.UpdateQuest(ctx, &gamev1.UpdateQuestRequest{
-		Scope: coreclient.Scope(tenant, merchant),
+		TenantId: tenant, MerchantId: merchant,
 		Quest: body.toProto(chi.URLParam(r, "questId")),
 	})
 	if err != nil {
@@ -124,7 +124,7 @@ func (h *Handler) deleteQuest(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	if _, err := h.core.Quest.DeleteQuest(ctx, &gamev1.DeleteQuestRequest{
-		Scope:   coreclient.Scope(tenant, merchant),
+		TenantId:   tenant, MerchantId: merchant,
 		QuestId: chi.URLParam(r, "questId"),
 	}); err != nil {
 		envelope.WriteError(w, tid, err)

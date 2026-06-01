@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "game/v1/engine.proto",
-    "description": "Package game.v1 is the Core service boundary — the central product surface.\nCore serves this contract over both gRPC and REST: the google.api.http\nannotations below drive a grpc-gateway that exposes every RPC as JSON/HTTP\nunder /api/v1, wrapped in the uniform {code, message, trace_id, data}\nenvelope. Core is auth-agnostic — it trusts the caller (a BFF the developer\nbuilds, see examples/) to authenticate and to pass the tenant/merchant Scope;\nit only validates and operates on the business object. Errors map to gRPC\nstatus codes (and to the envelope at the gateway). Versioned by package; a\nbreaking change becomes game.v2.",
+    "description": "Package game.v1 is the Core service boundary — the central product surface.\nCore serves this contract over both gRPC and REST: the google.api.http\nannotations below drive a grpc-gateway that exposes every RPC as JSON/HTTP\nunder /api/v1, wrapped in the uniform {code, message, trace_id, data}\nenvelope. Core is auth-agnostic — it trusts the caller (a BFF the developer\nbuilds, see examples/) to authenticate and to pass the tenant/merchant\nisolation keys (tenant_id + merchant_id); it only validates and operates on\nthe business object. Errors map to gRPC status codes (and to the envelope at\nthe gateway). Versioned by package; a breaking change becomes game.v2.",
     "version": "version not set"
   },
   "tags": [
@@ -87,19 +87,22 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max campaigns to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -107,6 +110,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -150,6 +154,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreateCampaignRequest creates a campaign under the caller's tenant/merchant.",
             "in": "body",
             "required": true,
             "schema": {
@@ -197,6 +202,7 @@
         "parameters": [
           {
             "name": "campaign.id",
+            "description": "Stable unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -250,18 +256,21 @@
         "parameters": [
           {
             "name": "campaign_id",
+            "description": "Campaign to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -307,18 +316,21 @@
         "parameters": [
           {
             "name": "campaign_id",
+            "description": "Campaign to analyze (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -364,6 +376,7 @@
         "parameters": [
           {
             "name": "campaign_id",
+            "description": "Campaign to resolve (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -409,6 +422,7 @@
         "parameters": [
           {
             "name": "campaign_id",
+            "description": "Campaign to duplicate (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -462,24 +476,28 @@
         "parameters": [
           {
             "name": "campaign_id",
+            "description": "Campaign whose quests to list (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose progress to include.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -524,20 +542,22 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "status",
-            "description": "filter (UNSPECIFIED = no filter)",
+            "description": "Status filter (UNSPECIFIED = no filter).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -553,20 +573,21 @@
           },
           {
             "name": "campaign_id",
-            "description": "filter (optional)",
+            "description": "Campaign filter (optional).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "prize_id",
-            "description": "filter (optional)",
+            "description": "Prize filter (optional).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max tasks to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -574,6 +595,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -619,18 +641,21 @@
         "parameters": [
           {
             "name": "task_id",
+            "description": "Task to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -676,6 +701,7 @@
         "parameters": [
           {
             "name": "task_id",
+            "description": "Task to finalize (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -729,6 +755,7 @@
         "parameters": [
           {
             "name": "task_id",
+            "description": "Task to retry (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -782,6 +809,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreateGameRequest creates a game under the caller's tenant/merchant.",
             "in": "body",
             "required": true,
             "schema": {
@@ -829,18 +857,21 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -886,24 +917,28 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game to check (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player to check.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -949,30 +984,35 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game to read history for (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose history to read.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max entries to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -980,6 +1020,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1025,24 +1066,28 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game whose milestones to read (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose progress to read.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1088,6 +1133,7 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game being played (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1141,6 +1187,7 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game the milestone belongs to (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1194,6 +1241,7 @@
         "parameters": [
           {
             "name": "game_id",
+            "description": "Game to start (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1295,6 +1343,7 @@
         "parameters": [
           {
             "name": "identity_id",
+            "description": "Identity to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1340,6 +1389,7 @@
         "parameters": [
           {
             "name": "identity_id",
+            "description": "Identity to link the contact to (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1392,25 +1442,29 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "campaign_id",
+            "description": "Campaign filter (optional).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max integrations to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1418,6 +1472,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1461,6 +1516,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreateIntegrationRequest registers an outbound integration.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1508,6 +1564,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "EmitEventRequest manually injects a domain event into the integration hub.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1555,18 +1612,21 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Integration to delete (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1611,25 +1671,29 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "campaign_id",
+            "description": "Campaign filter (optional).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max leaderboards to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1637,6 +1701,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1680,6 +1745,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreateLeaderboardRequest creates a leaderboard under the caller's tenant/merchant.",
             "in": "body",
             "required": true,
             "schema": {
@@ -1727,6 +1793,7 @@
         "parameters": [
           {
             "name": "leaderboard.id",
+            "description": "Stable unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1780,18 +1847,21 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1837,6 +1907,7 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard the entry is on (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1890,6 +1961,7 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard the entry is on (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1943,6 +2015,7 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard to finalize (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1996,24 +2069,28 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard to read (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max entries to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2021,6 +2098,7 @@
           },
           {
             "name": "offset",
+            "description": "Offset into the ranking (for paging).",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2067,6 +2145,7 @@
         "parameters": [
           {
             "name": "leaderboard_id",
+            "description": "Leaderboard to reset (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2120,6 +2199,7 @@
         "parameters": [
           {
             "name": "merchant.id",
+            "description": "Stable unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2221,18 +2301,21 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2278,6 +2361,7 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player adding the contact (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2331,6 +2415,7 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player to update (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2384,24 +2469,28 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player whose balance to read (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "scope_key",
+            "description": "Turn-balance scope key (e.g. campaign id).",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2447,6 +2536,7 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player consuming a turn (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2500,6 +2590,7 @@
         "parameters": [
           {
             "name": "player_id",
+            "description": "Player to grant turns to (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2552,19 +2643,22 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "game_id",
+            "description": "Game whose prizes to list.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2608,6 +2702,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreatePrizeRequest creates a prize and associates it with a game.",
             "in": "body",
             "required": true,
             "schema": {
@@ -2654,19 +2749,22 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "game_id",
+            "description": "Game whose prize summary to compute.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2712,6 +2810,7 @@
         "parameters": [
           {
             "name": "prize.id",
+            "description": "Stable unique identifier (server-assigned on create).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2765,18 +2864,21 @@
         "parameters": [
           {
             "name": "prize_id",
+            "description": "Prize to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2820,18 +2922,21 @@
         "parameters": [
           {
             "name": "prize_id",
+            "description": "Prize to delete (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2877,6 +2982,7 @@
         "parameters": [
           {
             "name": "prize_id",
+            "description": "Prize to load codes into (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2929,25 +3035,29 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "campaign_id",
+            "description": "Campaign filter (optional).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max quests to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2955,6 +3065,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2998,6 +3109,7 @@
         "parameters": [
           {
             "name": "body",
+            "description": "CreateQuestRequest creates a quest under the caller's tenant/merchant.",
             "in": "body",
             "required": true,
             "schema": {
@@ -3045,6 +3157,7 @@
         "parameters": [
           {
             "name": "quest.id",
+            "description": "Stable unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3098,18 +3211,21 @@
         "parameters": [
           {
             "name": "quest_id",
+            "description": "Quest to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3153,18 +3269,21 @@
         "parameters": [
           {
             "name": "quest_id",
+            "description": "Quest to delete (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3210,6 +3329,7 @@
         "parameters": [
           {
             "name": "quest_id",
+            "description": "Quest to complete (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3262,25 +3382,29 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose rewards to list.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max records to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -3288,6 +3412,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3333,6 +3458,7 @@
         "parameters": [
           {
             "name": "reward_id",
+            "description": "Reward to claim (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3386,6 +3512,7 @@
         "parameters": [
           {
             "name": "reward_id",
+            "description": "Reward to fulfill (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3439,6 +3566,7 @@
         "parameters": [
           {
             "name": "reward_id",
+            "description": "Reward to revoke (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3492,6 +3620,7 @@
         "parameters": [
           {
             "name": "limit",
+            "description": "Max tenants to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -3499,6 +3628,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3589,6 +3719,7 @@
         "parameters": [
           {
             "name": "tenant.id",
+            "description": "Stable unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3642,6 +3773,7 @@
         "parameters": [
           {
             "name": "tenant_id",
+            "description": "Tenant to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3687,12 +3819,14 @@
         "parameters": [
           {
             "name": "tenant_id",
+            "description": "Owning tenant (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max merchants to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -3700,6 +3834,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3743,6 +3878,7 @@
         "parameters": [
           {
             "name": "tenant_id",
+            "description": "Owning tenant (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3796,12 +3932,14 @@
         "parameters": [
           {
             "name": "tenant_id",
+            "description": "Owning tenant (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "merchant_id",
+            "description": "Merchant to fetch (from the path).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3846,25 +3984,29 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "scope_key",
+            "description": "Wallet scope key (e.g. campaign id).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose wallet to read.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3909,31 +4051,36 @@
         },
         "parameters": [
           {
-            "name": "scope.tenant_id",
+            "name": "tenant_id",
+            "description": "Tenant isolation key (required).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "scope.merchant_id",
+            "name": "merchant_id",
+            "description": "Merchant isolation key within the tenant.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "scope_key",
+            "description": "Wallet scope key (e.g. campaign id).",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "player_id",
+            "description": "Player whose ledger to read.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "limit",
+            "description": "Max entries to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -3941,6 +4088,7 @@
           },
           {
             "name": "cursor",
+            "description": "Opaque pagination cursor from a previous response.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3956,245 +4104,342 @@
     "CampaignServiceDuplicateCampaignBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the new copy."
         }
-      }
+      },
+      "description": "DuplicateCampaignRequest deep-copies a campaign under a new name."
     },
     "CampaignServiceUpdateCampaignBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "campaign": {
           "type": "object",
           "properties": {
             "tenant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning tenant."
             },
             "merchant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning merchant within the tenant."
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable campaign name."
             },
             "status": {
-              "$ref": "#/definitions/v1CampaignStatus"
+              "$ref": "#/definitions/v1CampaignStatus",
+              "description": "Lifecycle state."
             },
             "start_date": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Run window start (unix seconds)."
             },
             "end_date": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Run window end (unix seconds)."
             },
             "channels": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "description": "Enabled presentation channels."
             },
             "games": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "title": "linked game ids"
+              "description": "Linked game ids."
             },
             "quests": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "title": "linked quest ids"
+              "description": "Linked quest ids."
             },
             "settings": {
               "type": "string",
-              "title": "raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}"
+              "description": "Raw JSON settings: {require_auth, auth_methods, collect_fields,\nmax_plays_per_user, max_plays_per_day, wallet_scope}."
             },
             "created_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
             },
             "updated_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
             }
           },
-          "description": "Campaign groups games + quests under a merchant, with channels, auth methods,\na run window, and widget/eligibility settings. tenant_id + merchant_id are the\nisolation boundary (from the scope, never the path)."
+          "description": "Campaign with updated fields (id identifies the target).",
+          "title": "Campaign with updated fields (id identifies the target)."
         }
-      }
+      },
+      "description": "UpdateCampaignRequest updates a campaign in place."
     },
     "EngineServicePlayBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "session_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Session opened by StartGame."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player making the play."
         },
         "payload": {
           "type": "object",
-          "title": "shape-specific"
+          "description": "Shape-specific play input."
         },
         "idempotency_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Caller-supplied key to make the play idempotent."
         }
-      }
+      },
+      "description": "PlayRequest submits one play within a session."
     },
     "EngineServiceStartGameBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player starting the session."
         }
-      }
+      },
+      "description": "StartGameRequest opens a play session for a player on a game."
     },
     "FulfillmentServiceReportResultBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (advisory)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key (advisory)."
         },
         "status": {
           "$ref": "#/definitions/v1TaskStatus",
-          "title": "FULFILLED | FAILED"
+          "description": "Terminal status: FULFILLED | FAILED."
         },
         "receipt": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON delivery receipt."
         },
         "error": {
           "type": "string",
-          "title": "populated when status == failed"
+          "description": "Error detail, populated when status == FAILED."
         }
       },
-      "description": "ReportResult finalizes a task from an external orchestrator (n8n) callback.\nLooked up by the globally-unique task_id; scope is advisory."
+      "description": "ReportResult finalizes a task from an external orchestrator (n8n) callback.\nLooked up by the globally-unique task_id; tenant/merchant are advisory."
     },
     "FulfillmentServiceRetryTaskBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         }
-      }
+      },
+      "description": "RetryTaskRequest re-queues a failed task for delivery."
     },
     "IdentityServiceLinkContactBody": {
       "type": "object",
       "properties": {
         "contact": {
-          "$ref": "#/definitions/v1Contact"
+          "$ref": "#/definitions/v1Contact",
+          "description": "Verified contact to link."
         }
       }
     },
     "LeaderboardServiceAdjustEntryBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player whose entry to adjust."
         },
         "delta": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Signed score delta to apply."
         }
-      }
+      },
+      "description": "AdjustEntryRequest applies a manual score delta to a player's entry."
     },
     "LeaderboardServiceDisqualifyEntryBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player to disqualify."
         }
-      }
+      },
+      "description": "DisqualifyEntryRequest disqualifies a player's entry."
     },
     "LeaderboardServiceFinalizeLeaderboardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         }
-      }
+      },
+      "description": "FinalizeLeaderboardRequest closes a leaderboard and awards its prize tiers."
     },
     "LeaderboardServiceResetLeaderboardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         }
-      }
+      },
+      "description": "ResetLeaderboardRequest clears all entries from a leaderboard."
     },
     "LeaderboardServiceUpdateLeaderboardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "leaderboard": {
           "type": "object",
           "properties": {
             "tenant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning tenant."
             },
             "merchant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning merchant within the tenant."
             },
             "campaign_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Campaign this leaderboard belongs to."
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable leaderboard name."
             },
             "metric": {
-              "$ref": "#/definitions/v1LeaderboardMetric"
+              "$ref": "#/definitions/v1LeaderboardMetric",
+              "description": "Score the leaderboard ranks by."
             },
             "time_window": {
-              "type": "string"
+              "type": "string",
+              "description": "Raw JSON time window: {type, period, start, end}."
             },
             "prize_tiers": {
-              "type": "string"
+              "type": "string",
+              "description": "Raw JSON prize tiers: [{from_rank, to_rank, prize_id}]."
             },
             "anti_cheat": {
-              "type": "string"
+              "type": "string",
+              "description": "Raw JSON anti-cheat config: {score_ceiling, flag_outliers}."
             },
             "status": {
-              "$ref": "#/definitions/v1LeaderboardStatus"
+              "$ref": "#/definitions/v1LeaderboardStatus",
+              "description": "Lifecycle state."
             },
             "created_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
             },
             "updated_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
             }
           },
-          "description": "Leaderboard config. time_window/prize_tiers/anti_cheat are raw JSON (decoded\nby the hosting layer): time_window={type,period,start,end},\nprize_tiers=[{from_rank,to_rank,prize_id}], anti_cheat={score_ceiling,flag_outliers}."
+          "description": "Leaderboard with updated fields (id identifies the target).",
+          "title": "Leaderboard with updated fields (id identifies the target)."
         }
-      }
+      },
+      "description": "UpdateLeaderboardRequest updates a leaderboard in place."
     },
     "MerchantServiceCreateMerchantBody": {
       "type": "object",
       "properties": {
         "merchant": {
-          "$ref": "#/definitions/v1Merchant"
+          "$ref": "#/definitions/v1Merchant",
+          "description": "Merchant to create."
         }
       }
     },
@@ -4205,100 +4450,144 @@
           "type": "object",
           "properties": {
             "tenant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning tenant."
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable merchant name."
             },
             "logo": {
-              "type": "string"
+              "type": "string",
+              "description": "Logo image URL."
             },
             "settings": {
               "type": "string",
-              "title": "raw JSON: {wallet_scope_override}"
+              "description": "Raw JSON settings: {wallet_scope_override}."
             },
             "created_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
             },
             "updated_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
             }
-          }
+          },
+          "description": "Merchant with updated fields (id identifies the target).",
+          "title": "Merchant with updated fields (id identifies the target)."
         }
       }
     },
     "PlayerServiceAddContactBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "identity_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Identity to link the contact to."
         },
         "contact_type": {
-          "$ref": "#/definitions/v1ContactType"
+          "$ref": "#/definitions/v1ContactType",
+          "description": "Contact kind."
         },
         "contact_value": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw contact value; normalized server-side."
         },
         "method": {
           "$ref": "#/definitions/v1AuthMethod",
-          "title": "verification method (dev stubs auto-verify)"
+          "description": "Verification method used (dev stubs auto-verify)."
         }
-      }
+      },
+      "description": "AddContactRequest attaches a newly verified contact to a player's identity."
     },
     "PlayerServiceConsumeTurnBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "scope_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Turn-balance scope key (e.g. campaign id)."
         }
-      }
+      },
+      "description": "ConsumeTurnRequest spends one turn from a player's balance."
     },
     "PlayerServiceGrantTurnsBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "scope_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Turn-balance scope key (e.g. campaign id)."
         },
         "delta": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Signed amount to add (negative to deduct)."
         }
-      }
+      },
+      "description": "GrantTurnsRequest adds (or removes) turns from a player's balance."
     },
     "PlayerServiceUpdateProfileBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "profile": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw JSON profile to store."
         }
-      }
+      },
+      "description": "UpdateProfileRequest replaces a player's collected profile fields."
     },
     "QuestServiceCompleteQuestBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player completing the quest."
         },
         "proof": {
           "type": "string",
-          "title": "raw JSON, verifier-specific"
+          "description": "Raw JSON proof, verifier-specific."
         }
       },
       "description": "CompleteQuest verifies the proof, gates re-completion, and grants the reward."
@@ -4306,140 +4595,200 @@
     "QuestServiceUpdateQuestBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "quest": {
           "type": "object",
           "properties": {
             "tenant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning tenant."
             },
             "merchant_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Owning merchant within the tenant."
             },
             "campaign_id": {
-              "type": "string"
+              "type": "string",
+              "description": "Campaign this quest belongs to."
             },
             "type": {
-              "$ref": "#/definitions/v1QuestType"
+              "$ref": "#/definitions/v1QuestType",
+              "description": "Quest type selecting the verifier."
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable quest name."
             },
             "status": {
-              "$ref": "#/definitions/v1QuestStatus"
+              "$ref": "#/definitions/v1QuestStatus",
+              "description": "Whether the quest is live."
             },
             "reward": {
-              "$ref": "#/definitions/v1QuestReward"
+              "$ref": "#/definitions/v1QuestReward",
+              "description": "Reward granted on completion."
             },
             "config": {
               "type": "string",
-              "title": "raw JSON"
+              "description": "Raw JSON, verifier-specific config."
             },
             "created_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
             },
             "updated_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
             }
           },
-          "description": "Quest is an admin-configured mission under a campaign. config is verifier-\nspecific raw JSON (decoded only by the matching quest-type verifier)."
+          "description": "Quest with updated fields (id identifies the target).",
+          "title": "Quest with updated fields (id identifies the target)."
         }
-      }
+      },
+      "description": "UpdateQuestRequest updates a quest in place."
     },
     "RewardServiceClaimRewardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player claiming the reward."
         }
-      }
+      },
+      "description": "ClaimRewardRequest marks a won reward as claimed by the player."
     },
     "RewardServiceFulfillRewardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         }
-      }
+      },
+      "description": "FulfillRewardRequest marks a claimed reward as fulfilled (delivered)."
     },
     "RewardServiceImportCodesBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "codes": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Codes to import."
         }
-      }
+      },
+      "description": "ImportCodesRequest bulk-loads redemption codes into a prize's pool."
     },
     "RewardServiceRevokeRewardBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         }
-      }
+      },
+      "description": "RevokeRewardRequest revokes a reward, returning its stock."
     },
     "RewardServiceUpdatePrizeBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "prize": {
           "type": "object",
           "properties": {
-            "scope": {
-              "$ref": "#/definitions/v1Scope"
+            "tenant_id": {
+              "type": "string",
+              "description": "Tenant isolation key (required)."
+            },
+            "merchant_id": {
+              "type": "string",
+              "description": "Merchant isolation key within the tenant."
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable prize name."
             },
             "type": {
-              "type": "string"
+              "type": "string",
+              "description": "Registry-driven prize type (e.g. \"voucher\", \"physical\", \"points\")."
             },
             "image": {
-              "type": "string"
+              "type": "string",
+              "description": "Display image URL."
             },
             "value": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Nominal value (currency minor units or points), for display/tiering."
             },
             "total": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Total stock minted."
             },
             "remaining": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Stock still available to award."
             },
             "metadata": {
               "type": "string",
-              "title": "raw JSON"
+              "description": "Raw JSON, adapter/display-specific metadata."
             },
             "award_constraints": {
               "type": "string",
-              "title": "raw JSON: {max_per_user, max_per_day}"
+              "description": "Raw JSON award limits: {max_per_user, max_per_day}."
             },
             "fulfillment": {
               "type": "string",
-              "title": "raw JSON: {redemption_mode, method}"
+              "description": "Raw JSON fulfillment policy: {redemption_mode, method}."
             }
           },
-          "description": "Prize is an awardable item with finite stock."
+          "description": "Prize with updated fields (id identifies the target).",
+          "title": "Prize with updated fields (id identifies the target)."
         }
-      }
+      },
+      "description": "UpdatePrizeRequest updates a prize in place."
     },
     "TenantServiceUpdateTenantBody": {
       "type": "object",
@@ -4448,40 +4797,54 @@
           "type": "object",
           "properties": {
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Human-readable tenant name."
             },
             "plan": {
-              "type": "string"
+              "type": "string",
+              "description": "Subscription plan key."
             },
             "settings": {
               "type": "string",
-              "title": "raw JSON: {identity_linking, default_locale, wallet_scope}"
+              "description": "Raw JSON settings: {identity_linking, default_locale, wallet_scope}."
             },
             "created_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Creation time (unix seconds)."
             },
             "updated_at": {
               "type": "string",
-              "format": "int64"
+              "format": "int64",
+              "description": "Last update time (unix seconds)."
             }
-          }
+          },
+          "description": "Tenant with updated fields (id identifies the target).",
+          "title": "Tenant with updated fields (id identifies the target)."
         }
       }
     },
     "WalletServiceRedeemBody": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "milestone_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Milestone to redeem."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player redeeming."
         }
-      }
+      },
+      "description": "RedeemRequest spends points to claim a milestone reward."
     },
     "protobufAny": {
       "type": "object",
@@ -4523,7 +4886,8 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The updated identity."
         }
       }
     },
@@ -4531,7 +4895,8 @@
       "type": "object",
       "properties": {
         "entry": {
-          "$ref": "#/definitions/v1RankedEntry"
+          "$ref": "#/definitions/v1RankedEntry",
+          "description": "The updated entry."
         }
       }
     },
@@ -4551,87 +4916,102 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "tenant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning tenant."
         },
         "merchant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning merchant within the tenant."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable campaign name."
         },
         "status": {
-          "$ref": "#/definitions/v1CampaignStatus"
+          "$ref": "#/definitions/v1CampaignStatus",
+          "description": "Lifecycle state."
         },
         "start_date": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Run window start (unix seconds)."
         },
         "end_date": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Run window end (unix seconds)."
         },
         "channels": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Enabled presentation channels."
         },
         "games": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "linked game ids"
+          "description": "Linked game ids."
         },
         "quests": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "linked quest ids"
+          "description": "Linked quest ids."
         },
         "settings": {
           "type": "string",
-          "title": "raw JSON: {require_auth, auth_methods, collect_fields, max_plays_per_user, max_plays_per_day, wallet_scope}"
+          "description": "Raw JSON settings: {require_auth, auth_methods, collect_fields,\nmax_plays_per_user, max_plays_per_day, wallet_scope}."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
       },
-      "description": "Campaign groups games + quests under a merchant, with channels, auth methods,\na run window, and widget/eligibility settings. tenant_id + merchant_id are the\nisolation boundary (from the scope, never the path)."
+      "description": "Campaign groups games + quests under a merchant, with channels, auth methods,\na run window, and widget/eligibility settings. tenant_id + merchant_id are the\nisolation boundary (from the request, never the path)."
     },
     "v1CampaignAnalytics": {
       "type": "object",
       "properties": {
         "campaign_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Campaign the metrics belong to."
         },
         "total_plays": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total plays across the campaign."
         },
         "total_wins": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total winning plays."
         },
         "unique_players": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Distinct players who played."
         },
         "conversion": {
           "type": "number",
           "format": "double",
-          "title": "wins / plays"
+          "description": "Wins / plays."
         }
-      }
+      },
+      "description": "CampaignAnalytics is rolled-up performance for a campaign."
     },
     "v1CampaignStatus": {
       "type": "string",
@@ -4649,18 +5029,22 @@
       "type": "object",
       "properties": {
         "can_play": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the player may play right now."
         },
         "remaining_plays": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Plays remaining under the active caps."
         },
         "reason": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable reason when can_play is false."
         },
         "next_reset_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "When the play cap next resets (unix seconds; 0 if N/A)."
         }
       }
     },
@@ -4668,7 +5052,8 @@
       "type": "object",
       "properties": {
         "reward": {
-          "$ref": "#/definitions/v1RewardRecord"
+          "$ref": "#/definitions/v1RewardRecord",
+          "description": "The updated reward record."
         }
       }
     },
@@ -4676,15 +5061,18 @@
       "type": "object",
       "properties": {
         "completed": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the quest was completed this call."
         },
         "turns_granted": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Turns granted on completion."
         },
         "turn_balance": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Resulting turn balance."
         }
       }
     },
@@ -4692,11 +5080,13 @@
       "type": "object",
       "properties": {
         "ok": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether a turn was successfully consumed."
         },
         "balance": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Resulting turn balance."
         }
       }
     },
@@ -4704,14 +5094,16 @@
       "type": "object",
       "properties": {
         "type": {
-          "$ref": "#/definitions/v1ContactType"
+          "$ref": "#/definitions/v1ContactType",
+          "description": "Contact kind (phone/email)."
         },
         "value": {
           "type": "string",
-          "title": "normalized"
+          "description": "Normalized contact value."
         },
         "verified": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the contact has been verified."
         }
       },
       "description": "Contact is a verified means of identifying a person (globally unique)."
@@ -4729,76 +5121,108 @@
     "v1CreateCampaignRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "Campaign to create."
         }
-      }
+      },
+      "description": "CreateCampaignRequest creates a campaign under the caller's tenant/merchant."
     },
     "v1CreateCampaignResponse": {
       "type": "object",
       "properties": {
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "The created campaign."
         }
       }
     },
     "v1CreateGameRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "game": {
-          "$ref": "#/definitions/v1Game"
+          "$ref": "#/definitions/v1Game",
+          "description": "Game definition to create."
         }
-      }
+      },
+      "description": "CreateGameRequest creates a game under the caller's tenant/merchant."
     },
     "v1CreateGameResponse": {
       "type": "object",
       "properties": {
         "game": {
-          "$ref": "#/definitions/v1Game"
+          "$ref": "#/definitions/v1Game",
+          "description": "The created game."
         }
       }
     },
     "v1CreateIntegrationRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "integration": {
-          "$ref": "#/definitions/v1Integration"
+          "$ref": "#/definitions/v1Integration",
+          "description": "Integration to create."
         }
-      }
+      },
+      "description": "CreateIntegrationRequest registers an outbound integration."
     },
     "v1CreateIntegrationResponse": {
       "type": "object",
       "properties": {
         "integration": {
-          "$ref": "#/definitions/v1Integration"
+          "$ref": "#/definitions/v1Integration",
+          "description": "The created integration."
         }
       }
     },
     "v1CreateLeaderboardRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "leaderboard": {
-          "$ref": "#/definitions/v1Leaderboard"
+          "$ref": "#/definitions/v1Leaderboard",
+          "description": "Leaderboard to create."
         }
-      }
+      },
+      "description": "CreateLeaderboardRequest creates a leaderboard under the caller's tenant/merchant."
     },
     "v1CreateLeaderboardResponse": {
       "type": "object",
       "properties": {
         "leaderboard": {
-          "$ref": "#/definitions/v1Leaderboard"
+          "$ref": "#/definitions/v1Leaderboard",
+          "description": "The created leaderboard."
         }
       }
     },
@@ -4806,49 +5230,66 @@
       "type": "object",
       "properties": {
         "merchant": {
-          "$ref": "#/definitions/v1Merchant"
+          "$ref": "#/definitions/v1Merchant",
+          "description": "The created merchant."
         }
       }
     },
     "v1CreatePrizeRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "prize": {
-          "$ref": "#/definitions/v1Prize"
+          "$ref": "#/definitions/v1Prize",
+          "description": "Prize definition to create."
         },
         "game_id": {
           "type": "string",
-          "title": "associates the prize with a game for stock listing"
+          "description": "Game to associate the prize with (for stock listing)."
         }
-      }
+      },
+      "description": "CreatePrizeRequest creates a prize and associates it with a game."
     },
     "v1CreatePrizeResponse": {
       "type": "object",
       "properties": {
         "prize": {
-          "$ref": "#/definitions/v1Prize"
+          "$ref": "#/definitions/v1Prize",
+          "description": "The created prize."
         }
       }
     },
     "v1CreateQuestRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "quest": {
-          "$ref": "#/definitions/v1Quest"
+          "$ref": "#/definitions/v1Quest",
+          "description": "Quest to create."
         }
-      }
+      },
+      "description": "CreateQuestRequest creates a quest under the caller's tenant/merchant."
     },
     "v1CreateQuestResponse": {
       "type": "object",
       "properties": {
         "quest": {
-          "$ref": "#/definitions/v1Quest"
+          "$ref": "#/definitions/v1Quest",
+          "description": "The created quest."
         }
       }
     },
@@ -4856,7 +5297,8 @@
       "type": "object",
       "properties": {
         "tenant": {
-          "$ref": "#/definitions/v1Tenant"
+          "$ref": "#/definitions/v1Tenant",
+          "description": "Tenant to create."
         }
       }
     },
@@ -4864,7 +5306,8 @@
       "type": "object",
       "properties": {
         "tenant": {
-          "$ref": "#/definitions/v1Tenant"
+          "$ref": "#/definitions/v1Tenant",
+          "description": "The created tenant."
         }
       }
     },
@@ -4881,7 +5324,8 @@
       "type": "object",
       "properties": {
         "entry": {
-          "$ref": "#/definitions/v1RankedEntry"
+          "$ref": "#/definitions/v1RankedEntry",
+          "description": "The updated entry."
         }
       }
     },
@@ -4889,30 +5333,40 @@
       "type": "object",
       "properties": {
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "The newly created campaign copy."
         }
       }
     },
     "v1EmitEventRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Event type to emit."
         },
         "payload": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw JSON event payload object."
         }
-      }
+      },
+      "description": "EmitEventRequest manually injects a domain event into the integration hub."
     },
     "v1EmitEventResponse": {
       "type": "object",
       "properties": {
         "dispatched": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Number of integrations the event was delivered to."
         }
       }
     },
@@ -4932,14 +5386,16 @@
       "properties": {
         "awarded": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Number of tier prizes awarded."
         },
         "awards": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1TierAward"
-          }
+          },
+          "description": "The individual tier awards."
         }
       }
     },
@@ -4947,7 +5403,8 @@
       "type": "object",
       "properties": {
         "reward": {
-          "$ref": "#/definitions/v1RewardRecord"
+          "$ref": "#/definitions/v1RewardRecord",
+          "description": "The updated reward record."
         }
       }
     },
@@ -4955,62 +5412,81 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier (globally unique)."
         },
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "reward_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Reward this task delivers."
         },
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize being delivered."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Recipient player."
         },
         "game_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Game the reward was won in."
         },
         "campaign_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Campaign the reward belongs to."
         },
         "channel": {
-          "type": "string"
+          "type": "string",
+          "description": "Delivery channel (e.g. \"webhook\", \"sms\", \"zns\")."
         },
         "channel_config": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON channel configuration."
         },
         "status": {
-          "$ref": "#/definitions/v1TaskStatus"
+          "$ref": "#/definitions/v1TaskStatus",
+          "description": "Task lifecycle state."
         },
         "attempts": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Delivery attempts made so far."
         },
         "max_attempts": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Max attempts before the task is dead-lettered."
         },
         "last_error": {
-          "type": "string"
+          "type": "string",
+          "description": "Last delivery error message."
         },
         "receipt": {
           "type": "string",
-          "description": "raw JSON: voucher code, tracking no., ..."
+          "description": "Raw JSON delivery receipt: voucher code, tracking no., …."
         },
         "next_attempt_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Earliest time to retry (unix seconds)."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
       },
       "description": "FulfillmentTask is one row of the transactional outbox: a unit of delivery\nwork committed atomically with the reward it delivers."
@@ -5019,58 +5495,74 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier (server-assigned on create)."
         },
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "campaign_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Campaign this game belongs to."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable game name."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Registry-driven game type (e.g. \"spin_wheel\", \"scratch_card\")."
         },
         "seed_generator": {
-          "type": "string"
+          "type": "string",
+          "description": "Registry key selecting the seed generator."
         },
         "reward_handler": {
-          "type": "string"
+          "type": "string",
+          "description": "Registry key selecting the reward handler."
         },
         "validator": {
-          "type": "string"
+          "type": "string",
+          "description": "Registry key selecting the play validator (anti-cheat)."
         },
         "status": {
-          "$ref": "#/definitions/v1GameStatus"
+          "$ref": "#/definitions/v1GameStatus",
+          "description": "Lifecycle state."
         },
         "rules": {
-          "$ref": "#/definitions/v1Rules"
+          "$ref": "#/definitions/v1Rules",
+          "description": "Engine-enforced gameplay constraints."
         },
         "handler_config": {
           "type": "string",
-          "title": "raw JSON, decoded by the reward handler/seed"
+          "description": "Raw JSON, decoded by the reward handler/seed; never interpreted by the engine."
         },
         "validator_config": {
           "type": "string",
-          "title": "raw JSON, decoded by the validator (anti-cheat)"
+          "description": "Raw JSON, decoded by the validator (anti-cheat)."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         },
         "wallet_scope": {
           "$ref": "#/definitions/v1WalletScope",
-          "title": "UNSPECIFIED → campaign"
+          "description": "Wallet isolation level for points/milestones (UNSPECIFIED → campaign)."
         },
         "milestones": {
           "type": "string",
-          "title": "raw JSON: milestone config (currency, mode, auto_grant, thresholds)"
+          "description": "Raw JSON milestone config (currency, mode, auto_grant, thresholds)."
         }
       },
       "description": "Game is the config-driven game definition. handler_config is opaque JSON the\nengine never interprets (decoded only by the reward handler/seed). Widget/UI\nrender config is NOT a Core concern — it lives in the presentation layer (BFF)."
@@ -5091,7 +5583,8 @@
       "type": "object",
       "properties": {
         "analytics": {
-          "$ref": "#/definitions/v1CampaignAnalytics"
+          "$ref": "#/definitions/v1CampaignAnalytics",
+          "description": "The campaign analytics."
         }
       }
     },
@@ -5099,7 +5592,8 @@
       "type": "object",
       "properties": {
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "The requested campaign."
         }
       }
     },
@@ -5107,7 +5601,8 @@
       "type": "object",
       "properties": {
         "game": {
-          "$ref": "#/definitions/v1Game"
+          "$ref": "#/definitions/v1Game",
+          "description": "The requested game."
         }
       }
     },
@@ -5119,10 +5614,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1HistoryEntry"
-          }
+          },
+          "description": "Page of history entries (newest first)."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5130,7 +5627,8 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The requested identity."
         }
       }
     },
@@ -5138,7 +5636,8 @@
       "type": "object",
       "properties": {
         "leaderboard": {
-          "$ref": "#/definitions/v1Leaderboard"
+          "$ref": "#/definitions/v1Leaderboard",
+          "description": "The requested leaderboard."
         }
       }
     },
@@ -5150,10 +5649,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1LedgerEntry"
-          }
+          },
+          "description": "Page of ledger entries (newest first)."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5161,7 +5662,8 @@
       "type": "object",
       "properties": {
         "merchant": {
-          "$ref": "#/definitions/v1Merchant"
+          "$ref": "#/definitions/v1Merchant",
+          "description": "The requested merchant."
         }
       }
     },
@@ -5169,21 +5671,25 @@
       "type": "object",
       "properties": {
         "currency": {
-          "type": "string"
+          "type": "string",
+          "description": "Currency the milestones are denominated in."
         },
         "mode": {
-          "$ref": "#/definitions/v1MilestoneMode"
+          "$ref": "#/definitions/v1MilestoneMode",
+          "description": "How the milestone set behaves."
         },
         "balance": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Player's current balance in the currency."
         },
         "milestones": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1MilestoneState"
-          }
+          },
+          "description": "Milestones with the player's progress."
         }
       }
     },
@@ -5191,7 +5697,8 @@
       "type": "object",
       "properties": {
         "prize": {
-          "$ref": "#/definitions/v1Prize"
+          "$ref": "#/definitions/v1Prize",
+          "description": "The requested prize."
         }
       }
     },
@@ -5203,7 +5710,8 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1PrizeSummaryItem"
-          }
+          },
+          "description": "Per-prize summary items."
         }
       }
     },
@@ -5211,10 +5719,12 @@
       "type": "object",
       "properties": {
         "player": {
-          "$ref": "#/definitions/v1Player"
+          "$ref": "#/definitions/v1Player",
+          "description": "The requested player."
         },
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The backing global identity."
         }
       }
     },
@@ -5222,7 +5732,8 @@
       "type": "object",
       "properties": {
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "The public campaign config."
         }
       }
     },
@@ -5230,7 +5741,8 @@
       "type": "object",
       "properties": {
         "quest": {
-          "$ref": "#/definitions/v1Quest"
+          "$ref": "#/definitions/v1Quest",
+          "description": "The requested quest."
         }
       }
     },
@@ -5242,14 +5754,17 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1RankedEntry"
-          }
+          },
+          "description": "Page of ranked entries."
         },
         "total": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total ranked entries."
         },
         "window_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Key identifying the active time window."
         }
       }
     },
@@ -5257,7 +5772,8 @@
       "type": "object",
       "properties": {
         "task": {
-          "$ref": "#/definitions/v1FulfillmentTask"
+          "$ref": "#/definitions/v1FulfillmentTask",
+          "description": "The requested task."
         }
       }
     },
@@ -5265,7 +5781,8 @@
       "type": "object",
       "properties": {
         "tenant": {
-          "$ref": "#/definitions/v1Tenant"
+          "$ref": "#/definitions/v1Tenant",
+          "description": "The requested tenant."
         }
       }
     },
@@ -5274,10 +5791,12 @@
       "properties": {
         "balance": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Current turn balance."
         },
         "scope_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Scope key the balance is keyed by."
         }
       }
     },
@@ -5289,7 +5808,8 @@
           "additionalProperties": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Balances keyed by currency."
         }
       }
     },
@@ -5298,7 +5818,8 @@
       "properties": {
         "balance": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Resulting turn balance."
         }
       }
     },
@@ -5306,92 +5827,112 @@
       "type": "object",
       "properties": {
         "play_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Play id."
         },
         "game_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Game the play was on."
         },
         "rewards": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON rewards won."
         },
         "metadata": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON play metadata."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Play time (unix seconds)."
         }
-      }
+      },
+      "description": "HistoryEntry is one past play."
     },
     "v1Identity": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "contacts": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Contact"
-          }
+          },
+          "description": "Verified contacts linked to this person."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
-      }
+      },
+      "description": "Identity is a global person, independent of any tenant."
     },
     "v1ImportCodesResponse": {
       "type": "object",
       "properties": {
         "imported": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Number of codes imported."
         }
       }
     },
     "v1Integration": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
-        },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "type": {
-          "$ref": "#/definitions/v1IntegrationType"
+          "$ref": "#/definitions/v1IntegrationType",
+          "description": "Outbound adapter kind."
         },
         "campaign_id": {
           "type": "string",
-          "title": "optional: \"\" = all campaigns in scope"
+          "description": "Campaign filter (\"\" = all campaigns in scope)."
         },
         "events": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "subscribed event types (play_completed, prize_won, ...)"
+          "description": "Subscribed event types (play_completed, prize_won, …)."
         },
         "config": {
           "type": "string",
-          "title": "JSON: { url, hmac_secret, sheet_id, ... } (adapter-specific)"
+          "description": "Raw JSON adapter config: {url, hmac_secret, sheet_id, …}."
         },
         "status": {
-          "$ref": "#/definitions/v1IntegrationStatus"
+          "$ref": "#/definitions/v1IntegrationStatus",
+          "description": "Whether the integration is firing."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         }
-      }
+      },
+      "description": "Integration is an outbound adapter fired on subscribed domain events."
     },
     "v1IntegrationStatus": {
       "type": "string",
@@ -5421,42 +5962,54 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "tenant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning tenant."
         },
         "merchant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning merchant within the tenant."
         },
         "campaign_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Campaign this leaderboard belongs to."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable leaderboard name."
         },
         "metric": {
-          "$ref": "#/definitions/v1LeaderboardMetric"
+          "$ref": "#/definitions/v1LeaderboardMetric",
+          "description": "Score the leaderboard ranks by."
         },
         "time_window": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw JSON time window: {type, period, start, end}."
         },
         "prize_tiers": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw JSON prize tiers: [{from_rank, to_rank, prize_id}]."
         },
         "anti_cheat": {
-          "type": "string"
+          "type": "string",
+          "description": "Raw JSON anti-cheat config: {score_ceiling, flag_outliers}."
         },
         "status": {
-          "$ref": "#/definitions/v1LeaderboardStatus"
+          "$ref": "#/definitions/v1LeaderboardStatus",
+          "description": "Lifecycle state."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
       },
       "description": "Leaderboard config. time_window/prize_tiers/anti_cheat are raw JSON (decoded\nby the hosting layer): time_window={type,period,start,end},\nprize_tiers=[{from_rank,to_rank,prize_id}], anti_cheat={score_ceiling,flag_outliers}."
@@ -5489,27 +6042,33 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "currency": {
-          "type": "string"
+          "type": "string",
+          "description": "Currency code the entry is in."
         },
         "amount": {
           "type": "string",
           "format": "int64",
-          "title": "signed: + earn, - spend"
+          "description": "Signed amount: + earn, - spend."
         },
         "reason": {
-          "$ref": "#/definitions/v1LedgerReason"
+          "$ref": "#/definitions/v1LedgerReason",
+          "description": "Why the entry was written."
         },
         "ref_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Reference id (play, redemption, …)."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Entry time (unix seconds)."
         }
-      }
+      },
+      "description": "LedgerEntry is one signed movement in a player's points wallet."
     },
     "v1LedgerReason": {
       "type": "string",
@@ -5526,7 +6085,8 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The updated identity."
         }
       }
     },
@@ -5538,10 +6098,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Campaign"
-          }
+          },
+          "description": "Page of campaigns."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5553,10 +6115,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Integration"
-          }
+          },
+          "description": "Page of integrations."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5568,10 +6132,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Leaderboard"
-          }
+          },
+          "description": "Page of leaderboards."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5583,10 +6149,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Merchant"
-          }
+          },
+          "description": "Page of merchants."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5598,7 +6166,8 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1QuestState"
-          }
+          },
+          "description": "Quests with the player's completion status."
         }
       }
     },
@@ -5610,7 +6179,8 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Prize"
-          }
+          },
+          "description": "Prizes associated with the game."
         }
       }
     },
@@ -5622,10 +6192,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Quest"
-          }
+          },
+          "description": "Page of quests."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5637,10 +6209,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1RewardRecord"
-          }
+          },
+          "description": "Page of reward records (newest first)."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5652,10 +6226,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1FulfillmentTask"
-          }
+          },
+          "description": "Page of fulfillment tasks."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5667,10 +6243,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Tenant"
-          }
+          },
+          "description": "Page of tenants."
         },
         "next_cursor": {
-          "type": "string"
+          "type": "string",
+          "description": "Cursor for the next page (\"\" when exhausted)."
         }
       }
     },
@@ -5678,30 +6256,37 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "tenant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning tenant."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable merchant name."
         },
         "logo": {
-          "type": "string"
+          "type": "string",
+          "description": "Logo image URL."
         },
         "settings": {
           "type": "string",
-          "title": "raw JSON: {wallet_scope_override}"
+          "description": "Raw JSON settings: {wallet_scope_override}."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
-      }
+      },
+      "description": "Merchant is a brand/store under a tenant."
     },
     "v1MilestoneMode": {
       "type": "string",
@@ -5717,27 +6302,34 @@
       "type": "object",
       "properties": {
         "milestone_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Milestone id."
         },
         "threshold": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Points threshold to unlock."
         },
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize granted at the threshold."
         },
         "status": {
-          "$ref": "#/definitions/v1MilestoneStatus"
+          "$ref": "#/definitions/v1MilestoneStatus",
+          "description": "Progress state for the player."
         },
         "progress": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Current progress toward the threshold."
         },
         "remaining": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Points remaining to the threshold."
         }
-      }
+      },
+      "description": "MilestoneState is a milestone plus the caller's progress toward it."
     },
     "v1MilestoneStatus": {
       "type": "string",
@@ -5754,17 +6346,20 @@
       "type": "object",
       "properties": {
         "play_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Durable id of this play."
         },
         "rewards": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Reward"
-          }
+          },
+          "description": "Rewards won on this play (may be empty)."
         },
         "metadata": {
-          "type": "object"
+          "type": "object",
+          "description": "Shape-specific result metadata."
         }
       }
     },
@@ -5772,72 +6367,91 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "tenant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning tenant."
         },
         "merchant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning merchant within the tenant."
         },
         "identity_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Backing global identity."
         },
         "profile": {
           "type": "string",
-          "title": "raw JSON (collected fields)"
+          "description": "Raw JSON profile (collected fields)."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
-      }
+      },
+      "description": "Player is a tenant-scoped projection of a global identity."
     },
     "v1Prize": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier (server-assigned on create)."
         },
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable prize name."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Registry-driven prize type (e.g. \"voucher\", \"physical\", \"points\")."
         },
         "image": {
-          "type": "string"
+          "type": "string",
+          "description": "Display image URL."
         },
         "value": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Nominal value (currency minor units or points), for display/tiering."
         },
         "total": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total stock minted."
         },
         "remaining": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Stock still available to award."
         },
         "metadata": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON, adapter/display-specific metadata."
         },
         "award_constraints": {
           "type": "string",
-          "title": "raw JSON: {max_per_user, max_per_day}"
+          "description": "Raw JSON award limits: {max_per_user, max_per_day}."
         },
         "fulfillment": {
           "type": "string",
-          "title": "raw JSON: {redemption_mode, method}"
+          "description": "Raw JSON fulfillment policy: {redemption_mode, method}."
         }
       },
       "description": "Prize is an awardable item with finite stock."
@@ -5846,67 +6460,84 @@
       "type": "object",
       "properties": {
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize id."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize name."
         },
         "total": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Total stock minted."
         },
         "remaining": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Stock still available."
         },
         "awarded": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Units already awarded."
         },
         "codes_available": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Redemption codes still available in the pool."
         }
-      }
+      },
+      "description": "PrizeSummaryItem is per-prize stock/award counts for a game."
     },
     "v1Quest": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "tenant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning tenant."
         },
         "merchant_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Owning merchant within the tenant."
         },
         "campaign_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Campaign this quest belongs to."
         },
         "type": {
-          "$ref": "#/definitions/v1QuestType"
+          "$ref": "#/definitions/v1QuestType",
+          "description": "Quest type selecting the verifier."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable quest name."
         },
         "status": {
-          "$ref": "#/definitions/v1QuestStatus"
+          "$ref": "#/definitions/v1QuestStatus",
+          "description": "Whether the quest is live."
         },
         "reward": {
-          "$ref": "#/definitions/v1QuestReward"
+          "$ref": "#/definitions/v1QuestReward",
+          "description": "Reward granted on completion."
         },
         "config": {
           "type": "string",
-          "title": "raw JSON"
+          "description": "Raw JSON, verifier-specific config."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
       },
       "description": "Quest is an admin-configured mission under a campaign. config is verifier-\nspecific raw JSON (decoded only by the matching quest-type verifier)."
@@ -5915,14 +6546,16 @@
       "type": "object",
       "properties": {
         "type": {
-          "$ref": "#/definitions/v1QuestRewardType"
+          "$ref": "#/definitions/v1QuestRewardType",
+          "description": "Reward kind."
         },
         "quantity": {
           "type": "string",
           "format": "int64",
-          "title": "turns granted on completion"
+          "description": "Turns granted on completion."
         }
-      }
+      },
+      "description": "QuestReward is what a quest grants on completion."
     },
     "v1QuestRewardType": {
       "type": "string",
@@ -5937,20 +6570,22 @@
       "type": "object",
       "properties": {
         "quest": {
-          "$ref": "#/definitions/v1Quest"
+          "$ref": "#/definitions/v1Quest",
+          "description": "The quest definition."
         },
         "completed": {
           "type": "boolean",
-          "title": "ever completed (daily: today)"
+          "description": "Whether ever completed (for daily quests: today)."
         },
         "completions": {
           "type": "integer",
           "format": "int32",
-          "title": "lifetime count"
+          "description": "Lifetime completion count."
         },
         "last_completed": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last completion time (unix seconds)."
         }
       },
       "description": "QuestState is a quest plus the caller's completion status (player list)."
@@ -5984,22 +6619,27 @@
       "type": "object",
       "properties": {
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player the entry belongs to."
         },
         "score": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Ranking score."
         },
         "plays": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Plays contributing to the score."
         },
         "rank": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "1-based rank."
         },
         "state": {
-          "$ref": "#/definitions/v1EntryState"
+          "$ref": "#/definitions/v1EntryState",
+          "description": "Entry standing (active/flagged/disqualified)."
         }
       },
       "description": "RankedEntry is one player's standing (player list / rankings)."
@@ -6008,27 +6648,32 @@
       "type": "object",
       "properties": {
         "redeemed": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the redemption succeeded."
         },
         "mode": {
-          "$ref": "#/definitions/v1MilestoneMode"
+          "$ref": "#/definitions/v1MilestoneMode",
+          "description": "Milestone mode that governed the redemption."
         },
         "spent": {
           "type": "object",
           "additionalProperties": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Amounts spent, keyed by currency."
         },
         "reward": {
-          "$ref": "#/definitions/v1Reward"
+          "$ref": "#/definitions/v1Reward",
+          "description": "Reward granted, if any."
         },
         "balances": {
           "type": "object",
           "additionalProperties": {
             "type": "string",
             "format": "int64"
-          }
+          },
+          "description": "Resulting balances, keyed by currency."
         }
       }
     },
@@ -6036,7 +6681,8 @@
       "type": "object",
       "properties": {
         "task": {
-          "$ref": "#/definitions/v1FulfillmentTask"
+          "$ref": "#/definitions/v1FulfillmentTask",
+          "description": "The finalized task."
         }
       }
     },
@@ -6045,7 +6691,8 @@
       "properties": {
         "cleared": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Number of entries cleared."
         }
       }
     },
@@ -6053,7 +6700,8 @@
       "type": "object",
       "properties": {
         "contact": {
-          "$ref": "#/definitions/v1Contact"
+          "$ref": "#/definitions/v1Contact",
+          "description": "Verified contact to resolve."
         }
       },
       "description": "ResolveOrCreate takes a VERIFIED contact and returns the identity (created if\nnew). The hosting auth layer calls this after a provider verifies the contact."
@@ -6062,26 +6710,33 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The resolved or newly created identity."
         },
         "created": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the identity was newly created."
         }
       }
     },
     "v1ResolvePlayerRequest": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/definitions/v1Scope",
-          "title": "tenant_id (+ optional merchant_id)"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key (required)."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant (optional)."
         },
         "contact_type": {
-          "$ref": "#/definitions/v1ContactType"
+          "$ref": "#/definitions/v1ContactType",
+          "description": "Verified contact kind."
         },
         "contact_value": {
           "type": "string",
-          "title": "raw; normalized server-side"
+          "description": "Raw contact value; normalized server-side."
         }
       },
       "description": "ResolvePlayer is the business operation behind login: given a VERIFIED contact\n(the caller — a BFF — has already authenticated it), resolve-or-create the\nglobal identity and upsert the tenant-scoped player. Authentication itself\n(challenge issue/verify, token minting) is NOT Core's concern; it lives in the\nBFF, which calls this after a successful verification."
@@ -6090,16 +6745,20 @@
       "type": "object",
       "properties": {
         "player": {
-          "$ref": "#/definitions/v1Player"
+          "$ref": "#/definitions/v1Player",
+          "description": "The resolved or created player."
         },
         "identity": {
-          "$ref": "#/definitions/v1Identity"
+          "$ref": "#/definitions/v1Identity",
+          "description": "The backing global identity."
         },
         "identity_is_new": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the identity was newly created."
         },
         "player_is_new": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the player was newly created."
         }
       }
     },
@@ -6107,7 +6766,8 @@
       "type": "object",
       "properties": {
         "task": {
-          "$ref": "#/definitions/v1FulfillmentTask"
+          "$ref": "#/definitions/v1FulfillmentTask",
+          "description": "The updated task."
         }
       }
     },
@@ -6115,7 +6775,8 @@
       "type": "object",
       "properties": {
         "reward": {
-          "$ref": "#/definitions/v1RewardRecord"
+          "$ref": "#/definitions/v1RewardRecord",
+          "description": "The updated reward record."
         }
       }
     },
@@ -6123,32 +6784,38 @@
       "type": "object",
       "properties": {
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize that was awarded."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize name for display."
         },
         "image": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize image URL for display."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize type."
         },
         "quantity": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Number of units awarded."
         },
         "value": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Nominal value for display."
         },
         "reward_id": {
           "type": "string",
-          "title": "durable reward record id (for claim)"
+          "description": "Durable reward record id (used to claim)."
         },
         "code": {
           "type": "string",
-          "title": "assigned voucher code, if any"
+          "description": "Assigned voucher code, if any."
         }
       },
       "description": "Reward is a single awarded item in a play result."
@@ -6157,54 +6824,73 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
-        "scope": {
-          "$ref": "#/definitions/v1Scope"
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant isolation key."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant isolation key within the tenant."
         },
         "game_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Game the reward was won in."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player who won the reward."
         },
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize that was awarded."
         },
         "play_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Play that produced the reward."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize name snapshot at award time."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize type snapshot at award time."
         },
         "value": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Prize value snapshot at award time."
         },
         "code": {
-          "type": "string"
+          "type": "string",
+          "description": "Assigned voucher/redemption code, if any."
         },
         "status": {
-          "$ref": "#/definitions/v1RewardStatus"
+          "$ref": "#/definitions/v1RewardStatus",
+          "description": "Reward lifecycle state."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Won time (unix seconds)."
         },
         "claimed_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Claimed time (unix seconds; 0 if unclaimed)."
         },
         "fulfilled_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Fulfilled time (unix seconds; 0 if unfulfilled)."
         },
         "revoked_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Revoked time (unix seconds; 0 if not revoked)."
         }
       },
       "description": "RewardRecord is a durable record that a player won one unit of a prize."
@@ -6226,55 +6912,50 @@
       "properties": {
         "max_plays_per_user": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Lifetime play cap per player (0 = unlimited)."
         },
         "max_plays_per_day": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Per-day play cap per player (0 = unlimited)."
         },
         "require_login": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Require an authenticated player to start a game."
         },
         "start_date": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Unix seconds; plays before this are rejected (0 = no lower bound)."
         },
         "end_date": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Unix seconds; plays after this are rejected (0 = no upper bound)."
         },
         "use_turns": {
           "type": "boolean",
-          "title": "gate on quest-granted turn balance (keyed by campaign)"
+          "description": "Gate plays on the player's quest-granted turn balance (keyed by campaign)."
         }
       },
       "description": "Rules are engine-enforced gameplay constraints."
-    },
-    "v1Scope": {
-      "type": "object",
-      "properties": {
-        "tenant_id": {
-          "type": "string"
-        },
-        "merchant_id": {
-          "type": "string"
-        }
-      },
-      "description": "Scope is the tenant/merchant isolation boundary on every request."
     },
     "v1StartGameResponse": {
       "type": "object",
       "properties": {
         "session_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Opaque session id to pass to Play."
         },
         "seed_data": {
           "type": "string",
-          "title": "raw JSON, may be empty"
+          "description": "Raw JSON seed data for the client (may be empty)."
         },
         "expires_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Session expiry (unix seconds)."
         }
       }
     },
@@ -6295,51 +6976,63 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Stable unique identifier."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Human-readable tenant name."
         },
         "plan": {
-          "type": "string"
+          "type": "string",
+          "description": "Subscription plan key."
         },
         "settings": {
           "type": "string",
-          "title": "raw JSON: {identity_linking, default_locale, wallet_scope}"
+          "description": "Raw JSON settings: {identity_linking, default_locale, wallet_scope}."
         },
         "created_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation time (unix seconds)."
         },
         "updated_at": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update time (unix seconds)."
         }
-      }
+      },
+      "description": "Tenant is a top-level customer of the platform."
     },
     "v1TierAward": {
       "type": "object",
       "properties": {
         "rank": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Awarded rank."
         },
         "player_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Player at that rank."
         },
         "prize_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Prize awarded."
         },
         "reward_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Resulting durable reward record id."
         }
-      }
+      },
+      "description": "TierAward records a prize awarded to a rank on finalization."
     },
     "v1UpdateCampaignResponse": {
       "type": "object",
       "properties": {
         "campaign": {
-          "$ref": "#/definitions/v1Campaign"
+          "$ref": "#/definitions/v1Campaign",
+          "description": "The updated campaign."
         }
       }
     },
@@ -6347,7 +7040,8 @@
       "type": "object",
       "properties": {
         "leaderboard": {
-          "$ref": "#/definitions/v1Leaderboard"
+          "$ref": "#/definitions/v1Leaderboard",
+          "description": "The updated leaderboard."
         }
       }
     },
@@ -6355,7 +7049,8 @@
       "type": "object",
       "properties": {
         "merchant": {
-          "$ref": "#/definitions/v1Merchant"
+          "$ref": "#/definitions/v1Merchant",
+          "description": "The updated merchant."
         }
       }
     },
@@ -6363,7 +7058,8 @@
       "type": "object",
       "properties": {
         "prize": {
-          "$ref": "#/definitions/v1Prize"
+          "$ref": "#/definitions/v1Prize",
+          "description": "The updated prize."
         }
       }
     },
@@ -6371,7 +7067,8 @@
       "type": "object",
       "properties": {
         "player": {
-          "$ref": "#/definitions/v1Player"
+          "$ref": "#/definitions/v1Player",
+          "description": "The updated player."
         }
       }
     },
@@ -6379,7 +7076,8 @@
       "type": "object",
       "properties": {
         "quest": {
-          "$ref": "#/definitions/v1Quest"
+          "$ref": "#/definitions/v1Quest",
+          "description": "The updated quest."
         }
       }
     },
@@ -6387,7 +7085,8 @@
       "type": "object",
       "properties": {
         "tenant": {
-          "$ref": "#/definitions/v1Tenant"
+          "$ref": "#/definitions/v1Tenant",
+          "description": "The updated tenant."
         }
       }
     },

@@ -22,7 +22,7 @@ func (s *Server) CreateLeaderboard(ctx context.Context, req *gamev1.CreateLeader
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -37,7 +37,7 @@ func (s *Server) GetLeaderboard(ctx context.Context, req *gamev1.GetLeaderboardR
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	lb, err := s.lb.Get(ctx, scope.TenantID, scope.MerchantID, req.GetLeaderboardId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -49,7 +49,7 @@ func (s *Server) UpdateLeaderboard(ctx context.Context, req *gamev1.UpdateLeader
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	if scope.TenantID == "" || scope.MerchantID == "" {
 		return nil, s.fail(gkerr.New(gkerr.ReasonValidationFailed, "tenant_id and merchant_id are required"))
 	}
@@ -64,7 +64,7 @@ func (s *Server) ListLeaderboards(ctx context.Context, req *gamev1.ListLeaderboa
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	lbs, next, err := s.lb.List(ctx, scope.TenantID, scope.MerchantID, req.GetCampaignId(), int(req.GetLimit()), req.GetCursor())
 	if err != nil {
 		return nil, s.fail(err)
@@ -80,7 +80,7 @@ func (s *Server) FinalizeLeaderboard(ctx context.Context, req *gamev1.FinalizeLe
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	awards, err := s.lb.Finalize(ctx, scope, req.GetLeaderboardId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -100,7 +100,7 @@ func (s *Server) ResetLeaderboard(ctx context.Context, req *gamev1.ResetLeaderbo
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	n, err := s.lb.Reset(ctx, scope, req.GetLeaderboardId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -112,7 +112,7 @@ func (s *Server) DisqualifyEntry(ctx context.Context, req *gamev1.DisqualifyEntr
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	e, err := s.lb.Disqualify(ctx, scope, req.GetLeaderboardId(), req.GetPlayerId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -124,7 +124,7 @@ func (s *Server) AdjustEntry(ctx context.Context, req *gamev1.AdjustEntryRequest
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	e, err := s.lb.Adjust(ctx, scope, req.GetLeaderboardId(), req.GetPlayerId(), req.GetDelta())
 	if err != nil {
 		return nil, s.fail(err)
@@ -136,7 +136,7 @@ func (s *Server) GetRankings(ctx context.Context, req *gamev1.GetRankingsRequest
 	if err := s.lbReady(); err != nil {
 		return nil, err
 	}
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	entries, total, wk, err := s.lb.Rankings(ctx, scope, req.GetLeaderboardId(), int(req.GetLimit()), int(req.GetOffset()))
 	if err != nil {
 		return nil, s.fail(err)

@@ -21,7 +21,7 @@ const (
 
 // ListTasks returns outbox tasks for admin review (filter status/campaign/prize).
 func (s *Server) ListTasks(ctx context.Context, req *gamev1.ListTasksRequest) (*gamev1.ListTasksResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	tasks, next, err := s.store.ListTasks(ctx, scope, sqlstore.TaskFilter{
 		Status: string(domTaskStatus(req.GetStatus())), CampaignID: req.GetCampaignId(), PrizeID: req.GetPrizeId(),
 	}, int(req.GetLimit()), req.GetCursor())
@@ -37,7 +37,7 @@ func (s *Server) ListTasks(ctx context.Context, req *gamev1.ListTasksRequest) (*
 
 // GetTask returns one task by id within scope.
 func (s *Server) GetTask(ctx context.Context, req *gamev1.GetTaskRequest) (*gamev1.GetTaskResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	t, err := s.store.GetTask(ctx, scope, req.GetTaskId())
 	if err != nil {
 		return nil, s.fail(err)
@@ -47,7 +47,7 @@ func (s *Server) GetTask(ctx context.Context, req *gamev1.GetTaskRequest) (*game
 
 // RetryTask re-arms a failed or dead task for the dispatcher.
 func (s *Server) RetryTask(ctx context.Context, req *gamev1.RetryTaskRequest) (*gamev1.RetryTaskResponse, error) {
-	scope := scopeFromProto(req.GetScope())
+	scope := scopeFromProto(req)
 	t, err := s.store.RetryTask(ctx, scope, req.GetTaskId())
 	if err != nil {
 		return nil, s.fail(err)

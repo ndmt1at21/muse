@@ -60,3 +60,28 @@ def envProps(dataSchema):
       else . end
     )
   )
+# Timestamp fields are int64 unix-seconds, which protoc-gen-openapiv2 documents as
+# { type: string, format: int64 } (matching proto3 JSON). The gateway re-emits them
+# as JSON numbers (see restgw.numberizeTimestamps), so document them as integers.
+# Only time fields (*_at, *_date, last_completed) are converted; other int64 values
+# stay strings, matching the wire.
+| .definitions |= map_values(
+    if type == "object" and has("properties") then
+      .properties |= with_entries(
+        if (.key | (test("(_at|_date)$") or . == "last_completed"))
+           and (.value.type? == "string") and (.value.format? == "int64")
+        then .value.type = "integer"
+        else . end
+      )
+    else . end
+  )
+| .paths |= map_values(map_values(
+    if type == "object" and has("parameters") then
+      .parameters |= map(
+        if (.name? | (test("(_at|_date)$") or . == "last_completed"))
+           and (.type? == "string") and (.format? == "int64")
+        then .type = "integer"
+        else . end
+      )
+    else . end
+  ))

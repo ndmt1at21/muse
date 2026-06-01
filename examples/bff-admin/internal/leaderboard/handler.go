@@ -67,7 +67,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.CreateLeaderboard(ctx, &gamev1.CreateLeaderboardRequest{
-		Scope: coreclient.Scope(tenant, merchant), Leaderboard: body.toProto(""),
+		TenantId: tenant, MerchantId: merchant, Leaderboard: body.toProto(""),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -81,7 +81,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.ListLeaderboards(ctx, &gamev1.ListLeaderboardsRequest{
-		Scope:      coreclient.Scope(tenant, merchant),
+		TenantId:      tenant, MerchantId: merchant,
 		CampaignId: r.URL.Query().Get("campaignId"),
 		Limit:      int32(parseLimit(r.URL.Query().Get("limit"))),
 		Cursor:     r.URL.Query().Get("cursor"),
@@ -107,7 +107,7 @@ func (h *Handler) update(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.UpdateLeaderboard(ctx, &gamev1.UpdateLeaderboardRequest{
-		Scope: coreclient.Scope(tenant, merchant), Leaderboard: body.toProto(chi.URLParam(r, "lbId")),
+		TenantId: tenant, MerchantId: merchant, Leaderboard: body.toProto(chi.URLParam(r, "lbId")),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -121,7 +121,7 @@ func (h *Handler) finalize(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.FinalizeLeaderboard(ctx, &gamev1.FinalizeLeaderboardRequest{
-		Scope: coreclient.Scope(tenant, merchant), LeaderboardId: chi.URLParam(r, "lbId"),
+		TenantId: tenant, MerchantId: merchant, LeaderboardId: chi.URLParam(r, "lbId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -141,7 +141,7 @@ func (h *Handler) reset(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.ResetLeaderboard(ctx, &gamev1.ResetLeaderboardRequest{
-		Scope: coreclient.Scope(tenant, merchant), LeaderboardId: chi.URLParam(r, "lbId"),
+		TenantId: tenant, MerchantId: merchant, LeaderboardId: chi.URLParam(r, "lbId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -155,7 +155,7 @@ func (h *Handler) disqualify(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.DisqualifyEntry(ctx, &gamev1.DisqualifyEntryRequest{
-		Scope: coreclient.Scope(tenant, merchant), LeaderboardId: chi.URLParam(r, "lbId"), PlayerId: chi.URLParam(r, "playerId"),
+		TenantId: tenant, MerchantId: merchant, LeaderboardId: chi.URLParam(r, "lbId"), PlayerId: chi.URLParam(r, "playerId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)
@@ -176,7 +176,7 @@ func (h *Handler) adjust(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Leaderboard.AdjustEntry(ctx, &gamev1.AdjustEntryRequest{
-		Scope: coreclient.Scope(tenant, merchant), LeaderboardId: chi.URLParam(r, "lbId"),
+		TenantId: tenant, MerchantId: merchant, LeaderboardId: chi.URLParam(r, "lbId"),
 		PlayerId: chi.URLParam(r, "playerId"), Delta: body.Delta,
 	})
 	if err != nil {

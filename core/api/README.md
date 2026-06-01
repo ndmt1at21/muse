@@ -31,5 +31,6 @@ JSON by hand — change the proto / jq and run `make generate`.
   `expires_at`, …) is an `int64` **unix timestamp in seconds**; `0` means unset.
   Per proto3 JSON, Core's direct REST encodes int64 as a quoted string
   (`"created_at": "1717200000"`); the reference BFFs re-emit it as a JSON number.
-- **Scope & auth** — Core is auth-agnostic; `scope.tenant_id` / `scope.merchant_id`
-  are ordinary request fields, not security schemes.
+- **Tenancy & auth** — Core is auth-agnostic; `tenant_id` / `merchant_id` are
+  flat top-level request fields (never a nested `scope` object), not security
+  schemes.

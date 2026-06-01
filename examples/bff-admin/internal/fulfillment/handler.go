@@ -52,7 +52,7 @@ func (h *Handler) listTasks(w http.ResponseWriter, r *http.Request) {
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	q := r.URL.Query()
 	resp, err := h.core.Fulfillment.ListTasks(ctx, &gamev1.ListTasksRequest{
-		Scope:      coreclient.Scope(tenant, merchant),
+		TenantId:      tenant, MerchantId: merchant,
 		Status:     enumx.Parse[gamev1.TaskStatus](q.Get("status"), gamev1.TaskStatus_value),
 		CampaignId: q.Get("campaign_id"),
 		PrizeId:    q.Get("prize_id"),
@@ -81,7 +81,7 @@ func (h *Handler) retryTask(w http.ResponseWriter, r *http.Request) {
 	tenant, merchant := auth.Scope(r)
 	ctx := coreclient.WithTrace(r.Context(), tid)
 	resp, err := h.core.Fulfillment.RetryTask(ctx, &gamev1.RetryTaskRequest{
-		Scope: coreclient.Scope(tenant, merchant), TaskId: chi.URLParam(r, "taskId"),
+		TenantId: tenant, MerchantId: merchant, TaskId: chi.URLParam(r, "taskId"),
 	})
 	if err != nil {
 		envelope.WriteError(w, tid, err)

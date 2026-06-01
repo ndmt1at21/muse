@@ -11,11 +11,13 @@
 package restgw
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/muse/pkg/envelope"
@@ -25,6 +27,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 const (
@@ -89,8 +92,93 @@ func successRewriter(m *runtime.JSONPb) func(context.Context, proto.Message) (an
 		if err != nil {
 			return nil, err
 		}
+		data = numberizeTimestamps(resp, data)
 		return envelope.Success(traceFromCtx(ctx), json.RawMessage(data)), nil
 	}
+}
+
+// numberizeTimestamps rewrites protojson output so unix-timestamp fields — which
+// the proto3 JSON spec forces protojson to encode as quoted strings (e.g.
+// "created_at": "1717200000") — are emitted as JSON numbers instead
+// ("created_at": 1717200000). Only timestamp fields are touched; other int64
+// values (counts, balances, scores) stay as strings, which is fine. The walk is
+// guided by proto reflection, so enums (rendered as names), string ids, and
+// google.protobuf.Struct payloads are left untouched. Returns data unchanged on
+// any decode/encode error.
+func numberizeTimestamps(resp proto.Message, data []byte) []byte {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	var tree any
+	if err := dec.Decode(&tree); err != nil {
+		return data
+	}
+	tree = fixMessage(resp.ProtoReflect().Descriptor(), tree)
+
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false) // preserve <, >, & inside raw-JSON (Struct) payloads
+	if err := enc.Encode(tree); err != nil {
+		return data
+	}
+	return bytes.TrimRight(buf.Bytes(), "\n")
+}
+
+// fixMessage walks the decoded JSON object of a message, converting timestamp
+// leaves to numbers and recursing into nested/repeated messages.
+func fixMessage(md protoreflect.MessageDescriptor, node any) any {
+	obj, ok := node.(map[string]any)
+	if !ok {
+		return node
+	}
+	fields := md.Fields()
+	for i := 0; i < fields.Len(); i++ {
+		fd := fields.Get(i)
+		key := string(fd.Name()) // gateway marshals with UseProtoNames
+		v, present := obj[key]
+		if !present {
+			continue
+		}
+		switch {
+		case isTimestampField(fd):
+			obj[key] = toNumber(v)
+		case fd.Kind() == protoreflect.MessageKind && !isWellKnown(fd.Message()):
+			if fd.IsList() {
+				if arr, ok := v.([]any); ok {
+					for i, e := range arr {
+						arr[i] = fixMessage(fd.Message(), e)
+					}
+				}
+			} else if !fd.IsMap() {
+				obj[key] = fixMessage(fd.Message(), v)
+			}
+		}
+	}
+	return obj
+}
+
+// isTimestampField reports whether fd is one of Core's int64 unix-timestamp
+// fields (created_at, updated_at, *_at, *_date, last_completed). These are all
+// plain int64 scalars; counts/balances/scores share the type but are not times.
+func isTimestampField(fd protoreflect.FieldDescriptor) bool {
+	if fd.Kind() != protoreflect.Int64Kind || fd.IsList() || fd.IsMap() {
+		return false
+	}
+	n := string(fd.Name())
+	return strings.HasSuffix(n, "_at") || strings.HasSuffix(n, "_date") || n == "last_completed"
+}
+
+// toNumber turns protojson's quoted int64 string into an unquoted JSON number.
+func toNumber(v any) any {
+	if s, ok := v.(string); ok {
+		return json.Number(s)
+	}
+	return v
+}
+
+// isWellKnown reports whether md is a google.protobuf.* type (Struct, Value, …),
+// whose JSON shape does not follow its field descriptors and must not be walked.
+func isWellKnown(md protoreflect.MessageDescriptor) bool {
+	return strings.HasPrefix(string(md.FullName()), "google.protobuf.")
 }
 
 // errorHandler renders any gRPC status from Core as the error envelope.

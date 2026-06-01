@@ -65,8 +65,3 @@ func WithTrace(ctx context.Context, traceID string) context.Context {
 	}
 	return metadata.AppendToOutgoingContext(ctx, "x-trace-id", traceID)
 }
-
-// Scope builds a proto Scope from tenant/merchant ids.
-func Scope(tenantID, merchantID string) *gamev1.Scope {
-	return &gamev1.Scope{TenantId: tenantID, MerchantId: merchantID}
-}
